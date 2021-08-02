@@ -1,4 +1,13 @@
-// utils.asm
+////////////////////////////////////////////////////////////////////////////////
+//
+// Project   : ForestSaver - https://github.com/intoinside/ForestSaver
+// Target    : Commodore 64
+// Author    : Raffaele Intorcia - raffaele.intorcia@gmail.com
+//
+// Some useful routine.
+//
+////////////////////////////////////////////////////////////////////////////////
+
 
 // Fill screen with $20 char (preserve sprite pointer memory area)
 ClearScreen: {

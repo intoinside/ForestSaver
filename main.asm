@@ -1,4 +1,12 @@
-// main.asm
+////////////////////////////////////////////////////////////////////////////////
+//
+// Project   : ForestSaver - https://github.com/intoinside/ForestSaver
+// Target    : Commodore 64
+// Author    : Raffaele Intorcia - raffaele.intorcia@gmail.com
+//
+// Main source code. Game initialization and main loop container.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 BasicUpstart2(Entry)
 
