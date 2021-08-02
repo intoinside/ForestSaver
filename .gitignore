@@ -1,0 +1,7 @@
+*.gitignore
+bak/*
+bin/*
+*.dmp
+*.prg
+*.tmp
+*.sublime-*
