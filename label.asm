@@ -9,8 +9,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 VIC: {
-	.label BORDER_COLOR			= $d020
-	.label BACKGROUND_COLOR		= $d021
+  .label BORDER_COLOR       = $d020
+  .label BACKGROUND_COLOR   = $d021
+}
 
-	.label SCREEN_RAM			= $0400
+CIA: {
+  .label PORT_A             = $dd00
 }

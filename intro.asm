@@ -9,18 +9,20 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Manager of intro screen
+* = * "Intro IntroManager"
 IntroManager: {
-		jsr Init
-		jsr ClearScreen
+    jsr Init
+    jsr ClearScreen
 
-		rts
+    rts
 }
 
 // Initialization of intro screen
+* = * "Intro Init"
 Init: {
-		lda #$00
-		sta VIC.BORDER_COLOR
-		sta VIC.BACKGROUND_COLOR
+    lda #$00
+    sta VIC.BORDER_COLOR
+    sta VIC.BACKGROUND_COLOR
 
-		rts
+    rts
 }

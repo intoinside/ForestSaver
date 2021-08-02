@@ -10,26 +10,37 @@
 
 BasicUpstart2(Entry)
 
-Entry:
-		jsr MainGameSettings
-		jmp GamePlay
-
-GamePlay: {
-		jsr IntroManager
-
-	GamePlayFake:
-		jmp GamePlayFake
+* = * "Entry"
+Entry: {
+    jsr MainGameSettings
+    jmp GamePlay
 }
 
+* = * "Main GamePlay"
+GamePlay: {
+    jsr IntroManager
+
+  GamePlayFake:
+    jmp GamePlayFake
+}
+
+.label SCREEN_RAM = $8400
+
+* = * "Main MainGameSettings"
 MainGameSettings: {
-		lda $01
+    // Switch out Basic so there is available ram on $a000-$bfff
+    lda $01
+    ora #%00000010
+    and #%11111110
+    sta $01
 
-		// Switch out Basic
-		ora #%00000010
-		and #%11111110
-		sta $01
+    // Set Vic bank 2 ($8000-$bfff)
+    lda CIA.PORT_A
+    ora #%00000001
+    and #%11111101
+    sta CIA.PORT_A
 
-		rts
+    rts
 }
 
 #import "label.asm"
