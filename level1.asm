@@ -8,10 +8,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-Intro: {
+Level1: {
 
-// Manager of intro screen
-  * = * "Intro IntroManager"
+// Manager of level 1
+  * = * "Level1 Manager"
   Manager: {
       jsr Init
       jsr AddColorToMap
@@ -21,15 +21,17 @@ Intro: {
       lda #$ff
       cmp FirePressed
       bne CheckFirePressed
+      inc FirePressed
 
       rts
   }
 
   // Initialization of intro screen
-  * = * "Intro Init"
+  * = * "Level1 Init"
   Init: {
-  // Set background and border color to black
-      lda #$00
+
+  // Set background and border color to brown
+      lda #$09
       sta VIC.BORDER_COLOR
       sta VIC.BACKGROUND_COLOR
 
@@ -39,8 +41,8 @@ Intro: {
       sta VIC.EXTRA_BACKGROUND2
 
 // Set pointer to char memory to $b800-$bfff (xxxx111x)
-// and pointer to screen memory to $8000-$83ff (0000xxxx)
-      lda #%00001110
+// and pointer to screen memory to $8400-$87ff (0001xxxx)
+      lda #%00011110
       sta VIC.MEMORY_SETUP
 
       rts
@@ -49,9 +51,9 @@ Intro: {
   AddColorToMap: {
 // TODO(intoinside): don't like this macro, maybe changed with a function
 // (there's no need to be fast but there is a need to have smaller code)
-      SetColorToChars($8000)
+    SetColorToChars($8400)
 
-      rts
+    rts
   }
 
 }

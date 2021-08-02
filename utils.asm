@@ -8,19 +8,34 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
 // Fill screen with $20 char (preserve sprite pointer memory area)
-* = * "Utils ClearScreen"
-ClearScreen: {
+.macro ClearScreen(screenram) {
     lda #$20
     ldx #250
   !:
     dex
-    sta SCREEN_RAM, x
-    sta SCREEN_RAM + 250, x
-    sta SCREEN_RAM + 500, x
-    sta SCREEN_RAM + 750, x
+    sta screenram, x
+    sta screenram + 250, x
+    sta screenram + 500, x
+    sta screenram + 750, x
     bne !-
+}
 
-    rts
+.macro SetColorToChars(screenram) {
+    ldx #250
+  PaintCols:
+    ldy screenram, x
+    lda CharColors, y
+    sta $d800, x
+    ldy screenram + 250, x
+    lda CharColors, y
+    sta $d800 + 250, x
+    ldy screenram + 500, x
+    lda CharColors, y
+    sta $d800 + 500, x
+    ldy screenram + 750, x
+    lda CharColors, y
+    sta $d800 + 750, x
+    dex
+    bne PaintCols
 }

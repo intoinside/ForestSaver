@@ -4,22 +4,27 @@
 // Target    : Commodore 64
 // Author    : Raffaele Intorcia - raffaele.intorcia@gmail.com
 //
-// Label declaration
+// Routine for joystick managing
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-VIC: {
-  .label BORDER_COLOR       = $d020
-  .label BACKGROUND_COLOR   = $d021
+FirePressed:
+  .byte $00
 
-  .label EXTRA_BACKGROUND1  = $d022
-  .label EXTRA_BACKGROUND2  = $d023
+// Read joystick (port 2) status and set FirePressed to $ff if fire is pressed
+// $00 otherwise
+GetOnlyFirePress: {
+    lda $dc00
+    ldx #$00
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    bcs !NoFirePressed+
+    ldx #$ff
+  !NoFirePressed:
+    stx FirePressed
 
-  .label SCREEN_CONTROL_1   = $d011
-  .label SCREEN_CONTROL_2   = $d016
-  .label MEMORY_SETUP       = $d018
-}
-
-CIA: {
-  .label PORT_A             = $dd00
+    rts
 }
