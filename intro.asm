@@ -29,7 +29,7 @@ Intro: {
   * = * "Intro Init"
   Init: {
   // Set background and border color to black
-      lda #$00
+      lda #$08
       sta VIC.BORDER_COLOR
       sta VIC.BACKGROUND_COLOR
 

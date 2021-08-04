@@ -1,6 +1,7 @@
 
 
-
+* = $8000 "IntroMap"
+  .import binary "./maps/intro.bin"
 * = $8400 "Map1"
   .import binary "./maps/map1.bin"
 * = $8800 "Map2"
