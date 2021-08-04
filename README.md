@@ -1,6 +1,6 @@
 # ForestSaver
 
-## A ranger has to do a lot of work to preserve the forest. He must be careful of the loggers, the industries that want to pollute the lakes and the arsonists who want space for their pastures.
+A ranger has to do a lot of work to preserve the forest. He must be careful of the loggers, the industries that want to pollute the lakes and the arsonists who want space for their pastures.
 
 ## Tools used
 * Sublime Text https://www.sublimetext.com/3 with Kick Assembler http://theweb.dk/KickAssembler/
@@ -12,7 +12,7 @@
 ## Tech information (ita and then eng)
 Per il funzionamento, ho scelto il Vic Bank 2 ($8000-$bfff). Questo consente di avere a disposizione per il programma
 tutta l'area da $1000 a $7fff.
-Ogni livello (compreso lo schermata di introduzione) fa riferimento ad una screen memory separata, il cui contenuto viene caricato
+Ogni livello (compresa la schermata di introduzione) fa riferimento ad una screen memory separata, il cui contenuto viene caricato
 dalle direttive .import.
 
 ```
@@ -31,16 +31,16 @@ Essendo previsti 3 livelli + intro, sono necessarie quattro screen memory che sa
 * $8c00-$8fff Livello 3
 
 Con questa organizzazione è presumibile che gli sprite occuperanno lo spazio a partire da $9000.
-Dato che ogni sprite occupa 63 bytes (cioè $3f), saturando tutta la memoria fino a $bfff, potenzialmente si possono inserire fino a 195 sprite.
+Dato che ogni sprite occupa 63 bytes più 1 di padding (cioè $40), saturando tutta la memoria fino a $bfff, potenzialmente si possono inserire fino a 195 sprite.
 Per fare due conti esplicativi:
 * $bfff - $9000 = $2fff cioè 12287 bytes a disposizione
-* (spazio totale a disposizione) $2fff / (dimensione di ogni sprite) $3f = $c3 cioè 195 sprite
+* (spazio totale a disposizione) $2fff / (dimensione di ogni sprite) $40 = $bf cioè 191 sprite
 
 L'aggiunta di un quarto livello, con l'occupazione della relativa screen memory, ridurrebbe il numero massimo di sprite a
 * $bfff - $9400 = $2bff cioè 11263 bytes a disposizione
-* (spazio totale a disposizione) $2bff / (dimensione di ogni sprite) $3f = $b2 cioè 178 sprite
+* (spazio totale a disposizione) $2bff / (dimensione di ogni sprite) $40 = $af cioè 175 sprite
 
-Anche 178 è un valore sufficiente quindi farò qualche valutazione in futuro sulla possibilità di aggiungere un livello.
+Anche 175 è un valore accettabile quindi farò qualche valutazione in futuro sulla possibilità di aggiungere un ulteriore livello.
 
 La mappa dei colori dei caratteri viene caricata nell'area di memoria a partire da $c000
 ```
