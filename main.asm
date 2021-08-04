@@ -20,6 +20,7 @@ Entry: {
 GamePlay: {
     jsr Intro.Manager
     jsr Level1.Manager
+    jsr Level2.Manager
 
   GamePlayFake:
     jmp GamePlayFake
@@ -49,4 +50,5 @@ MainGameSettings: {
 #import "joystick.asm"
 #import "intro.asm"
 #import "level1.asm"
+#import "level2.asm"
 #import "allimport.asm"

@@ -39,3 +39,17 @@
     dex
     bne PaintCols
 }
+
+StupidWaitRoutine: {
+        ldy #$bf
+    LoopY:
+        ldx #$ff
+    LoopX:
+        nop
+        nop
+        dex
+        bne LoopX
+        dey
+        bne LoopY
+        rts
+}
