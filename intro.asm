@@ -22,6 +22,8 @@ Intro: {
       cmp FirePressed
       bne CheckFirePressed
 
+      jsr Finalize
+
       rts
   }
 
@@ -38,10 +40,38 @@ Intro: {
       lda #$01
       sta VIC.EXTRA_BACKGROUND2
 
-// Set pointer to char memory to $b800-$bfff (xxxx111x)
-// and pointer to screen memory to $8000-$83ff (0000xxxx)
+// Set pointer to char memory to $7800-$7fff (xxxx111x)
+// and pointer to screen memory to $4000-$43ff (0000xxxx)
       lda #%00001110
       sta VIC.MEMORY_SETUP
+
+      lda #$50
+      sta SPRITE_0
+
+      lda #$50
+      sta $d000
+      sta $d001
+
+      lda #$0a
+      sta SPRITES.EXTRACOLOR1
+
+      lda #$00
+      sta SPRITES.EXTRACOLOR2
+
+      lda #$07
+      sta SPRITES.COLOR0
+
+// Enable the first sprite (just for test)
+      lda #$01
+      sta VIC.SPRITE_ENABLE
+      sta VIC.SPRITE_MULTICOLOR
+
+      rts
+  }
+
+  Finalize: {
+      lda #$00
+      sta VIC.SPRITE_ENABLE
 
       rts
   }
@@ -49,9 +79,11 @@ Intro: {
   AddColorToMap: {
 // TODO(intoinside): don't like this macro, maybe changed with a function
 // (there's no need to be fast but there is a need to have smaller code)
-      SetColorToChars($8000)
+      SetColorToChars($4000)
 
       rts
   }
+
+  .label SPRITE_0   = $43f8
 
 }

@@ -24,6 +24,8 @@ Level1: {
       bne CheckFirePressed
       inc FirePressed
 
+      jsr Finalize
+
       rts
   }
 
@@ -31,7 +33,7 @@ Level1: {
   * = * "Level1 Init"
   Init: {
 
-  // Set background and border color to brown
+// Set background and border color to brown
       lda #$09
       sta VIC.BORDER_COLOR
       sta VIC.BACKGROUND_COLOR
@@ -41,10 +43,15 @@ Level1: {
       lda #$01
       sta VIC.EXTRA_BACKGROUND2
 
-// Set pointer to char memory to $b800-$bfff (xxxx111x)
-// and pointer to screen memory to $8400-$87ff (0001xxxx)
+// Set pointer to char memory to $7800-$7fff (xxxx111x)
+// and pointer to screen memory to $4400-$47ff (0001xxxx)
       lda #%00011110
       sta VIC.MEMORY_SETUP
+
+      rts
+  }
+
+  Finalize: {
 
       rts
   }
@@ -52,7 +59,7 @@ Level1: {
   AddColorToMap: {
 // TODO(intoinside): don't like this macro, maybe changed with a function
 // (there's no need to be fast but there is a need to have smaller code)
-    SetColorToChars($8400)
+    SetColorToChars($4400)
 
     rts
   }

@@ -18,8 +18,17 @@ VIC: {
   .label SCREEN_CONTROL_1   = $d011
   .label SCREEN_CONTROL_2   = $d016
   .label MEMORY_SETUP       = $d018
+
+  .label SPRITE_ENABLE      = $d015
+  .label SPRITE_MULTICOLOR  = $d01c
 }
 
 CIA: {
   .label PORT_A             = $dd00
+}
+
+SPRITES: {
+  .label EXTRACOLOR1        = $d025
+  .label EXTRACOLOR2        = $d026
+  .label COLOR0             = $d027
 }

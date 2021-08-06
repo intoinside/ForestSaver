@@ -34,8 +34,8 @@ MainGameSettings: {
     and #%11111110
     sta $01
 
-// Set Vic bank 2 ($8000-$bfff)
-    lda #%00000001
+// Set Vic bank 1 ($4000-$7fff)
+    lda #%00000010
     sta CIA.PORT_A
 
 // Set Multicolor mode on
