@@ -16,11 +16,60 @@ Intro: {
       jsr Init
       jsr AddColorToMap
 
-    CheckFirePressed:
-      jsr GetOnlyFirePress
-      lda #$ff
-      cmp FirePressed
-      bne CheckFirePressed
+    JoystickMovement:
+      jsr WaitRoutine
+      jsr GetJoystickMove
+
+      lda Direction
+      beq CheckDirectionY
+
+// Handle horizontal move
+      cmp #$ff
+      beq MoveToLeft
+
+    MoveToRight:
+//        jsr switch_sprite_frog
+      ldx SPRITES.X0          // Moving to right
+      inx                     // Calculate new sprite x position
+      beq ToggleExtraBit      // If zero then should toggle extra bit
+      lda SPRITES.EXTRA_BIT   // If non zero, check extra bit
+      and #$01
+      beq UpdateSpriteXPos    // If extra bit not set, then update position
+      cpx #$46
+      bcs CheckDirectionY     // If extra bit set and new position is over right
+      jmp UpdateSpriteXPos    // border, no movement allowed
+
+    ToggleExtraBit:
+      lda SPRITES.EXTRA_BIT
+      eor #$01
+      sta SPRITES.EXTRA_BIT
+    UpdateSpriteXPos:
+      stx SPRITES.X0
+      jmp CheckDirectionY
+
+    MoveToLeft:
+//        jsr switch_sprite_frog
+      lda SPRITES.EXTRA_BIT   // Moving to right, check extra bit
+      and #$01
+      bne TryToMoveLeft       // If extra bit is set, then move allowed
+      ldx SPRITES.X0          // Check if position is on left border
+      cpx #$16
+      bcc CheckDirectionY     // If extra bit not set and x-position is not on
+      dex                     // left border, then move allowed
+      jmp UpdateSpriteXPos
+
+    TryToMoveLeft:
+      ldx SPRITES.X0          // Calculate new position
+      dex
+      cpx #$ff
+      bne UpdateSpriteXPos    // If position is $ff then extra bit must be
+      jmp ToggleExtraBit      // toggled
+
+    CheckDirectionY:
+      lda DirectionY
+
+      lda FirePressed
+      beq JoystickMovement
 
       jsr Finalize
 
@@ -48,8 +97,9 @@ Intro: {
       lda #$50
       sta SPRITE_0
 
-      lda #$50
+      lda #$fc
       sta $d000
+      lda #$40
       sta $d001
 
       lda #$0a
@@ -72,6 +122,16 @@ Intro: {
   Finalize: {
       lda #$00
       sta VIC.SPRITE_ENABLE
+
+      // Reset game var
+      sta GameEnded
+
+      // Reset player orientation and direction
+      sta Direction
+      sta DirectionY
+
+      lda #$01
+      sta Orientation
 
       rts
   }

@@ -31,4 +31,9 @@ SPRITES: {
   .label EXTRACOLOR1        = $d025
   .label EXTRACOLOR2        = $d026
   .label COLOR0             = $d027
+
+  .label X0                 = $d000
+  .label Y0                 = $d001
+
+  .label EXTRA_BIT          = $d010
 }
