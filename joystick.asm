@@ -23,6 +23,7 @@ GetJoystickMove: {
   !NoUp:
     lsr
     bcs !NoDown+
+    ldx #$01
   !NoDown:
     stx DirectionY
     ldx #$00

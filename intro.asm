@@ -67,10 +67,33 @@ Intro: {
 
     CheckDirectionY:
       lda DirectionY
+      beq CheckFire
 
+      ldy SPRITES.Y0          // Calculate new position
+
+      cmp #$ff
+      beq MoveToUp
+
+    MoveToDown:
+      iny
+      cpy #$e7
+      bcs CheckFire
+      sty SPRITES.Y0
+
+      jmp CheckFire
+
+    MoveToUp:
+      dey
+      cpy #$34
+      bcc CheckFire
+      sty SPRITES.Y0
+
+    CheckFire:
       lda FirePressed
       beq JoystickMovement
 
+
+    NoMovement:
       jsr Finalize
 
       rts
