@@ -36,18 +36,20 @@ Essendo previsti 3 livelli + intro, sono necessarie quattro screen memory che sa
 * $4c00-$4fff Livello 3
 * $5000-$53ff Livello 4
 
-Con questa organizzazione è presumibile che gli sprite occuperanno lo spazio a partire da $6000. In questo modo, gli sprite avranno a disposzione tutto lo spazio restante nel Vic bank 1, da $6000 a $77ff.
-Dato che ogni sprite occupa 63 bytes più 1 di padding (cioè $40), saturando tutta la memoria ipotizzata, potenzialmente si possono inserire fino a 127 sprite.
+Con questa organizzazione è presumibile che gli sprite occuperanno lo spazio a partire da $6000. In questo modo, gli sprite avranno a disposizione tutto lo spazio restante nel Vic bank 1, da $6000 a $77ff.
+Dato che ogni sprite occupa 63 bytes più 1 di padding (cioè $40), saturando tutta la memoria ipotizzata, potenzialmente si possono inserire fino a 95 sprite.
 Per fare due conti esplicativi:
 * $77ff - $6000 = $17ff cioè 6143 bytes a disposizione
 * (spazio totale a disposizione) $17ff / (dimensione di ogni sprite) $40 = $5f cioè 95 sprite
+
+L'indirizzo $6000 è stato scelto per avere spazio per l'eventuale aggiunta di livelli da mappare sulle screen memory disponibili. Da $5400 a $5fff si possono mappare ulteriori 2 screen.
 
 Se volessimo utilizzare tutta la memoria disponibile nel bank 1, gli sprite possono partire da $5400:
 * $77ff - $5400 = $23ff cioè 9215 bytes a disposizione
 * (spazio totale a disposizione) $23ff / (dimensione di ogni sprite) $40 = $8f cioè 143 sprite
 
-Al momento, i livelli ipotizzati sono 3 (quindi fino a 4fff), per comodità e, soprattutto in previsione di avere tanti sprite, verranno posizionati a partire da $5400.
-Si possono ricavare altre zone di memoria (esterne al bank 1) dove posizionare eventuali ulteriori sprite, ma per utilizzarli sarà necessario fare un bank switch oppure una copia on-the-fly degli sprite all'interno del bank. Per ora non è necessario ricorrere a questi stratagemmi.
+Al momento, i livelli ipotizzati sono 3 (quindi fino a $4fff), per comodità e, soprattutto in previsione di avere tanti sprite, verranno posizionati a partire da $5400 (lasciando quindi spazio per un ulteriore livello).
+Si possono ricavare altre zone di memoria (esterne al bank 1) dove posizionare eventuali ulteriori sprite, ma per utilizzarli sarà necessario fare un bank switch (rimappando anche le screen memory) oppure una copia on-the-fly degli sprite all'interno del bank. Per ora non è necessario ricorrere a questi stratagemmi.
 
 ```
 * = $5400 "Sprites"
@@ -60,6 +62,7 @@ Dopo l'area degli sprite, è presente la char memory, scelta nel momento di impo
 * = $7800 "Charset"
   .import binary "./maps/charset.bin"
 ```
+In questo momento sono presenti 157 caratteri, che occupano 1256 byte ($4e8) e sono destinati ad aumentare. La dimensione massima è $800 cioè 2048 bytes.
 
 La definizione dei colori dei caratteri viene caricata nell'area di memoria a partire da $c000.
 ```
@@ -67,5 +70,7 @@ La definizione dei colori dei caratteri viene caricata nell'area di memoria a pa
 CharColors:
   .import binary "./maps/charcolors.bin"
 ```
+
+I dati inseriti in questa porzione di memoria sono "tampone" nel senso che verranno utilizzati come base per mappare i colori al cambio del puntamento della screen memory.
 
 TBD
