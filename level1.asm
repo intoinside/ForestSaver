@@ -102,9 +102,15 @@ Level1: {
   UpdateRangerFrame: {
       inc RangerFrame
       lda RangerFrame
-      lsr
-      lsr
-      bcc CheckVerticalMove
+      asl
+      asl
+      asl
+      asl
+      asl
+      bcc NoMove
+
+      lda #$00
+      sta RangerFrame
 
       lda Direction
       beq CheckVerticalMove
@@ -112,13 +118,25 @@ Level1: {
       beq Left
 
     Right:
-      lda #RANGER_STANDING + 5
-      sta SPRITE_0
+      ldx #RANGER_STANDING + 5
+      lda SPRITE_0
+      cmp #RANGER_STANDING + 6
+      beq RightUpdate
+      inx
+
+    RightUpdate:
+      stx SPRITE_0
       jmp CheckVerticalMove
 
     Left:
-      lda #RANGER_STANDING + 7
-      sta SPRITE_0
+      ldx #RANGER_STANDING + 7
+      lda SPRITE_0
+      cmp #RANGER_STANDING + 8
+      beq LeftUpdate
+      inx
+
+    LeftUpdate:
+      stx SPRITE_0
 
     CheckVerticalMove:
       //lda DirectionY
@@ -128,7 +146,7 @@ Level1: {
       rts
 
     RangerFrame:
-      .byte $00
+      .byte $ff
   }
 
   // Initialization of intro screen
