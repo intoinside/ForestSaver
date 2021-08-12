@@ -125,8 +125,9 @@ Level1: {
       inx
 
     RightUpdate:
+      // If right frame edit occours, no other frame switch will be performed
       stx SPRITE_0
-      jmp CheckVerticalMove
+      jmp NoMove
 
     Left:
       ldx #RANGER_STANDING + 7
@@ -136,11 +137,23 @@ Level1: {
       inx
 
     LeftUpdate:
+      // If left frame edit occours, no other frame switch will be performed
       stx SPRITE_0
+      jmp NoMove
 
     CheckVerticalMove:
-      //lda DirectionY
-      //beq NoMove
+      lda DirectionY
+      beq NoMove
+      cmp #$ff
+      beq Up
+
+    Down:
+
+    DownUpdate:
+
+    Up:
+
+    UpUpdate:
 
     NoMove:
       rts
