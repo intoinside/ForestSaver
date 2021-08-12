@@ -24,12 +24,14 @@ Level1: {
       lda Direction
       beq CheckDirectionY
 
+      jsr UpdateRangerFrame
+
 // Handle horizontal move
+      lda Direction
       cmp #$ff
       beq MoveToLeft
 
     MoveToRight:
-      jsr UpdateRangerFrame
       ldx SPRITES.X0          // Moving to right
       inx                     // Calculate new sprite x position
       beq ToggleExtraBit      // If zero then should toggle extra bit
@@ -49,7 +51,6 @@ Level1: {
       jmp CheckDirectionY
 
     MoveToLeft:
-      jsr UpdateRangerFrame
       lda SPRITES.EXTRA_BIT   // Moving to right, check extra bit
       and #$01
       bne TryToMoveLeft       // If extra bit is set, then move allowed
@@ -70,8 +71,11 @@ Level1: {
       lda DirectionY
       beq CheckFirePressed
 
+      jsr UpdateRangerFrame
+
       ldy SPRITES.Y0          // Calculate new position
 
+      lda DirectionY
       cmp #$ff
       beq MoveToUp
 
@@ -102,11 +106,10 @@ Level1: {
   UpdateRangerFrame: {
       inc RangerFrame
       lda RangerFrame
-      asl
-      asl
-      asl
-      asl
-      asl
+      lsr
+      lsr
+      lsr
+      lsr
       bcc NoMove
 
       lda #$00
@@ -148,12 +151,25 @@ Level1: {
       beq Up
 
     Down:
+      ldx #RANGER_STANDING + 1
+      lda SPRITE_0
+      cmp #RANGER_STANDING + 2
+      beq UpUpdate
+      inx
 
     DownUpdate:
+      stx SPRITE_0
+      jmp NoMove
 
     Up:
+      ldx #RANGER_STANDING + 3
+      lda SPRITE_0
+      cmp #RANGER_STANDING + 4
+      beq UpUpdate
+      inx
 
     UpUpdate:
+      stx SPRITE_0
 
     NoMove:
       rts
