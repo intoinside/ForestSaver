@@ -1,4 +1,8 @@
 
+#importonce
+
+#import "main.asm"
+
 // Screen map memory definition
 * = $4000 "IntroMap"
   .import binary "./maps/intro.bin"

@@ -8,6 +8,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#importonce
+
+#import "utils.asm"
+#import "joystick.asm"
+#import "allimport.asm"
+#import "main.asm"
+
 Level1: {
 
 // Manager of level 1

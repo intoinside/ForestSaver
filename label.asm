@@ -8,6 +8,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#importonce
+
+#import "main.asm"
+
 VIC: {
   .label BORDER_COLOR       = $d020
   .label BACKGROUND_COLOR   = $d021
