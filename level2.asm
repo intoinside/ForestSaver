@@ -10,9 +10,6 @@
 
 #importonce
 
-#import "main.asm"
-#import "joystick.asm"
-
 Level2: {
 
 // Manager of level 2
@@ -52,9 +49,33 @@ Level2: {
       lda #%00101110
       sta VIC.MEMORY_SETUP
 
+// Init ranger
+      lda #SPRITES.RANGER_STANDING
+      sta SPRITE_0
+
+      lda #$50
+      sta SPRITES.X0
+      lda #$40
+      sta SPRITES.Y0
+
+      lda #$0a
+      sta SPRITES.EXTRACOLOR1
+
+      lda #$00
+      sta SPRITES.EXTRACOLOR2
+
+      lda #$07
+      sta SPRITES.COLOR0
+
+// Enable the first sprite (just for test)
+      lda #$01
+      sta VIC.SPRITE_MULTICOLOR
+      sta VIC.SPRITE_ENABLE
+
       rts
   }
 
+  * = * "Level2 Finalize"
   Finalize: {
 
       rts
@@ -68,4 +89,13 @@ Level2: {
     rts
   }
 
+  .label SPRITE_0     = $4bf8
+  .label LIMIT_UP     = $32
+  .label LIMIT_DOWN   = $e7
+  .label LIMIT_LEFT   = $16
+  .label LIMIT_RIGHT  = $46
+
 }
+
+#import "main.asm"
+#import "joystick.asm"

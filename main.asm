@@ -60,9 +60,5 @@ MainGameSettings: {
 #import "intro.asm"
 #import "level1.asm"
 #import "level2.asm"
-#import "label.asm"
-/*
-#import "utils.asm"
-#import "joystick.asm"
 #import "allimport.asm"
-*/
+#import "label.asm"

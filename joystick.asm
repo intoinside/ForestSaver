@@ -10,8 +10,6 @@
 
 #importonce
 
-#import "main.asm"
-
 FirePressed:
   .byte $00
 
@@ -72,3 +70,5 @@ GetOnlyFirePress: {
 
     rts
 }
+
+#import "main.asm"

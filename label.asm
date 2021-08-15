@@ -10,8 +10,6 @@
 
 #importonce
 
-#import "main.asm"
-
 VIC: {
   .label BORDER_COLOR       = $d020
   .label BACKGROUND_COLOR   = $d021
@@ -40,4 +38,11 @@ SPRITES: {
   .label Y0                 = $d001
 
   .label EXTRA_BIT          = $d010
+
+  .label RANGER_STANDING    = $50
+
+  .label ENEMY_STANDING     = $59
+
 }
+
+#import "main.asm"

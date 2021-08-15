@@ -10,8 +10,6 @@
 
 #importonce
 
-#import "allimport.asm"
-
 // Fill screen with $20 char (preserve sprite pointer memory area)
 .macro ClearScreen(screenram) {
     lda #$20
@@ -67,3 +65,5 @@ StupidWaitRoutine: {
         bne LoopY
         rts
 }
+
+#import "allimport.asm"

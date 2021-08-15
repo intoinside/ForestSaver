@@ -10,10 +10,6 @@
 
 #importonce
 
-#import "label.asm"
-#import "joystick.asm"
-#import "main.asm"
-
 Intro: {
 
 // Manager of intro screen
@@ -79,3 +75,7 @@ Intro: {
   }
 
 }
+
+#import "label.asm"
+#import "joystick.asm"
+#import "main.asm"

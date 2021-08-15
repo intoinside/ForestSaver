@@ -10,10 +10,10 @@
 
 #importonce
 
-#import "utils.asm"
-#import "joystick.asm"
-#import "allimport.asm"
-#import "main.asm"
+DelayCounter:
+   .byte 0                  // Counter storage
+DelayRequested:
+   .byte 5                  // 5/60 second delay
 
 Level1: {
 
@@ -25,6 +25,7 @@ Level1: {
       jsr StupidWaitRoutine
 
     JoystickMovement:
+      jsr TimedRoutine
       jsr WaitRoutine
       jsr GetJoystickMove
 
@@ -102,8 +103,12 @@ Level1: {
 
     CheckFirePressed:
       lda FirePressed
-      beq JoystickMovement
+      bne LevelDone
 
+    JoystickMovementHelper:
+      jmp JoystickMovement
+
+    LevelDone:
       jsr Finalize
 
       rts
@@ -128,9 +133,9 @@ Level1: {
       beq Left
 
     Right:
-      ldx #RANGER_STANDING + 5
+      ldx #SPRITES.RANGER_STANDING + 5
       lda SPRITE_0
-      cmp #RANGER_STANDING + 6
+      cmp #SPRITES.RANGER_STANDING + 6
       beq RightUpdate
       inx
 
@@ -140,9 +145,9 @@ Level1: {
       jmp NoMove
 
     Left:
-      ldx #RANGER_STANDING + 7
+      ldx #SPRITES.RANGER_STANDING + 7
       lda SPRITE_0
-      cmp #RANGER_STANDING + 8
+      cmp #SPRITES.RANGER_STANDING + 8
       beq LeftUpdate
       inx
 
@@ -158,9 +163,9 @@ Level1: {
       beq Up
 
     Down:
-      ldx #RANGER_STANDING + 1
+      ldx #SPRITES.RANGER_STANDING + 1
       lda SPRITE_0
-      cmp #RANGER_STANDING + 2
+      cmp #SPRITES.RANGER_STANDING + 2
       beq UpUpdate
       inx
 
@@ -169,9 +174,9 @@ Level1: {
       jmp NoMove
 
     Up:
-      ldx #RANGER_STANDING + 3
+      ldx #SPRITES.RANGER_STANDING + 3
       lda SPRITE_0
-      cmp #RANGER_STANDING + 4
+      cmp #SPRITES.RANGER_STANDING + 4
       beq UpUpdate
       inx
 
@@ -205,7 +210,7 @@ Level1: {
       sta VIC.MEMORY_SETUP
 
 // Init ranger
-      lda #RANGER_STANDING
+      lda #SPRITES.RANGER_STANDING
       sta SPRITE_0
 
       lda #$50
@@ -230,10 +235,36 @@ Level1: {
       rts
   }
 
+  * = * "Level1 Finalize"
   Finalize: {
+      // jsr StopInterrupt
+
       lda #$00
       sta VIC.SPRITE_ENABLE
 
+      rts
+  }
+
+  * = * "Level1 TimedRoutine"
+  TimedRoutine: {
+      lda DelayCounter
+      beq DelayTriggered        // when counter is zero stop decrementing
+      dec DelayCounter      // decrement the counter
+
+      lda #8
+      sta $4410
+
+      jmp Exit
+
+    DelayTriggered:
+
+      lda #DelayRequested      // delay reached 0, reset it
+      sta DelayCounter
+
+      lda #10
+      sta $4410
+
+    Exit:
       rts
   }
 
@@ -251,6 +282,6 @@ Level1: {
   .label LIMIT_LEFT   = $16
   .label LIMIT_RIGHT  = $46
 
-  .label RANGER_STANDING  = $50
-
 }
+
+#import "utils.asm"
