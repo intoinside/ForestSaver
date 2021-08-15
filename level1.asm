@@ -10,11 +10,6 @@
 
 #importonce
 
-DelayCounter:
-   .byte 0                  // Counter storage
-DelayRequested:
-   .byte 5                  // 5/60 second delay
-
 Level1: {
 
 // Manager of level 1
@@ -251,9 +246,6 @@ Level1: {
       beq DelayTriggered        // when counter is zero stop decrementing
       dec DelayCounter      // decrement the counter
 
-      lda #8
-      sta $4410
-
       jmp Exit
 
     DelayTriggered:
@@ -261,11 +253,16 @@ Level1: {
       lda #DelayRequested      // delay reached 0, reset it
       sta DelayCounter
 
-      lda #10
-      sta $4410
+      inc $4410
 
     Exit:
       rts
+
+    DelayCounter:
+      .byte 50                  // Counter storage
+    DelayRequested:
+      .byte 50                  // 5/60 second delay
+
   }
 
   AddColorToMap: {
