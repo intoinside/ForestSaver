@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/intoinside/ForestSaver/tree/main.svg?style=svg)](https://circleci.com/gh/intoinside/ForestSaver/tree/main)
+
 # ForestSaver
 
 A ranger has to do a lot of work to preserve the forest. He must be careful of the loggers, the industries that want to pollute the lakes and the arsonists who want space for their pastures.
