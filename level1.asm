@@ -24,6 +24,21 @@ Level1: {
       jsr TimedRoutine
       jsr GetJoystickMove
 
+      jsr HandleRangerMove
+      jsr HandleEnemyMove
+
+    CheckFirePressed:
+      lda FirePressed
+      bne LevelDone
+
+      jmp JoystickMovement
+
+    LevelDone:
+      jsr Finalize
+  }
+
+  * = * "Level1 HandleRangerMove"
+  HandleRangerMove: {
       lda Direction
       beq CheckDirectionY
 
@@ -72,7 +87,7 @@ Level1: {
 
     CheckDirectionY:
       lda DirectionY
-      beq CheckFirePressed
+      beq Done
 
       jsr Ranger.UpdateRangerFrame
 
@@ -85,27 +100,18 @@ Level1: {
     MoveToDown:
       iny
       cpy #LIMIT_DOWN
-      bcs CheckFirePressed
+      bcs Done
       sty SPRITES.Y0
 
-      jmp CheckFirePressed
+      jmp Done
 
     MoveToUp:
       dey
       cpy #LIMIT_UP
-      bcc CheckFirePressed
+      bcc Done
       sty SPRITES.Y0
 
-    CheckFirePressed:
-      lda FirePressed
-      bne LevelDone
-
-    JoystickMovementHelper:
-      jmp JoystickMovement
-
-    LevelDone:
-      jsr Finalize
-
+    Done:
       rts
   }
 
@@ -148,22 +154,23 @@ Level1: {
       sta Ranger.UpdateRangerFrame.StoreSprite3 + 2
       sta Ranger.UpdateRangerFrame.StoreSprite4 + 2
 
+      sta WoodCutter.Init.LoadSprite1 + 2
+      sta WoodCutter.UpdateWoodCutterFrame.LoadSprite1 + 2
+      sta WoodCutter.UpdateWoodCutterFrame.LoadSprite2 + 2
+      sta WoodCutter.UpdateWoodCutterFrame.LoadSprite3 + 2
+      sta WoodCutter.UpdateWoodCutterFrame.LoadSprite4 + 2
+      sta WoodCutter.UpdateWoodCutterFrame.StoreSprite1 + 2
+      sta WoodCutter.UpdateWoodCutterFrame.StoreSprite2 + 2
+      sta WoodCutter.UpdateWoodCutterFrame.StoreSprite3 + 2
+      sta WoodCutter.UpdateWoodCutterFrame.StoreSprite4 + 2
+
       jsr Ranger.Init
-
-      lda #$50
-      sta SPRITES.X0
-      lda #$40
-      sta SPRITES.Y0
-
-      lda #SPRITES.ENEMY_STANDING
-      sta SPRITES.SPRITE_1
-      sta SPRITES.SPRITE_2
+      jsr WoodCutter.Init
 
       lda #$07
       sta SPRITES.COLOR0
       lda #$02
       sta SPRITES.COLOR1
-      sta SPRITES.COLOR2
 
 // Enable the first sprite (just for test)
       lda #%00000111
@@ -238,8 +245,8 @@ Level1: {
       rts
   }
 
-  * = * "Level1 EnemyManager"
-  EnemyManager: {
+  * = * "Level1 HandleEnemyMove"
+  HandleEnemyMove: {
       lda EnemyNo6Alive
       beq IsEnemyNo5Alive
       jsr Enemy6Manager
@@ -256,7 +263,13 @@ Level1: {
 
   * = * "Level1 Enemy6Manager"
   Enemy6Manager: {
+      // Passing X/Y direction to woodcutter frame update
       ldx TrackPointer
+      lda DirectionX, x
+      sta WoodCutter.UpdateWoodCutterFrame.DirectionX
+      lda DirectionY, x
+      sta WoodCutter.UpdateWoodCutterFrame.DirectionY
+
       cpx TrackWalkCounter
       beq Done
       lda TrackWalkX, x
@@ -265,6 +278,7 @@ Level1: {
       lda TrackWalkY, x
       sta SPRITES.Y1
 
+      jsr WoodCutter.UpdateWoodCutterFrame
       inc TrackPointer
 
     Done:
@@ -274,23 +288,24 @@ Level1: {
       .byte 0
 
     TrackWalkCounter:
-      .byte 11
+      .byte 30
 
     TrackWalkX:
-      .byte 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
+      .fill 30, 10+i
 
     TrackWalkY:
-      .byte 90, 90, 91, 91, 92, 92, 93, 93, 94, 94, 95
-
+      .fill 30, 135
     DirectionX:
-      .byte 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01
+      .fill 30, 1
     DirectionY:
-      .byte 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01
+      .byte 00, 00, 01, 00, 01, 00, 01, 00, 01, 00
+      .byte 01, 00, 01, 00, 01, 00, 01, 00, 01, 00
+      .byte 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
   }
 
   * = * "Level1 TimedRoutine"
   TimedRoutine: {
-      jsr TimedRoutine10th
+      // jsr TimedRoutine10th
       lda DelayCounter
       beq DelayTriggered        // when counter is zero stop decrementing
       dec DelayCounter      // decrement the counter
@@ -326,6 +341,7 @@ Level1: {
       .byte 1
   }
 
+/*
   TimedRoutine10th: {
       lda DelayCounter
       beq DelayTriggered        // when counter is zero stop decrementing
@@ -349,7 +365,7 @@ Level1: {
     DelayRequested:
       .byte 8                  // 8/50 second delay
   }
-
+*/
   AddColorToMap: {
 // TODO(intoinside): don't like this macro, maybe changed with a function
 // (there's no need to be fast but there is a need to have smaller code)
@@ -371,4 +387,5 @@ Level1: {
 }
 
 #import "ranger.asm"
+#import "woodcutter.asm"
 #import "utils.asm"

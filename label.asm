@@ -49,9 +49,10 @@ SPRITES: {
 
   .label ENEMY_STANDING     = $59
 
+  // These label will be modified with self-modification code
   .label SPRITE_0           = $bef8
-  .label SPRITE_1           = $47f9
-  .label SPRITE_2           = $47fa
+  .label SPRITE_1           = $bef9
+  .label SPRITE_2           = $befa
 }
 
 #import "main.asm"
