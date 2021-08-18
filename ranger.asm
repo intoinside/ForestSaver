@@ -109,3 +109,5 @@ Ranger: {
       .byte $ff
   }
 }
+
+#import "label.asm"

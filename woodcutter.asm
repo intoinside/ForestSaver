@@ -114,3 +114,5 @@ WoodCutter: {
       .byte $00
   }
 }
+
+#import "label.asm"
