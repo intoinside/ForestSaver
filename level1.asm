@@ -20,14 +20,14 @@ Level1: {
       jsr StupidWaitRoutine
 
     JoystickMovement:
-      jsr TimedRoutine
       jsr WaitRoutine
+      jsr TimedRoutine
       jsr GetJoystickMove
 
       lda Direction
       beq CheckDirectionY
 
-      jsr UpdateRangerFrame
+      jsr Ranger.UpdateRangerFrame
 
 // Handle horizontal move
       lda Direction
@@ -74,7 +74,7 @@ Level1: {
       lda DirectionY
       beq CheckFirePressed
 
-      jsr UpdateRangerFrame
+      jsr Ranger.UpdateRangerFrame
 
       ldy SPRITES.Y0          // Calculate new position
 
@@ -109,86 +109,9 @@ Level1: {
       rts
   }
 
-  * = * "Level1 UpdateRangerFrame"
-  UpdateRangerFrame: {
-      inc RangerFrame
-      lda RangerFrame
-      lsr
-      lsr
-      lsr
-      lsr
-      bcc NoMove
-
-      lda #$00
-      sta RangerFrame
-
-      lda Direction
-      beq CheckVerticalMove
-      cmp #$ff
-      beq Left
-
-    Right:
-      ldx #SPRITES.RANGER_STANDING + 5
-      lda SPRITE_0
-      cmp #SPRITES.RANGER_STANDING + 6
-      beq RightUpdate
-      inx
-
-    RightUpdate:
-      // If right frame edit occours, no other frame switch will be performed
-      stx SPRITE_0
-      jmp NoMove
-
-    Left:
-      ldx #SPRITES.RANGER_STANDING + 7
-      lda SPRITE_0
-      cmp #SPRITES.RANGER_STANDING + 8
-      beq LeftUpdate
-      inx
-
-    LeftUpdate:
-      // If left frame edit occours, no other frame switch will be performed
-      stx SPRITE_0
-      jmp NoMove
-
-    CheckVerticalMove:
-      lda DirectionY
-      beq NoMove
-      cmp #$ff
-      beq Up
-
-    Down:
-      ldx #SPRITES.RANGER_STANDING + 1
-      lda SPRITE_0
-      cmp #SPRITES.RANGER_STANDING + 2
-      beq UpUpdate
-      inx
-
-    DownUpdate:
-      stx SPRITE_0
-      jmp NoMove
-
-    Up:
-      ldx #SPRITES.RANGER_STANDING + 3
-      lda SPRITE_0
-      cmp #SPRITES.RANGER_STANDING + 4
-      beq UpUpdate
-      inx
-
-    UpUpdate:
-      stx SPRITE_0
-
-    NoMove:
-      rts
-
-    RangerFrame:
-      .byte $ff
-  }
-
   // Initialization of intro screen
   * = * "Level1 Init"
   Init: {
-
 // Set background and border color to brown
       lda #$09
       sta VIC.BORDER_COLOR
@@ -204,27 +127,49 @@ Level1: {
       lda #%00011110
       sta VIC.MEMORY_SETUP
 
-// Init ranger
-      lda #SPRITES.RANGER_STANDING
-      sta SPRITE_0
-
-      lda #$50
-      sta SPRITES.X0
-      lda #$40
-      sta SPRITES.Y0
-
+// Init common sprite color
       lda #$0a
       sta SPRITES.EXTRACOLOR1
 
       lda #$00
       sta SPRITES.EXTRACOLOR2
 
+// Init ranger
+// Self modification code: sprite pointer needs to be relocated when screen
+// memory address changes. $47f8
+      lda #$47
+      sta Ranger.Init.LoadSprite1 + 2
+      sta Ranger.UpdateRangerFrame.LoadSprite1 + 2
+      sta Ranger.UpdateRangerFrame.LoadSprite2 + 2
+      sta Ranger.UpdateRangerFrame.LoadSprite3 + 2
+      sta Ranger.UpdateRangerFrame.LoadSprite4 + 2
+      sta Ranger.UpdateRangerFrame.StoreSprite1 + 2
+      sta Ranger.UpdateRangerFrame.StoreSprite2 + 2
+      sta Ranger.UpdateRangerFrame.StoreSprite3 + 2
+      sta Ranger.UpdateRangerFrame.StoreSprite4 + 2
+
+      jsr Ranger.Init
+
+      lda #$50
+      sta SPRITES.X0
+      lda #$40
+      sta SPRITES.Y0
+
+      lda #SPRITES.ENEMY_STANDING
+      sta SPRITES.SPRITE_1
+      sta SPRITES.SPRITE_2
+
       lda #$07
       sta SPRITES.COLOR0
+      lda #$02
+      sta SPRITES.COLOR1
+      sta SPRITES.COLOR2
 
 // Enable the first sprite (just for test)
-      lda #$01
+      lda #%00000111
       sta VIC.SPRITE_MULTICOLOR
+
+      lda #%00000001
       sta VIC.SPRITE_ENABLE
 
       rts
@@ -232,7 +177,6 @@ Level1: {
 
   * = * "Level1 Finalize"
   Finalize: {
-      // jsr StopInterrupt
 
       lda #$00
       sta VIC.SPRITE_ENABLE
@@ -240,8 +184,113 @@ Level1: {
       rts
   }
 
+  * = * "Level1 AddEnemy"
+  AddEnemy: {
+      dec EnemyLeft
+      lda EnemyLeft
+      cmp #$05
+      beq EnemyNo6
+
+      /*
+      cmp #$04
+      beq EnemyNo5
+      cmp #$03
+      beq EnemyNo4
+      cmp #$02
+      beq EnemyNo3
+      cmp #$01
+      beq EnemyNo2
+      cmp #$00
+      beq EnemyNo1
+      */
+      jmp Done
+
+    EnemyNo6:
+      lda #$0
+      sta SPRITES.X1
+      lda #$45
+      sta SPRITES.Y1
+
+      inc EnemyNo6Alive
+
+      lda #%00000011
+      sta VIC.SPRITE_ENABLE
+
+      jmp Done
+
+/*
+    EnemyNo5:
+      lda #$20
+      sta SPRITES.X2
+      lda #$45
+      sta SPRITES.Y2
+
+      lda SPRITES.EXTRA_BIT
+      ora #%00000100
+      sta SPRITES.EXTRA_BIT
+
+      lda #%00000111
+      sta VIC.SPRITE_ENABLE
+
+      jmp Done
+*/
+    Done:
+      rts
+  }
+
+  * = * "Level1 EnemyManager"
+  EnemyManager: {
+      lda EnemyNo6Alive
+      beq IsEnemyNo5Alive
+      jsr Enemy6Manager
+
+    IsEnemyNo5Alive:
+    IsEnemyNo4Alive:
+    IsEnemyNo3Alive:
+    IsEnemyNo2Alive:
+    IsEnemyNo1Alive:
+
+    Done:
+      rts
+  }
+
+  * = * "Level1 Enemy6Manager"
+  Enemy6Manager: {
+      ldx TrackPointer
+      cpx TrackWalkCounter
+      beq Done
+      lda TrackWalkX, x
+      sta SPRITES.X1
+
+      lda TrackWalkY, x
+      sta SPRITES.Y1
+
+      inc TrackPointer
+
+    Done:
+      rts
+
+    TrackPointer:
+      .byte 0
+
+    TrackWalkCounter:
+      .byte 11
+
+    TrackWalkX:
+      .byte 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
+
+    TrackWalkY:
+      .byte 90, 90, 91, 91, 92, 92, 93, 93, 94, 94, 95
+
+    DirectionX:
+      .byte 01, 01, 01, 01, 01, 01, 01, 01, 01, 01, 01
+    DirectionY:
+      .byte 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01
+  }
+
   * = * "Level1 TimedRoutine"
   TimedRoutine: {
+      jsr TimedRoutine10th
       lda DelayCounter
       beq DelayTriggered        // when counter is zero stop decrementing
       dec DelayCounter      // decrement the counter
@@ -249,11 +298,21 @@ Level1: {
       jmp Exit
 
     DelayTriggered:
+      inc $4410
 
-      lda #DelayRequested      // delay reached 0, reset it
+      lda DelayRequested      // delay reached 0, reset it
       sta DelayCounter
 
-      inc $4410
+      lda WaitingForEnemy
+      beq NotWaiting
+
+    Waiting:
+      dec WaitingForEnemy
+      jsr AddEnemy
+
+      jmp Exit
+
+    NotWaiting:
 
     Exit:
       rts
@@ -261,8 +320,34 @@ Level1: {
     DelayCounter:
       .byte 50                  // Counter storage
     DelayRequested:
-      .byte 50                  // 5/60 second delay
+      .byte 50                  // 1 second delay
 
+    WaitingForEnemy:
+      .byte 1
+  }
+
+  TimedRoutine10th: {
+      lda DelayCounter
+      beq DelayTriggered        // when counter is zero stop decrementing
+      dec DelayCounter        // decrement the counter
+
+      jmp Exit
+
+    DelayTriggered:
+      inc $4411
+
+      lda DelayRequested      // delay reached 0, reset it
+      sta DelayCounter
+
+      jsr EnemyManager
+
+    Exit:
+      rts
+
+    DelayCounter:
+      .byte 8                  // Counter storage
+    DelayRequested:
+      .byte 8                  // 8/50 second delay
   }
 
   AddColorToMap: {
@@ -273,12 +358,17 @@ Level1: {
     rts
   }
 
-  .label SPRITE_0     = $47f8
   .label LIMIT_UP     = $32
-  .label LIMIT_DOWN   = $e7
+  .label LIMIT_DOWN   = $e0
   .label LIMIT_LEFT   = $16
   .label LIMIT_RIGHT  = $46
 
+  EnemyLeft:
+    .byte 6
+
+  EnemyNo6Alive:
+    .byte 0
 }
 
+#import "ranger.asm"
 #import "utils.asm"

@@ -33,9 +33,15 @@ SPRITES: {
   .label EXTRACOLOR1        = $d025
   .label EXTRACOLOR2        = $d026
   .label COLOR0             = $d027
+  .label COLOR1             = $d028
+  .label COLOR2             = $d029
 
   .label X0                 = $d000
   .label Y0                 = $d001
+  .label X1                 = $d002
+  .label Y1                 = $d003
+  .label X2                 = $d004
+  .label Y2                 = $d005
 
   .label EXTRA_BIT          = $d010
 
@@ -43,6 +49,9 @@ SPRITES: {
 
   .label ENEMY_STANDING     = $59
 
+  .label SPRITE_0           = $bef8
+  .label SPRITE_1           = $47f9
+  .label SPRITE_2           = $47fa
 }
 
 #import "main.asm"
