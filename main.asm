@@ -54,6 +54,9 @@ MainGameSettings: {
     lda #%00011000
     sta VIC.SCREEN_CONTROL_2
 
+    lda #$ff
+    sta VIC.SPRITE_MULTICOLOR
+
     rts
 }
 

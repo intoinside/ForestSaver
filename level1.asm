@@ -169,13 +169,12 @@ Level1: {
 
       lda #$07
       sta SPRITES.COLOR0
-      lda #$02
+      lda #$08
       sta SPRITES.COLOR1
+      lda #$02
+      sta SPRITES.COLOR2
 
-// Enable the first sprite (just for test)
-      lda #%00000111
-      sta VIC.SPRITE_MULTICOLOR
-
+// Enable the first sprite
       lda #%00000001
       sta VIC.SPRITE_ENABLE
 
@@ -214,13 +213,13 @@ Level1: {
 
     EnemyNo6:
       lda #$0
-      sta SPRITES.X1
+      sta SPRITES.X2
       lda #$45
-      sta SPRITES.Y1
+      sta SPRITES.Y2
 
       inc EnemyNo6Alive
 
-      lda #%00000011
+      lda #%00000101
       sta VIC.SPRITE_ENABLE
 
       jmp Done
@@ -271,15 +270,32 @@ Level1: {
       sta WoodCutter.UpdateWoodCutterFrame.DirectionY
 
       cpx TrackWalkCounter
-      beq Done
+      beq WalkDone
       lda TrackWalkX, x
-      sta SPRITES.X1
+      sta SPRITES.X2
 
       lda TrackWalkY, x
-      sta SPRITES.Y1
+      sta SPRITES.Y2
 
       jsr WoodCutter.UpdateWoodCutterFrame
       inc TrackPointer
+      jmp Done
+
+    WalkDone:
+    // Setting hatchet sprite
+      lda SPRITES.X2
+      sta SPRITES.X1
+      lda SPRITES.Y2
+      sta SPRITES.Y1
+
+      lda #SPRITES.RANGER_STANDING + 20
+      sta SPRITE_1
+
+      lda #$08
+      sta SPRITES.COLOR1
+
+      lda #%00000111
+      sta VIC.SPRITE_ENABLE
 
     Done:
       rts
@@ -288,7 +304,7 @@ Level1: {
       .byte 0
 
     TrackWalkCounter:
-      .byte 37
+      .byte 30
 
     TrackWalkX:
       .fill 37, 10+i
@@ -379,6 +395,8 @@ Level1: {
   .label LIMIT_DOWN   = $e0
   .label LIMIT_LEFT   = $16
   .label LIMIT_RIGHT  = $46
+
+  .label SPRITE_1     = $47f9
 
   EnemyLeft:
     .byte 6
