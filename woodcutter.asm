@@ -30,7 +30,7 @@ WoodCutter: {
       lda WoodCutterFrame
       lsr
       lsr
- //     lsr
+      lsr
       lsr
       bcc NoMove
 
@@ -107,7 +107,7 @@ WoodCutter: {
       rts
 
     WoodCutterFrame:
-      .byte $ff
+      .byte $00
     DirectionX:
       .byte $00
     DirectionY:

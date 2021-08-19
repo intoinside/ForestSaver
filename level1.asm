@@ -288,19 +288,20 @@ Level1: {
       .byte 0
 
     TrackWalkCounter:
-      .byte 30
+      .byte 37
 
     TrackWalkX:
-      .fill 30, 10+i
+      .fill 37, 10+i
 
     TrackWalkY:
-      .fill 30, 135
+      .fill 37, 136
     DirectionX:
-      .fill 30, 1
+      .fill 37, 1
     DirectionY:
-      .byte 00, 00, 01, 00, 01, 00, 01, 00, 01, 00
-      .byte 01, 00, 01, 00, 01, 00, 01, 00, 01, 00
       .byte 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+      .byte 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+      .byte 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
+      .byte 00, 00, 00, 00, 00, 00, 00
   }
 
   * = * "Level1 TimedRoutine"
