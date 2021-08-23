@@ -262,27 +262,49 @@ Level1: {
 
   * = * "Level1 Enemy6Manager"
   Enemy6Manager: {
+      lda CutCompleted
+      bne WalkOut
+
+      lda WalkInCompleted
+      bne ShowHatchet
+
+    WalkIn:
       // Passing X/Y direction to woodcutter frame update
       ldx TrackPointer
+      cpx #TrackWalkCounter
+      beq WalkInDone
+
       lda DirectionX, x
       sta WoodCutter.UpdateWoodCutterFrame.DirectionX
       lda DirectionY, x
       sta WoodCutter.UpdateWoodCutterFrame.DirectionY
 
-      cpx TrackWalkCounter
-      beq WalkDone
+      // Woodcutter didn't reached the tree, walk
       lda TrackWalkX, x
       sta SPRITES.X2
 
       lda TrackWalkY, x
       sta SPRITES.Y2
 
+      // Walk-step completed, update woodcutter frame
       jsr WoodCutter.UpdateWoodCutterFrame
       inc TrackPointer
+
       jmp Done
 
-    WalkDone:
-    // Setting hatchet sprite
+    WalkInDone:
+      inc WalkInCompleted
+
+      jmp Done
+
+    ShowHatchet:
+      // Woodcutter is in position, start to cut the tree
+      lda HatchetShown
+      bne Done
+
+      dec TrackPointer
+
+      // Walk is done, hatchet must be set
       lda SPRITES.X2
       sta SPRITES.X1
       lda SPRITES.Y2
@@ -294,35 +316,129 @@ Level1: {
       lda #$08
       sta SPRITES.COLOR1
 
-      lda #%00000111
+      lda VIC.SPRITE_ENABLE
+      ora #%00000010
+      sta VIC.SPRITE_ENABLE
+      inc HatchetShown
+
+      jmp Done
+
+    WalkOut:
+    // Tree has been cut, hide hatchet and move woodcutter out of screen
+      ldx TrackPointer
+      beq WalkOutDone
+
+/*
+// Old code. This refactor saves, 3bytes and 8cycles
+      lda DirectionX, x                                 //3by, 4
+      sta WoodCutter.UpdateWoodCutterFrame.DirectionX   //3by, 4
+      dec WoodCutter.UpdateWoodCutterFrame.DirectionX   //3by, 6
+      dec WoodCutter.UpdateWoodCutterFrame.DirectionX   //3by, 6
+*/
+
+      lda DirectionX, x                                 //3by, 4
+      sec                                               //1by, 2
+      sbc #2                                            //2by, 2
+      sta WoodCutter.UpdateWoodCutterFrame.DirectionX   //3by, 4
+
+      lda DirectionY, x                                 //3by, 4
+      sta WoodCutter.UpdateWoodCutterFrame.DirectionY   //3by, 4
+
+      lda TrackWalkX, x
+      sta SPRITES.X2
+
+      lda TrackWalkY, x
+      sta SPRITES.Y2
+
+      jsr WoodCutter.UpdateWoodCutterFrame
+      dec TrackPointer
+
+      jmp Done
+
+    WalkOutDone:
+      lda VIC.SPRITE_ENABLE
+      and #%11111011
       sta VIC.SPRITE_ENABLE
 
     Done:
       rts
 
+    HatchetShown:
+      .byte 0
     TrackPointer:
       .byte 0
+    CutCompleted:
+      .byte 0
+    WalkInCompleted:
+      .byte 0
 
-    TrackWalkCounter:
-      .byte 30
+    .label TrackWalkCounter = 41
 
     TrackWalkX:
-      .fill 37, 10+i
-
+      .fill TrackWalkCounter, 6+i
     TrackWalkY:
-      .fill 37, 136
+      .fill TrackWalkCounter, 136
+
     DirectionX:
-      .fill 37, 1
+      .fill TrackWalkCounter, 1
     DirectionY:
-      .byte 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
-      .byte 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
-      .byte 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
-      .byte 00, 00, 00, 00, 00, 00, 00
+      .fill TrackWalkCounter, 0
+  }
+
+  * = * "Level1 UseTheHatchet"
+  UseTheHatchet: {
+      lda Enemy6Manager.HatchetShown
+      beq Done
+
+      inc HatchetFrame
+      lda HatchetFrame
+      lsr
+      lsr
+      bcc Done
+
+      lda #$00
+      sta HatchetFrame
+
+      lda SPRITE_1
+      cmp #SPRITES.RANGER_STANDING + 20
+      beq SwitchUpFrame
+    SwitchDownFrame:
+      dec SPRITE_1
+      jmp Done
+
+    SwitchUpFrame:
+      inc SPRITE_1
+      dec HatchetStrokes
+      beq TreeCutCompleted
+      jmp Done
+
+    TreeCutCompleted:
+      inc Enemy6Manager.CutCompleted
+      lda #$00
+      sta Enemy6Manager.HatchetShown
+      lda #HatchetStrokesMax
+      sta HatchetStrokes
+      lda VIC.SPRITE_ENABLE
+      and #%11111101
+      sta VIC.SPRITE_ENABLE
+
+    Done:
+      rts
+
+// Test. This should be set to higher value
+    .label HatchetStrokesMax = $6
+
+    HatchetStrokes:
+      .byte HatchetStrokesMax
+
+    HatchetFrame:
+      .byte $ff
   }
 
   * = * "Level1 TimedRoutine"
   TimedRoutine: {
-      // jsr TimedRoutine10th
+      jsr TimedRoutine10th
+
       lda DelayCounter
       beq DelayTriggered        // when counter is zero stop decrementing
       dec DelayCounter      // decrement the counter
@@ -358,7 +474,6 @@ Level1: {
       .byte 1
   }
 
-/*
   TimedRoutine10th: {
       lda DelayCounter
       beq DelayTriggered        // when counter is zero stop decrementing
@@ -367,12 +482,11 @@ Level1: {
       jmp Exit
 
     DelayTriggered:
+      jsr UseTheHatchet
       inc $4411
 
       lda DelayRequested      // delay reached 0, reset it
       sta DelayCounter
-
-      jsr EnemyManager
 
     Exit:
       rts
@@ -382,7 +496,7 @@ Level1: {
     DelayRequested:
       .byte 8                  // 8/50 second delay
   }
-*/
+
   AddColorToMap: {
 // TODO(intoinside): don't like this macro, maybe changed with a function
 // (there's no need to be fast but there is a need to have smaller code)
