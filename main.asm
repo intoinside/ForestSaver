@@ -21,13 +21,6 @@ Entry: {
 GameEnded:          // $00 - Game in progress
   .byte $00         // $ff - Played dead, game ended
 
-Orientation:        // Player sprite orientation
-  .byte $01       // $01 - right, $ff - left
-Direction:          // Player sprite direction
-  .byte $01       // $00 - no move, $01 - right, $ff - left
-DirectionY:         // Player sprite vertical direction
-  .byte $ff       // $00 - no move, $01 - down, $ff - up
-
 * = * "Main GamePlay"
 GamePlay: {
     jsr Intro.Manager

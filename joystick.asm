@@ -13,6 +13,14 @@
 FirePressed:
   .byte $00
 
+Direction:          // Player sprite direction
+  .byte $01         // $00 - no move, $01 - right, $ff - left
+DirectionY:         // Player sprite vertical direction
+  .byte $ff         // $00 - no move, $01 - down, $ff - up
+
+Orientation:        // Player sprite orientation
+  .byte $01         // $01 - right, $ff - left
+
 GetJoystickMove: {
     ldx #$00
     lda $dc00

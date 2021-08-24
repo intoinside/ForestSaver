@@ -56,13 +56,6 @@ Intro: {
       lda #$00
       sta GameEnded
 
-      // Reset player orientation and direction
-      sta Direction
-      sta DirectionY
-
-      lda #$01
-      sta Orientation
-
       rts
   }
 
