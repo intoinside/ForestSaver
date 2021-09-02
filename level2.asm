@@ -90,10 +90,6 @@ Level2: {
   }
 
   .label SPRITE_0     = $4bf8
-  .label LIMIT_UP     = $32
-  .label LIMIT_DOWN   = $e7
-  .label LIMIT_LEFT   = $16
-  .label LIMIT_RIGHT  = $46
 
 }
 

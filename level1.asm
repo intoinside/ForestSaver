@@ -6,6 +6,15 @@
 //
 // Manager for level 1.
 //
+// Sprite pointer settings:
+// * Ranger       Sprite 0
+// * Hatchet 1    Sprite 1
+// * Woodcutter 1 Sprite 2
+// * Hatchet 2    Sprite 3
+// * Woodcutter 2 Sprite 4
+// * Hatchet 3    Sprite 5
+// * Woodcutter 3 Sprite 6
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #importonce
@@ -24,7 +33,7 @@ Level1: {
       jsr TimedRoutine
       jsr GetJoystickMove
 
-      jsr HandleRangerMove
+      jsr Ranger.HandleRangerMove
       jsr HandleEnemyMove
 
     CheckFirePressed:
@@ -35,84 +44,6 @@ Level1: {
 
     LevelDone:
       jsr Finalize
-  }
-
-  * = * "Level1 HandleRangerMove"
-  HandleRangerMove: {
-      lda Direction
-      beq CheckDirectionY
-
-      jsr Ranger.UpdateRangerFrame
-
-// Handle horizontal move
-      lda Direction
-      cmp #$ff
-      beq MoveToLeft
-
-    MoveToRight:
-      ldx SPRITES.X0          // Moving to right
-      inx                     // Calculate new sprite x position
-      beq ToggleExtraBit      // If zero then should toggle extra bit
-      lda SPRITES.EXTRA_BIT   // If non zero, check extra bit
-      and #$01
-      beq UpdateSpriteXPos    // If extra bit not set, then update position
-      cpx #LIMIT_RIGHT
-      bcs CheckDirectionY     // If extra bit set and new position is over right
-      jmp UpdateSpriteXPos    // border, no movement allowed
-
-    ToggleExtraBit:
-      lda SPRITES.EXTRA_BIT
-      eor #$01
-      sta SPRITES.EXTRA_BIT
-    UpdateSpriteXPos:
-      stx SPRITES.X0
-      jmp CheckDirectionY
-
-    MoveToLeft:
-      lda SPRITES.EXTRA_BIT   // Moving to right, check extra bit
-      and #$01
-      bne TryToMoveLeft       // If extra bit is set, then move allowed
-      ldx SPRITES.X0          // Check if position is on left border
-      cpx #LIMIT_LEFT
-      bcc CheckDirectionY     // If extra bit not set and x-position is not on
-      dex                     // left border, then move allowed
-      jmp UpdateSpriteXPos
-
-    TryToMoveLeft:
-      ldx SPRITES.X0          // Calculate new position
-      dex
-      cpx #$ff
-      bne UpdateSpriteXPos    // If position is $ff then extra bit must be
-      jmp ToggleExtraBit      // toggled
-
-    CheckDirectionY:
-      lda DirectionY
-      beq Done
-
-      jsr Ranger.UpdateRangerFrame
-
-      ldy SPRITES.Y0          // Calculate new position
-
-      lda DirectionY
-      cmp #$ff
-      beq MoveToUp
-
-    MoveToDown:
-      iny
-      cpy #LIMIT_DOWN
-      bcs Done
-      sty SPRITES.Y0
-
-      jmp Done
-
-    MoveToUp:
-      dey
-      cpy #LIMIT_UP
-      bcc Done
-      sty SPRITES.Y0
-
-    Done:
-      rts
   }
 
   // Initialization of intro screen
@@ -140,41 +71,44 @@ Level1: {
       lda #$00
       sta SPRITES.EXTRACOLOR2
 
-// Init ranger
-// Self modification code: sprite pointer needs to be relocated when screen
-// memory address changes. $47f8
+// Woodcutter sprite init
+      lda #SPRITES.ENEMY_STANDING
+      sta SPRITE_2
+      sta SPRITE_4
+      sta SPRITE_6
+
+// Ranger coordinates
+      lda #$50
+      sta SPRITES.X0
+      lda #$40
+      sta SPRITES.Y0
+
+// Ranger module init
+      lda #$00
+      sta Ranger.ScreenMemoryAddress + 1
       lda #$47
-      sta Ranger.Init.LoadSprite1 + 2
-      sta Ranger.UpdateRangerFrame.LoadSprite1 + 2
-      sta Ranger.UpdateRangerFrame.LoadSprite2 + 2
-      sta Ranger.UpdateRangerFrame.LoadSprite3 + 2
-      sta Ranger.UpdateRangerFrame.LoadSprite4 + 2
-      sta Ranger.UpdateRangerFrame.StoreSprite1 + 2
-      sta Ranger.UpdateRangerFrame.StoreSprite2 + 2
-      sta Ranger.UpdateRangerFrame.StoreSprite3 + 2
-      sta Ranger.UpdateRangerFrame.StoreSprite4 + 2
-
-      sta WoodCutter.Init.LoadSprite1 + 2
-      sta WoodCutter.UpdateWoodCutterFrame.LoadSprite1 + 2
-      sta WoodCutter.UpdateWoodCutterFrame.LoadSprite2 + 2
-      sta WoodCutter.UpdateWoodCutterFrame.LoadSprite3 + 2
-      sta WoodCutter.UpdateWoodCutterFrame.LoadSprite4 + 2
-      sta WoodCutter.UpdateWoodCutterFrame.StoreSprite1 + 2
-      sta WoodCutter.UpdateWoodCutterFrame.StoreSprite2 + 2
-      sta WoodCutter.UpdateWoodCutterFrame.StoreSprite3 + 2
-      sta WoodCutter.UpdateWoodCutterFrame.StoreSprite4 + 2
-
+      sta Ranger.ScreenMemoryAddress
       jsr Ranger.Init
+
+      lda #$00
+      sta WoodCutter.ScreenMemoryAddress + 1
+      lda #$47
+      sta WoodCutter.ScreenMemoryAddress
       jsr WoodCutter.Init
 
+// Sprite color setting
       lda #$07
       sta SPRITES.COLOR0
       lda #$08
       sta SPRITES.COLOR1
+      sta SPRITES.COLOR3
+      sta SPRITES.COLOR5
       lda #$02
       sta SPRITES.COLOR2
+      sta SPRITES.COLOR4
+      sta SPRITES.COLOR6
 
-// Enable the first sprite
+// Enable the first sprite (ranger)
       lda #%00000001
       sta VIC.SPRITE_ENABLE
 
@@ -183,7 +117,6 @@ Level1: {
 
   * = * "Level1 Finalize"
   Finalize: {
-
       lda #$00
       sta VIC.SPRITE_ENABLE
 
@@ -197,9 +130,9 @@ Level1: {
       cmp #$05
       beq EnemyNo6
 
-      /*
       cmp #$04
       beq EnemyNo5
+      /*
       cmp #$03
       beq EnemyNo4
       cmp #$02
@@ -219,27 +152,34 @@ Level1: {
 
       inc EnemyNo6Alive
 
-      lda #%00000101
+      lda VIC.SPRITE_ENABLE
+      ora #%00000100
       sta VIC.SPRITE_ENABLE
 
       jmp Done
 
-/*
     EnemyNo5:
-      lda #$20
-      sta SPRITES.X2
-      lda #$45
-      sta SPRITES.Y2
-
+      lda #$10
+      sta SPRITES.X4
+      lda #$cf
+      sta SPRITES.Y4
       lda SPRITES.EXTRA_BIT
-      ora #%00000100
+      ora #%00000000
       sta SPRITES.EXTRA_BIT
 
-      lda #%00000111
+      inc EnemyNo5Alive
+
+      lda VIC.SPRITE_ENABLE
+      ora #%00010000
       sta VIC.SPRITE_ENABLE
 
       jmp Done
-*/
+
+    EnemyNo4:
+    EnemyNo3:
+    EnemyNo2:
+    EnemyNo1:
+
     Done:
       rts
   }
@@ -251,6 +191,10 @@ Level1: {
       jsr Enemy6Manager
 
     IsEnemyNo5Alive:
+      lda EnemyNo5Alive
+      beq IsEnemyNo4Alive
+      jsr Enemy5Manager
+
     IsEnemyNo4Alive:
     IsEnemyNo3Alive:
     IsEnemyNo2Alive:
@@ -279,21 +223,35 @@ Level1: {
       cpx #TrackWalkCounter
       beq WalkInDone
 
-      // Passing X/Y direction to woodcutter frame update
+      // Woodcutter didn't reached the tree, walk
+      lda TrackWalkX, x
+      sta WoodCutter.SetPosition.NewX
+      lda TrackWalkY, x
+      sta WoodCutter.SetPosition.NewY
+      lda #$04
+      sta WoodCutter.SetPosition.SpriteXLow
+      lda #$05
+      sta WoodCutter.SetPosition.SpriteYLow
+      jsr WoodCutter.SetPosition
+
+      lda #<SPRITE_2
+      sta WoodCutter.ScreenMemoryAddress + 1
+      lda #>SPRITE_2
+      sta WoodCutter.ScreenMemoryAddress
+
       lda DirectionX, x
       sta WoodCutter.UpdateWoodCutterFrame.DirectionX
       lda DirectionY, x
       sta WoodCutter.UpdateWoodCutterFrame.DirectionY
 
-      // Woodcutter didn't reached the tree, walk
-      lda TrackWalkX, x
-      sta SPRITES.X2
+      lda WoodCutterFrame
+      sta WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
 
-      lda TrackWalkY, x
-      sta SPRITES.Y2
-
-      // Walk-step completed, update woodcutter frame
       jsr WoodCutter.UpdateWoodCutterFrame
+
+      lda WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+      sta WoodCutterFrame
+
       inc TrackPointer
 
       jmp Done
@@ -317,11 +275,8 @@ Level1: {
       lda SPRITES.Y2
       sta SPRITES.Y1
 
-      lda #SPRITES.RANGER_STANDING + 20
+      lda #SPRITES.HATCHET
       sta SPRITE_1
-
-      lda #$08
-      sta SPRITES.COLOR1
 
       lda VIC.SPRITE_ENABLE
       ora #%00000010
@@ -332,16 +287,20 @@ Level1: {
 
     HatchetStrike:
     // When a jsr is performed, stack is populated with return address, remember
+      lda #<SPRITE_1
+      sta Hatchet.ScreenMemoryAddress + 1
+      lda #>SPRITE_1
+      sta Hatchet.ScreenMemoryAddress
+
       lda HatchetFrame
-      pha
-      lda #$f9
-      pha
-      lda #$47
-      pha
+      sta Hatchet.UseTheHatchet.HatchetFrame
+
       jsr Hatchet.UseTheHatchet
-      pla
+
+      lda Hatchet.UseTheHatchet.HatchetFrame
       sta HatchetFrame
-      pla
+
+      lda Hatchet.UseTheHatchet.StrokeHappened
       bne StrokeHappened
       jmp Done
 
@@ -367,21 +326,36 @@ Level1: {
       ldx TrackPointer
       beq WalkOutDone
 
-      lda DirectionX, x                                 //3by, 4
+      lda TrackWalkX, x
+      sta WoodCutter.SetPosition.NewX
+      lda TrackWalkY, x
+      sta WoodCutter.SetPosition.NewY
+      lda #$04
+      sta WoodCutter.SetPosition.SpriteXLow
+      lda #$05
+      sta WoodCutter.SetPosition.SpriteYLow
+      jsr WoodCutter.SetPosition
+
+      lda #<SPRITE_2
+      sta WoodCutter.ScreenMemoryAddress + 1
+      lda #>SPRITE_2
+      sta WoodCutter.ScreenMemoryAddress
+
+      lda DirectionX, x
       sec                                               //1by, 2
       sbc #2                                            //2by, 2
-      sta WoodCutter.UpdateWoodCutterFrame.DirectionX   //3by, 4
+      sta WoodCutter.UpdateWoodCutterFrame.DirectionX
+      lda DirectionY, x
+      sta WoodCutter.UpdateWoodCutterFrame.DirectionY
 
-      lda DirectionY, x                                 //3by, 4
-      sta WoodCutter.UpdateWoodCutterFrame.DirectionY   //3by, 4
-
-      lda TrackWalkX, x
-      sta SPRITES.X2
-
-      lda TrackWalkY, x
-      sta SPRITES.Y2
+      lda WoodCutterFrame
+      sta WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
 
       jsr WoodCutter.UpdateWoodCutterFrame
+
+      lda WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+      sta WoodCutterFrame
+
       dec TrackPointer
 
       jmp Done
@@ -401,6 +375,9 @@ Level1: {
     HatchetFrame:
       .byte $ff
 
+    WoodCutterFrame:
+      .byte $00
+
     HatchetShown:
       .byte 0
     TrackPointer:
@@ -419,6 +396,203 @@ Level1: {
 
     DirectionX:
       .fill TrackWalkCounter, 1
+    DirectionY:
+      .fill TrackWalkCounter, 0
+  }
+
+    * = * "Level1 Enemy5Manager"
+  Enemy5Manager: {
+      lda CutCompleted
+      bne GoToWalkOutFar
+      jmp CutNotCompleted
+
+    GoToWalkOutFar:
+      jmp WalkOut
+
+    CutNotCompleted:
+      lda WalkInCompleted
+      bne ShowHatchet
+
+    WalkIn:
+      // Woodcutter walks in
+      ldx TrackPointer
+      cpx #TrackWalkCounter
+      beq WalkInDone
+
+      // Woodcutter didn't reached the tree, walk
+      lda TrackWalkX, x
+      sta WoodCutter.SetPosition.NewX
+      lda TrackWalkY, x
+      sta WoodCutter.SetPosition.NewY
+      lda #$08
+      sta WoodCutter.SetPosition.SpriteXLow
+      lda #$09
+      sta WoodCutter.SetPosition.SpriteYLow
+      jsr WoodCutter.SetPosition
+
+      lda #<SPRITE_4
+      sta WoodCutter.ScreenMemoryAddress + 1
+      lda #>SPRITE_4
+      sta WoodCutter.ScreenMemoryAddress
+
+      lda DirectionX, x
+      sta WoodCutter.UpdateWoodCutterFrame.DirectionX
+      lda DirectionY, x
+      sta WoodCutter.UpdateWoodCutterFrame.DirectionY
+
+      lda WoodCutterFrame
+      sta WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+
+      jsr WoodCutter.UpdateWoodCutterFrame
+
+      lda WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+      sta WoodCutterFrame
+
+      inc TrackPointer
+
+      jmp Done
+
+      // Woodcutter is in position, stop walk
+    WalkInDone:
+      inc WalkInCompleted
+
+      jmp Done
+
+    ShowHatchet:
+      // Woodcutter is in position, start to cut the tree
+      lda HatchetShown
+      bne HatchetStrike
+
+      dec TrackPointer
+
+      // Walk is done, hatchet must be set
+      lda SPRITES.X4
+      sta SPRITES.X3
+      lda SPRITES.Y4
+      sta SPRITES.Y3
+
+      lda #SPRITES.HATCHET
+      sta SPRITE_3
+
+      lda VIC.SPRITE_ENABLE
+      ora #%00001000
+      sta VIC.SPRITE_ENABLE
+      inc HatchetShown
+
+      jmp Done
+
+    HatchetStrike:
+    // When a jsr is performed, stack is populated with return address, remember
+      lda #<SPRITE_3
+      sta Hatchet.ScreenMemoryAddress + 1
+      lda #>SPRITE_3
+      sta Hatchet.ScreenMemoryAddress
+
+      lda HatchetFrame
+      sta Hatchet.UseTheHatchet.HatchetFrame
+
+      jsr Hatchet.UseTheHatchet
+
+      lda Hatchet.UseTheHatchet.HatchetFrame
+      sta HatchetFrame
+
+      lda Hatchet.UseTheHatchet.StrokeHappened
+      bne StrokeHappened
+      jmp Done
+
+    StrokeHappened:
+      dec HatchetStrokes
+      lda HatchetStrokes
+      bne Done
+      inc CutCompleted
+
+    HideHatchet:
+      lda #$00
+      sta HatchetShown
+      lda #HatchetStrokesMax
+      sta HatchetStrokes
+      lda VIC.SPRITE_ENABLE
+      and #%11110111
+      sta VIC.SPRITE_ENABLE
+
+      jmp Done
+
+    WalkOut:
+    // Tree has been cut, hide hatchet and move woodcutter out of screen
+      ldx TrackPointer
+      beq WalkOutDone
+
+      lda TrackWalkX, x
+      sta WoodCutter.SetPosition.NewX
+      lda TrackWalkY, x
+      sta WoodCutter.SetPosition.NewY
+      lda #$08
+      sta WoodCutter.SetPosition.SpriteXLow
+      lda #$09
+      sta WoodCutter.SetPosition.SpriteYLow
+      jsr WoodCutter.SetPosition
+
+      lda #<SPRITE_4
+      sta WoodCutter.ScreenMemoryAddress + 1
+      lda #>SPRITE_4
+      sta WoodCutter.ScreenMemoryAddress
+
+// RIVEDERE PATH DEL TAGLIALEGNA
+      lda DirectionX, x
+      sec                                               //1by, 2
+      sbc #2                                            //2by, 2
+      sta WoodCutter.UpdateWoodCutterFrame.DirectionX
+      lda DirectionY, x
+      sta WoodCutter.UpdateWoodCutterFrame.DirectionY
+
+      lda WoodCutterFrame
+      sta WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+
+      jsr WoodCutter.UpdateWoodCutterFrame
+
+      lda WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+      sta WoodCutterFrame
+
+      dec TrackPointer
+
+      jmp Done
+
+    WalkOutDone:
+      lda VIC.SPRITE_ENABLE
+      and #%11101111
+      sta VIC.SPRITE_ENABLE
+
+    Done:
+      rts
+
+    .label HatchetStrokesMax = $0f
+    HatchetStrokes:
+      .byte HatchetStrokesMax
+
+    HatchetFrame:
+      .byte $ff
+
+    WoodCutterFrame:
+      .byte $00
+
+    HatchetShown:
+      .byte 0
+    TrackPointer:
+      .byte 0
+    CutCompleted:
+      .byte 0
+    WalkInCompleted:
+      .byte 0
+
+    .label TrackWalkCounter = 41
+
+    TrackWalkX:
+      .fill TrackWalkCounter, $ff-i
+    TrackWalkY:
+      .fill TrackWalkCounter, 200
+
+    DirectionX:
+      .fill TrackWalkCounter, $ff
     DirectionY:
       .fill TrackWalkCounter, 0
   }
@@ -459,7 +633,7 @@ Level1: {
       .byte 50                  // 1 second delay
 
     WaitingForEnemy:
-      .byte 1
+      .byte 2
   }
 
   TimedRoutine10th: {
@@ -492,17 +666,22 @@ Level1: {
     rts
   }
 
-  .label LIMIT_UP     = $32
-  .label LIMIT_DOWN   = $e0
-  .label LIMIT_LEFT   = $16
-  .label LIMIT_RIGHT  = $46
-
+// Hatchet sprite pointer
   .label SPRITE_1     = $47f9
+  .label SPRITE_3     = $47fb
+  .label SPRITE_5     = $47fd
+
+// Enemy sprite pointer
+  .label SPRITE_2     = $47fa
+  .label SPRITE_4     = $47fc
+  .label SPRITE_6     = $47fe
 
   EnemyLeft:
     .byte 6
 
   EnemyNo6Alive:
+    .byte 0
+  EnemyNo5Alive:
     .byte 0
 }
 

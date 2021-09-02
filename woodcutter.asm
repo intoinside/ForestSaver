@@ -13,19 +13,41 @@
 WoodCutter: {
   * = * "WoodCutter Init"
   Init: {
+// Self modify code to use current screen memotry address, update hibyte
+      lda ScreenMemoryAddress
+      sta LoadSprite1 + 2
+      sta UpdateWoodCutterFrame.LoadSprite1 + 2
+      sta UpdateWoodCutterFrame.LoadSprite2 + 2
+      sta UpdateWoodCutterFrame.LoadSprite3 + 2
+      sta UpdateWoodCutterFrame.LoadSprite4 + 2
+      sta UpdateWoodCutterFrame.StoreSprite1 + 2
+      sta UpdateWoodCutterFrame.StoreSprite2 + 2
+      sta UpdateWoodCutterFrame.StoreSprite3 + 2
+      sta UpdateWoodCutterFrame.StoreSprite4 + 2
+
+// Update lobyte
+      lda ScreenMemoryAddress + 1
+      sta LoadSprite1 + 1
+
       lda #SPRITES.ENEMY_STANDING
     LoadSprite1:
-      sta SPRITES.SPRITE_2
-
-      lda #$00
-      sta SPRITES.X1
-      sta SPRITES.Y1
+      sta SPRITE_PTR
 
       rts
   }
 
   * = * "WoodCutter UpdateWoodCutterFrame"
   UpdateWoodCutterFrame: {
+      lda ScreenMemoryAddress + 1
+      sta UpdateWoodCutterFrame.LoadSprite1 + 1
+      sta UpdateWoodCutterFrame.LoadSprite2 + 1
+      sta UpdateWoodCutterFrame.LoadSprite3 + 1
+      sta UpdateWoodCutterFrame.LoadSprite4 + 1
+      sta UpdateWoodCutterFrame.StoreSprite1 + 1
+      sta UpdateWoodCutterFrame.StoreSprite2 + 1
+      sta UpdateWoodCutterFrame.StoreSprite3 + 1
+      sta UpdateWoodCutterFrame.StoreSprite4 + 1
+
       inc WoodCutterFrame
       lda WoodCutterFrame
       lsr
@@ -46,7 +68,7 @@ WoodCutter: {
     Right:
       ldx #SPRITES.ENEMY_STANDING + 5
     LoadSprite1:
-      lda SPRITES.SPRITE_2
+      lda SPRITE_PTR
       cmp #SPRITES.ENEMY_STANDING + 6
       beq RightUpdate
       inx
@@ -54,13 +76,13 @@ WoodCutter: {
     RightUpdate:
       // If right frame edit occours, no other frame switch will be performed
     StoreSprite1:
-      stx SPRITES.SPRITE_2
+      stx SPRITE_PTR
       jmp NoMove
 
     Left:
       ldx #SPRITES.ENEMY_STANDING + 7
     LoadSprite2:
-      lda SPRITES.SPRITE_2
+      lda SPRITE_PTR
       cmp #SPRITES.ENEMY_STANDING + 8
       beq LeftUpdate
       inx
@@ -68,7 +90,7 @@ WoodCutter: {
     LeftUpdate:
       // If left frame edit occours, no other frame switch will be performed
     StoreSprite2:
-      stx SPRITES.SPRITE_2
+      stx SPRITE_PTR
       jmp NoMove
 
     CheckVerticalMove:
@@ -81,27 +103,27 @@ WoodCutter: {
     Down:
       ldx #SPRITES.ENEMY_STANDING + 1
     LoadSprite3:
-      lda SPRITES.SPRITE_2
+      lda SPRITE_PTR
       cmp #SPRITES.ENEMY_STANDING + 2
       beq UpUpdate
       inx
 
     DownUpdate:
     StoreSprite3:
-      stx SPRITES.SPRITE_2
+      stx SPRITE_PTR
       jmp NoMove
 
     Up:
       ldx #SPRITES.ENEMY_STANDING + 3
     LoadSprite4:
-      lda SPRITES.SPRITE_2
+      lda SPRITE_PTR
       cmp #SPRITES.ENEMY_STANDING + 4
       beq UpUpdate
       inx
 
     UpUpdate:
     StoreSprite4:
-      stx SPRITES.SPRITE_2
+      stx SPRITE_PTR
 
     NoMove:
       rts
@@ -113,6 +135,38 @@ WoodCutter: {
     DirectionY:
       .byte $00
   }
+
+  SetPosition: {
+      lda SpriteXLow
+      sta SetX + 1
+      lda SpriteYLow
+      sta SetY + 1
+
+      lda NewX
+    SetX:
+      sta $d0ef
+
+      lda NewY
+    SetY:
+      sta $d0ef
+
+    Done:
+      rts
+
+    NewX:
+      .byte $00
+    NewY:
+      .byte $00
+    SpriteXLow:
+      .byte $00
+    SpriteYLow:
+      .byte $00
+  }
+
+  .label SPRITE_PTR = $beef
+
+  ScreenMemoryAddress:
+    .word $be00
 }
 
 #import "label.asm"

@@ -17,37 +17,22 @@ Hatchet: {
       rts
   }
 
-// Parameter list in stack:
-// Return address           2byte
-// Sprite pointer address   2byte
-// Hatchet frame            1byte
-
-// Output list on stack:
-// Return address           2byte
-// Hatchet frame            1byte
-// Hatchet stroke performed 1byte
 * = * "Hatchet UseTheHatchet"
   UseTheHatchet: {
-      pla
-      sta ReturnAddress
-      pla
-      sta ReturnAddress + 1
-
-      // Caller must set into stack the hi-byte and lo-byte of sprite pointer
-      pla
-      sta LoadHatchet1 + 2
-      sta LoadHatchet2 + 2
-      sta LoadHatchet3 + 2
-      pla
+      lda ScreenMemoryAddress + 1
       sta LoadHatchet1 + 1
       sta LoadHatchet2 + 1
       sta LoadHatchet3 + 1
-      pla
-      sta HatchetFrame
+
+      lda ScreenMemoryAddress
+      sta LoadHatchet1 + 2
+      sta LoadHatchet2 + 2
+      sta LoadHatchet3 + 2
 
       ldx #$00
 
       inc HatchetFrame
+      lda HatchetFrame
       lsr
       lsr
       lsr
@@ -72,24 +57,17 @@ Hatchet: {
       inx
 
     Done:
-      txa
-      pha
-      lda HatchetFrame
-      pha
-      lda ReturnAddress + 1
-      pha
-      lda ReturnAddress
-      pha
+      stx StrokeHappened
 
       rts
 
     .label SPRITE_PTR   = $beef
 
+    StrokeHappened:
+      .byte $00
+
     HatchetFrame:
       .byte $ff
-
-    ReturnAddress:
-      .word $beef
   }
 
 * = * "Hatchet UpdateHatchetFrame"
@@ -97,6 +75,9 @@ Hatchet: {
 
     rts
   }
+
+  ScreenMemoryAddress:
+    .word $be00
 }
 
 #import "label.asm"
