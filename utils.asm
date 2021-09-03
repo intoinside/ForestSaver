@@ -10,6 +10,68 @@
 
 #importonce
 
+.macro RemoveTree(startAddress, colorStartAddress) {
+    ldx #$00
+    stx startAddress
+    stx startAddress + $01
+    stx startAddress + $02
+    stx startAddress + $03
+
+    stx startAddress + $28
+    stx startAddress + $29
+    stx startAddress + $2a
+    stx startAddress + $2b
+
+    stx startAddress + $50
+    stx startAddress + $53
+
+    inx
+    stx startAddress + $51
+    inx
+    stx startAddress + $52
+
+    inx
+    stx startAddress + $78
+    inx
+    stx startAddress + $79
+    inx
+    stx startAddress + $7a
+    inx
+    stx startAddress + $7b
+
+    ldx #$04
+  Loop:
+    ldy startAddress
+    lda CharColors, y
+    sta colorStartAddress + $d800, x
+    dex
+    bne Loop
+
+    ldx #$04
+  Loop2:
+    ldy startAddress + $28
+    lda CharColors, y
+    sta colorStartAddress + $d800 + $28, x
+    dex
+    bne Loop2
+
+    ldx #$04
+  Loop3:
+    ldy startAddress + $50
+    lda CharColors, y
+    sta colorStartAddress + $d800 + $50, x
+    dex
+    bne Loop3
+
+    ldx #$04
+  Loop4:
+    ldy startAddress + $78
+    lda CharColors, y
+    sta colorStartAddress + $d800 + $78, x
+    dex
+    bne Loop4
+}
+
 // Fill screen with $20 char (preserve sprite pointer memory area)
 .macro ClearScreen(screenram) {
     lda #$20

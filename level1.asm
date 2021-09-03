@@ -307,9 +307,12 @@ Level1: {
     StrokeHappened:
       dec HatchetStrokes
       lda HatchetStrokes
-      bne Done
+      bne DoneFar
       inc CutCompleted
+      jmp HideHatchet
 
+    DoneFar:
+      jmp Done
     HideHatchet:
       lda #$00
       sta HatchetShown
@@ -322,7 +325,10 @@ Level1: {
       jmp Done
 
     WalkOut:
-    // Tree has been cut, hide hatchet and move woodcutter out of screen
+    // Tree has been cut, remove tree
+      RemoveTree($456c, $016c);
+
+    // Hide hatchet and move woodcutter out of screen
       ldx TrackPointer
       beq WalkOutDone
 

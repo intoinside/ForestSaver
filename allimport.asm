@@ -30,6 +30,7 @@
 
 // Charset and char color
 * = $7800 "Charset"
+Charset:
   .import binary "./maps/charset.bin"
 * = $c000 "CharColors"
 CharColors:
