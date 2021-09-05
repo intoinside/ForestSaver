@@ -163,10 +163,10 @@ WoodCutter: {
       .byte $00
   }
 
-  .label SPRITE_PTR = $beef
-
   ScreenMemoryAddress:
     .word $be00
+
+  .label SPRITE_PTR = $beef
 }
 
 #import "label.asm"

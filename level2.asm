@@ -82,11 +82,12 @@ Level2: {
   }
 
   AddColorToMap: {
-// TODO(intoinside): don't like this macro, maybe changed with a function
-// (there's no need to be fast but there is a need to have smaller code)
-    SetColorToChars($4800)
+      lda #$48
+      sta SetColorToChars.ScreenMemoryAddress
 
-    rts
+      jsr SetColorToChars
+
+      rts
   }
 
   .label SPRITE_0     = $4bf8

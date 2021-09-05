@@ -60,9 +60,10 @@ Intro: {
   }
 
   AddColorToMap: {
-// TODO(intoinside): don't like this macro, maybe changed with a function
-// (there's no need to be fast but there is a need to have smaller code)
-      SetColorToChars($4000)
+      lda #$40
+      sta SetColorToChars.ScreenMemoryAddress
+
+      jsr SetColorToChars
 
       rts
   }
