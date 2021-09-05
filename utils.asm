@@ -10,6 +10,9 @@
 
 #importonce
 
+SpriteNumberMask:
+    .byte %00000001, %00000010, %00000100, %00001000, %00010000, %00100000, %01000000, %10000000
+
 .macro RemoveTree(startAddress, colorStartAddress) {
     ldx #$00
     stx startAddress
@@ -83,6 +86,12 @@
     sta screenram + 500, x
     sta screenram + 750, x
     bne !-
+}
+
+.macro SpriteCollided(spriteNumber) {
+    ldy spriteNumber
+    lda SpriteNumberMask, y
+    and SPRITES.COLLISION_REGISTER
 }
 
 * = * "SetColorToChars"
