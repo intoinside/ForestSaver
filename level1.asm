@@ -204,8 +204,61 @@ Level1: {
       rts
   }
 
+  * = * "Level1 WoodCutterFined"
+  HandleWoodCutterFined: {
+      lda HatctedHidden
+      bne Stage2
+
+      lda ComplaintShown
+      bne Stage3
+
+    Stage1:
+// WoodCutter and Ranger met, hide hatchet
+      lda VIC.SPRITE_ENABLE
+      and #%11111101
+      sta VIC.SPRITE_ENABLE
+      inc HatctedHidden
+
+      jmp Done
+
+    Stage2:
+// Hatchet hidden
+      lda #$64
+      sta $4569
+      lda #$65
+      sta $456a
+      lda #$66
+      sta $456b
+
+      lda #$67
+      sta $4591
+      lda #$68
+      sta $4592
+      lda #$69
+      sta $4593
+
+      inc ComplaintShown
+
+      jmp Done
+
+    Stage3:
+      jmp Done
+
+    Done:
+      rts
+
+    HatctedHidden: .byte $00
+    ComplaintShown: .byte $00
+  }
+
   * = * "Level1 Enemy6Manager"
   Enemy6Manager: {
+      lda WoodCutterFined
+      beq CutCompletedCheck
+      jsr HandleWoodCutterFined
+      jmp Done
+
+    CutCompletedCheck:
       lda CutCompleted
       bne GoToWalkOutFar
       jmp CutNotCompleted
@@ -286,6 +339,9 @@ Level1: {
       jmp Done
 
     HatchetStrike:
+      SpriteCollided(1);
+      bne RangerWoodCutterMet
+
     // When a jsr is performed, stack is populated with return address, remember
       lda #<SPRITE_1
       sta Hatchet.ScreenMemoryAddress + 1
@@ -311,6 +367,10 @@ Level1: {
       inc CutCompleted
       jmp HideHatchet
 
+    RangerWoodCutterMet:
+      inc WoodCutterFined
+      jmp Done
+
     DoneFar:
       jmp Done
     HideHatchet:
@@ -322,12 +382,12 @@ Level1: {
       and #%11111101
       sta VIC.SPRITE_ENABLE
 
-      jmp Done
-
-    WalkOut:
     // Tree has been cut, remove tree
       RemoveTree($456c, $016c);
 
+      jmp Done
+
+    WalkOut:
     // Hide hatchet and move woodcutter out of screen
       ldx TrackPointer
       beq WalkOutDone
@@ -382,6 +442,9 @@ Level1: {
       .byte $ff
 
     WoodCutterFrame:
+      .byte $00
+
+    WoodCutterFined:
       .byte $00
 
     HatchetShown:
