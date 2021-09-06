@@ -204,57 +204,176 @@ Level1: {
       rts
   }
 
-  * = * "Level1 WoodCutterFined"
+  * = * "Level1 HandleWoodCutterFined"
   HandleWoodCutterFined: {
-      lda HatctedHidden
-      bne Stage2
-
       lda ComplaintShown
-      bne Stage3
+      beq SelfMod
+      jmp Done
+
+    SelfMod:
+// Char self mod
+      lda ComplainChars
+      sta EditMap1 + 1
+      lda ComplainChars + 1
+      sta EditMap2 + 1
+      lda ComplainChars + 2
+      sta EditMap3 + 1
+
+      lda ComplainChars + 3
+      sta EditMap4 + 1
+      lda ComplainChars + 4
+      sta EditMap5 + 1
+      lda ComplainChars + 5
+      sta EditMap6 + 1
+
+// Map self mod
+      lda MapComplain
+      sta EditMap1 + 3
+      lda MapComplain + 1
+      sta EditMap1 + 4
+
+      lda MapComplain + 2
+      sta EditMap2 + 3
+      lda MapComplain + 3
+      sta EditMap2 + 4
+
+      lda MapComplain + 4
+      sta EditMap3 + 3
+      lda MapComplain + 5
+      sta EditMap3 + 4
+
+      lda MapComplain + 6
+      sta EditMap4 + 3
+      lda MapComplain + 7
+      sta EditMap4 + 4
+
+      lda MapComplain + 8
+      sta EditMap5 + 3
+      lda MapComplain + 9
+      sta EditMap5 + 4
+
+      lda MapComplain + 10
+      sta EditMap6 + 3
+      lda MapComplain + 11
+      sta EditMap6 + 4
 
     Stage1:
 // WoodCutter and Ranger met, hide hatchet
       lda VIC.SPRITE_ENABLE
       and #%11111101
       sta VIC.SPRITE_ENABLE
-      inc HatctedHidden
 
-      jmp Done
+    EditMap1:
+      lda #$00
+      sta $beef
+    EditMap2:
+      lda #$00
+      sta $beef
+    EditMap3:
+      lda #$00
+      sta $beef
 
-    Stage2:
-// Hatchet hidden
-      lda #$64
-      sta $4569
-      lda #$65
-      sta $456a
-      lda #$66
-      sta $456b
-
-      lda #$67
-      sta $4591
-      lda #$68
-      sta $4592
-      lda #$69
-      sta $4593
+    EditMap4:
+      lda #$00
+      sta $beef
+    EditMap5:
+      lda #$00
+      sta $beef
+    EditMap6:
+      lda #$00
+      sta $beef
 
       inc ComplaintShown
-
-      jmp Done
-
-    Stage3:
-      jmp Done
 
     Done:
       rts
 
-    HatctedHidden: .byte $00
+    ComplainChars:  .byte $64, $65, $66, $67, $68, $69
+    MapComplain:    .word $4569, $456a, $456b, $4591, $4592, $4593
+
     ComplaintShown: .byte $00
   }
+
+/*
+  * = * "Level1 HandleWoodCutterFinedOut"
+  HandleWoodCutterFinedOut: {
+      lda ComplaintHidden
+      beq SelfMod
+      jmp Done
+
+// Char self mod
+      lda ComplainChars
+      sta EditMap1 + 1
+      sta EditMap2 + 1
+      sta EditMap3 + 1
+
+      sta EditMap4 + 1
+      sta EditMap5 + 1
+      sta EditMap6 + 1
+
+// Map self mod
+      lda MapComplain
+      sta EditMap1 + 3
+      lda MapComplain + 1
+      sta EditMap1 + 4
+
+      lda MapComplain + 2
+      sta EditMap2 + 3
+      lda MapComplain + 3
+      sta EditMap2 + 4
+
+      lda MapComplain + 4
+      sta EditMap3 + 3
+      lda MapComplain + 5
+      sta EditMap3 + 4
+
+      lda MapComplain + 6
+      sta EditMap4 + 3
+      lda MapComplain + 7
+      sta EditMap4 + 4
+
+      lda MapComplain + 8
+      sta EditMap5 + 3
+      lda MapComplain + 9
+      sta EditMap5 + 4
+
+      lda MapComplain + 10
+      sta EditMap6 + 3
+      lda MapComplain + 11
+      sta EditMap6 + 4
+
+    EditMap1:
+      lda #FixComplainChars
+      sta $beef
+    EditMap2:
+      sta $beef
+    EditMap3:
+      sta $beef
+
+    EditMap4:
+      sta $beef
+    EditMap5:
+      sta $beef
+    EditMap6:
+      sta $beef
+
+    Done:
+      rts
+
+    FixComplainChars: .byte $00
+    MapComplain:      .word $4569, $456a, $456b, $4591, $4592, $4593
+
+    ComplaintHidden: .byte $00
+  }
+*/
 
   * = * "Level1 Enemy6Manager"
   Enemy6Manager: {
       lda WoodCutterFined
       beq CutCompletedCheck
+      lda HandleWoodCutterFined.ComplaintShown
+      bne GoToWalkOutFar
+
       jsr HandleWoodCutterFined
       jmp Done
 
