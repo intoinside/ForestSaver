@@ -206,11 +206,6 @@ Level1: {
 
   * = * "Level1 HandleWoodCutterFined"
   HandleWoodCutterFined: {
-      lda ComplaintShown
-      beq SelfMod
-      jmp Done
-
-    SelfMod:
 // Char self mod
       lda ComplainChars
       sta EditMap1 + 1
@@ -283,67 +278,47 @@ Level1: {
       lda #$00
       sta $beef
 
-      inc ComplaintShown
-
-    Done:
       rts
 
     ComplainChars:  .byte $64, $65, $66, $67, $68, $69
     MapComplain:    .word $4569, $456a, $456b, $4591, $4592, $4593
-
-    ComplaintShown: .byte $00
   }
 
-/*
   * = * "Level1 HandleWoodCutterFinedOut"
   HandleWoodCutterFinedOut: {
-      lda ComplaintHidden
-      beq SelfMod
-      jmp Done
-
-// Char self mod
-      lda ComplainChars
-      sta EditMap1 + 1
-      sta EditMap2 + 1
-      sta EditMap3 + 1
-
-      sta EditMap4 + 1
-      sta EditMap5 + 1
-      sta EditMap6 + 1
-
-// Map self mod
       lda MapComplain
-      sta EditMap1 + 3
+      sta EditMap1 + 1
       lda MapComplain + 1
-      sta EditMap1 + 4
+      sta EditMap1 + 2
 
       lda MapComplain + 2
-      sta EditMap2 + 3
+      sta EditMap2 + 1
       lda MapComplain + 3
-      sta EditMap2 + 4
+      sta EditMap2 + 2
 
       lda MapComplain + 4
-      sta EditMap3 + 3
+      sta EditMap3 + 1
       lda MapComplain + 5
-      sta EditMap3 + 4
+      sta EditMap3 + 2
 
       lda MapComplain + 6
-      sta EditMap4 + 3
+      sta EditMap4 + 1
       lda MapComplain + 7
-      sta EditMap4 + 4
+      sta EditMap4 + 2
 
       lda MapComplain + 8
-      sta EditMap5 + 3
+      sta EditMap5 + 1
       lda MapComplain + 9
-      sta EditMap5 + 4
+      sta EditMap5 + 2
 
       lda MapComplain + 10
-      sta EditMap6 + 3
+      sta EditMap6 + 1
       lda MapComplain + 11
-      sta EditMap6 + 4
+      sta EditMap6 + 2
 
+    EditCharMap1:
+      lda FixComplainChars
     EditMap1:
-      lda #FixComplainChars
       sta $beef
     EditMap2:
       sta $beef
@@ -357,24 +332,22 @@ Level1: {
     EditMap6:
       sta $beef
 
-    Done:
       rts
 
     FixComplainChars: .byte $00
     MapComplain:      .word $4569, $456a, $456b, $4591, $4592, $4593
-
-    ComplaintHidden: .byte $00
   }
-*/
 
   * = * "Level1 Enemy6Manager"
   Enemy6Manager: {
       lda WoodCutterFined
       beq CutCompletedCheck
-      lda HandleWoodCutterFined.ComplaintShown
+      lda ComplaintShown
       bne GoToWalkOutFar
 
       jsr HandleWoodCutterFined
+      inc ComplaintShown
+
       jmp Done
 
     CutCompletedCheck:
@@ -546,6 +519,10 @@ Level1: {
       jmp Done
 
     WalkOutDone:
+      lda ComplaintHidden
+      jsr HandleWoodCutterFinedOut
+      inc ComplaintHidden
+
       lda VIC.SPRITE_ENABLE
       and #%11111011
       sta VIC.SPRITE_ENABLE
@@ -565,6 +542,11 @@ Level1: {
 
     WoodCutterFined:
       .byte $00
+
+    ComplaintShown:
+      .byte 0
+    ComplaintHidden:
+      .byte 0
 
     HatchetShown:
       .byte 0
