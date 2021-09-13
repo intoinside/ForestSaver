@@ -88,6 +88,21 @@ SpriteNumberMask:
     bne !-
 }
 
+.macro EnableSprite(bSprite, bEnable) {
+    ldy #bSprite
+    lda SpriteNumberMask, y
+    .if (bEnable)   // Build-time condition (not run-time)
+    {
+        ora VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
+    }
+    else
+    {
+        eor #$FF    // Get mask compliment
+        and VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
+    }
+    sta VIC.SPRITE_ENABLE       // Set the new value into the sprite enable register
+}
+
 .macro SpriteCollided(spriteNumber) {
     ldy spriteNumber
     lda SpriteNumberMask, y
@@ -140,6 +155,24 @@ SetColorToChars: {
 
   CleanLoop:
     .byte $03
+}
+
+.macro GetRandomUpTo(maxNumber) {
+    lda #maxNumber
+    sta GetRandom.GeneratorMax
+    jsr GetRandom
+}
+
+GetRandom: {
+  Loop:
+    lda $d012
+    eor $dc04
+    sbc $dc05
+    cmp GeneratorMax
+    bcs Loop
+    rts
+
+    GeneratorMax: .byte $00
 }
 
 WaitRoutine: {

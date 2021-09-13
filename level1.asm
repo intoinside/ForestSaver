@@ -83,18 +83,25 @@ Level1: {
       lda #$40
       sta SPRITES.Y0
 
+// Optimization may be done
 // Ranger module init
       lda #$00
       sta Ranger.ScreenMemoryAddress + 1
-      lda #$47
+      lda #$44
       sta Ranger.ScreenMemoryAddress
       jsr Ranger.Init
 
       lda #$00
       sta WoodCutter.ScreenMemoryAddress + 1
-      lda #$47
+      lda #$44
       sta WoodCutter.ScreenMemoryAddress
       jsr WoodCutter.Init
+
+      lda #$00
+      sta Hud.ScreenMemoryAddress + 1
+      lda #$44
+      sta Hud.ScreenMemoryAddress
+      jsr Hud.Init
 
 // Sprite color setting
       lda #$07
@@ -125,40 +132,60 @@ Level1: {
 
   * = * "Level1 AddEnemy"
   AddEnemy: {
-      dec EnemyLeft
-      lda EnemyLeft
-      cmp #$05
-      beq EnemyNo6
+      lda WaitingForEnemy
+      beq Done
 
-      cmp #$04
-      beq EnemyNo5
-      /*
-      cmp #$03
-      beq EnemyNo4
+      GetRandomUpTo(6)
+
       cmp #$02
-      beq EnemyNo3
+      beq StartEnemy2
+
+      cmp #$03
+      beq StartEnemy3
+
+/*
+      cmp #$04
+      beq StartEnemy4
+
+      cmp #$03
+      beq StartEnemy4
+
+      cmp #$02
+      beq StartEnemy5
+
       cmp #$01
-      beq EnemyNo2
-      cmp #$00
-      beq EnemyNo1
-      */
+      beq StartEnemy7
+*/
+
       jmp Done
 
-    EnemyNo6:
+    StartEnemy2:
+      lda EnemyActive
+      and #%00000100
+      bne Done
+      lda EnemyActive
+      ora #%00000100
+      sta EnemyActive
+
       lda #$0
       sta SPRITES.X2
       lda #$45
       sta SPRITES.Y2
 
-      inc EnemyNo6Alive
+      EnableSprite(2, true)
 
-      lda VIC.SPRITE_ENABLE
-      ora #%00000100
-      sta VIC.SPRITE_ENABLE
+      dec WaitingForEnemy
 
       jmp Done
 
-    EnemyNo5:
+    StartEnemy3:
+      lda EnemyActive
+      and #%00001000
+      bne Done
+      lda EnemyActive
+      ora #%00001000
+      sta EnemyActive
+
       lda #$10
       sta SPRITES.X4
       lda #$cf
@@ -167,38 +194,48 @@ Level1: {
       ora #%00000000
       sta SPRITES.EXTRA_BIT
 
-      inc EnemyNo5Alive
+      EnableSprite(4, true)
 
-      lda VIC.SPRITE_ENABLE
-      ora #%00010000
-      sta VIC.SPRITE_ENABLE
+      dec WaitingForEnemy
 
       jmp Done
 
-    EnemyNo4:
-    EnemyNo3:
-    EnemyNo2:
-    EnemyNo1:
+    StartEnemy4:
+      jmp Done
+
+    StartEnemy5:
+      jmp Done
+
+    StartEnemy6:
+      jmp Done
+
+    StartEnemy7:
+      jmp Done
 
     Done:
       rts
+
+    EnemyActive:      .byte $00
+    WaitingForEnemy:  .byte $02
   }
 
   * = * "Level1 HandleEnemyMove"
   HandleEnemyMove: {
-      lda EnemyNo6Alive
-      beq IsEnemyNo5Alive
-      jsr Enemy6Manager
+      lda AddEnemy.EnemyActive
+      and #%00000100
+      beq IsEnemyNo3Alive
+      jsr Enemy2Manager
 
-    IsEnemyNo5Alive:
-      lda EnemyNo5Alive
+    IsEnemyNo3Alive:
+      lda AddEnemy.EnemyActive
+      and #%00001000
       beq IsEnemyNo4Alive
-      jsr Enemy5Manager
+      jsr Enemy3Manager
 
     IsEnemyNo4Alive:
-    IsEnemyNo3Alive:
-    IsEnemyNo2Alive:
-    IsEnemyNo1Alive:
+    IsEnemyNo5Alive:
+    IsEnemyNo6Alive:
+    IsEnemyNo7Alive:
 
     Done:
       rts
@@ -254,9 +291,7 @@ Level1: {
 
     Stage1:
 // WoodCutter and Ranger met, hide hatchet
-      lda VIC.SPRITE_ENABLE
-      and #%11111101
-      sta VIC.SPRITE_ENABLE
+      EnableSprite(1, false)
 
     EditMap1:
       lda #$00
@@ -338,8 +373,8 @@ Level1: {
     MapComplain:      .word $4569, $456a, $456b, $4591, $4592, $4593
   }
 
-  * = * "Level1 Enemy6Manager"
-  Enemy6Manager: {
+  * = * "Level1 Enemy2Manager"
+  Enemy2Manager: {
       lda WoodCutterFined
       beq CutCompletedCheck
       lda ComplaintShown
@@ -423,16 +458,16 @@ Level1: {
       lda #SPRITES.HATCHET
       sta SPRITE_1
 
-      lda VIC.SPRITE_ENABLE
-      ora #%00000010
-      sta VIC.SPRITE_ENABLE
+      EnableSprite(1, true)
+
       inc HatchetShown
 
       jmp Done
 
     HatchetStrike:
-      SpriteCollided(1);
-      bne RangerWoodCutterMet
+// TODO(rafs): need to setup a new collision detector
+      // SpriteCollided(0);
+      // bne RangerWoodCutterMet
 
     // When a jsr is performed, stack is populated with return address, remember
       lda #<SPRITE_1
@@ -470,12 +505,11 @@ Level1: {
       sta HatchetShown
       lda #HatchetStrokesMax
       sta HatchetStrokes
-      lda VIC.SPRITE_ENABLE
-      and #%11111101
-      sta VIC.SPRITE_ENABLE
+
+      EnableSprite(1, false)
 
     // Tree has been cut, remove tree
-      RemoveTree($456c, $016c);
+      RemoveTree($456c, $016c)
 
       jmp Done
 
@@ -523,9 +557,7 @@ Level1: {
       jsr HandleWoodCutterFinedOut
       inc ComplaintHidden
 
-      lda VIC.SPRITE_ENABLE
-      and #%11111011
-      sta VIC.SPRITE_ENABLE
+      EnableSprite(2, false)
 
     Done:
       rts
@@ -570,8 +602,32 @@ Level1: {
       .fill TrackWalkCounter, 0
   }
 
-    * = * "Level1 Enemy5Manager"
-  Enemy5Manager: {
+    * = * "Level1 Enemy3Manager"
+  Enemy3Manager: {
+    /*
+      lda CutCompleted
+      bne GoToWalkOutFar
+      jmp CutNotCompleted
+
+    GoToWalkOutFar:
+      jmp WalkOut
+
+    CutNotCompleted:
+      lda WalkInCompleted
+      bne ShowHatchet
+*/
+
+      lda WoodCutterFined
+      beq CutCompletedCheck
+      lda ComplaintShown
+      bne GoToWalkOutFar
+
+      jsr HandleWoodCutterFined
+      inc ComplaintShown
+
+      jmp Done
+
+    CutCompletedCheck:
       lda CutCompleted
       bne GoToWalkOutFar
       jmp CutNotCompleted
@@ -644,9 +700,8 @@ Level1: {
       lda #SPRITES.HATCHET
       sta SPRITE_3
 
-      lda VIC.SPRITE_ENABLE
-      ora #%00001000
-      sta VIC.SPRITE_ENABLE
+      EnableSprite(3, true)
+
       inc HatchetShown
 
       jmp Done
@@ -681,9 +736,8 @@ Level1: {
       sta HatchetShown
       lda #HatchetStrokesMax
       sta HatchetStrokes
-      lda VIC.SPRITE_ENABLE
-      and #%11110111
-      sta VIC.SPRITE_ENABLE
+
+      EnableSprite(1, false)
 
       jmp Done
 
@@ -728,9 +782,11 @@ Level1: {
       jmp Done
 
     WalkOutDone:
-      lda VIC.SPRITE_ENABLE
-      and #%11101111
-      sta VIC.SPRITE_ENABLE
+      lda ComplaintHidden
+      jsr HandleWoodCutterFinedOut
+      inc ComplaintHidden
+
+      EnableSprite(4, false)
 
     Done:
       rts
@@ -744,6 +800,14 @@ Level1: {
 
     WoodCutterFrame:
       .byte $00
+
+    WoodCutterFined:
+      .byte $00
+
+    ComplaintShown:
+      .byte 0
+    ComplaintHidden:
+      .byte 0
 
     HatchetShown:
       .byte 0
@@ -783,11 +847,7 @@ Level1: {
       lda DelayRequested      // delay reached 0, reset it
       sta DelayCounter
 
-      lda WaitingForEnemy
-      beq NotWaiting
-
     Waiting:
-      dec WaitingForEnemy
       jsr AddEnemy
 
       jmp Exit
@@ -801,9 +861,6 @@ Level1: {
       .byte 50                  // Counter storage
     DelayRequested:
       .byte 50                  // 1 second delay
-
-    WaitingForEnemy:
-      .byte 2
   }
 
   TimedRoutine10th: {
@@ -856,6 +913,7 @@ Level1: {
     .byte 0
 }
 
+#import "hud.asm"
 #import "ranger.asm"
 #import "woodcutter.asm"
 #import "hatchet.asm"

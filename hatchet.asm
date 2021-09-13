@@ -13,6 +13,10 @@
 Hatchet: {
 * = * "Hatchet Init"
   Init: {
+      clc
+      lda ScreenMemoryAddress
+      adc #$03
+      sta ScreenMemoryAddress
 
       rts
   }

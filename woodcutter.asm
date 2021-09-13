@@ -13,6 +13,11 @@
 WoodCutter: {
   * = * "WoodCutter Init"
   Init: {
+      clc
+      lda ScreenMemoryAddress
+      adc #$03
+      sta ScreenMemoryAddress
+
 // Self modify code to use current screen memotry address, update hibyte
       lda ScreenMemoryAddress
       sta LoadSprite1 + 2
