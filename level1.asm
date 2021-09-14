@@ -404,30 +404,14 @@ Level1: {
       beq WalkInDone
 
       // Woodcutter didn't reached the tree, walk
-      lda TrackWalkX, x
-      sta WoodCutter.SetPosition.NewX
-      lda TrackWalkY, x
-      sta WoodCutter.SetPosition.NewY
-      lda #$04
-      sta WoodCutter.SetPosition.SpriteXLow
-      lda #$05
-      sta WoodCutter.SetPosition.SpriteYLow
-      jsr WoodCutter.SetPosition
+      CallSetPosition(TrackWalkX, TrackWalkY, $04, $05);
 
       lda #<SPRITE_2
       sta WoodCutter.ScreenMemoryAddress + 1
       lda #>SPRITE_2
       sta WoodCutter.ScreenMemoryAddress
 
-      lda DirectionX, x
-      sta WoodCutter.UpdateWoodCutterFrame.DirectionX
-      lda DirectionY, x
-      sta WoodCutter.UpdateWoodCutterFrame.DirectionY
-
-      lda WoodCutterFrame
-      sta WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
-
-      jsr WoodCutter.UpdateWoodCutterFrame
+      CallUpdateWoodCutterFrame(DirectionX, DirectionY, WoodCutterFrame, false);
 
       lda WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
       sta WoodCutterFrame
@@ -475,10 +459,7 @@ Level1: {
       lda #>SPRITE_1
       sta Hatchet.ScreenMemoryAddress
 
-      lda HatchetFrame
-      sta Hatchet.UseTheHatchet.HatchetFrame
-
-      jsr Hatchet.UseTheHatchet
+      CallUseTheHatchet(HatchetFrame);
 
       lda Hatchet.UseTheHatchet.HatchetFrame
       sta HatchetFrame
@@ -518,32 +499,14 @@ Level1: {
       ldx TrackPointer
       beq WalkOutDone
 
-      lda TrackWalkX, x
-      sta WoodCutter.SetPosition.NewX
-      lda TrackWalkY, x
-      sta WoodCutter.SetPosition.NewY
-      lda #$04
-      sta WoodCutter.SetPosition.SpriteXLow
-      lda #$05
-      sta WoodCutter.SetPosition.SpriteYLow
-      jsr WoodCutter.SetPosition
+      CallSetPosition(TrackWalkX, TrackWalkY, $04, $05);
 
       lda #<SPRITE_2
       sta WoodCutter.ScreenMemoryAddress + 1
       lda #>SPRITE_2
       sta WoodCutter.ScreenMemoryAddress
 
-      lda DirectionX, x
-      sec                                               //1by, 2
-      sbc #2                                            //2by, 2
-      sta WoodCutter.UpdateWoodCutterFrame.DirectionX
-      lda DirectionY, x
-      sta WoodCutter.UpdateWoodCutterFrame.DirectionY
-
-      lda WoodCutterFrame
-      sta WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
-
-      jsr WoodCutter.UpdateWoodCutterFrame
+      CallUpdateWoodCutterFrame(DirectionX, DirectionY, WoodCutterFrame, true);
 
       lda WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
       sta WoodCutterFrame
@@ -911,6 +874,46 @@ Level1: {
     .byte 0
   EnemyNo5Alive:
     .byte 0
+}
+
+// Set woodcutter position
+.macro CallSetPosition(trackX, trackY, spriteXLow, spriteYLow) {
+  lda trackX, x
+  sta WoodCutter.SetPosition.NewX
+  lda trackY, x
+  sta WoodCutter.SetPosition.NewY
+  lda #spriteXLow
+  sta WoodCutter.SetPosition.SpriteXLow
+  lda #spriteYLow
+  sta WoodCutter.SetPosition.SpriteYLow
+  jsr WoodCutter.SetPosition
+}
+
+// Update woodcutter frame
+.macro CallUpdateWoodCutterFrame(directionX, directionY, woodCutterframe, reverse) {
+  lda directionX, x
+
+  .if (reverse)
+  {
+    sec
+    sbc #2
+  }
+  sta WoodCutter.UpdateWoodCutterFrame.DirectionX
+  lda directionY, x
+  sta WoodCutter.UpdateWoodCutterFrame.DirectionY
+
+  lda woodCutterframe
+  sta WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+
+  jsr WoodCutter.UpdateWoodCutterFrame
+}
+
+// Update hatchet frame
+.macro CallUseTheHatchet(hatchetFrame) {
+  lda hatchetFrame
+  sta Hatchet.UseTheHatchet.HatchetFrame
+
+  jsr Hatchet.UseTheHatchet
 }
 
 #import "hud.asm"
