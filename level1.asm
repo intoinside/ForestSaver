@@ -766,16 +766,17 @@ Level1: {
     WalkInCompleted:
       .byte 0
 
-    .label TrackWalkCounter = 41
+    .label TrackWalkCounter = 112
+    .label MaxXWithXBit = 65
 
     TrackWalkX:
-      .fill 30, 30 - i
-      .fill TrackWalkCounter - 30, 255 - i
+      .fill MaxXWithXBit, MaxXWithXBit - i
+      .fill TrackWalkCounter - MaxXWithXBit, 255 - i
     TrackWalkY:
-      .fill TrackWalkCounter, 70
+      .fill TrackWalkCounter, 87
     TrackWalkXXbit:
-      .fill 30, 255
-      .fill TrackWalkCounter - 30, 0
+      .fill MaxXWithXBit, 255
+      .fill TrackWalkCounter - MaxXWithXBit, 0
 
     DirectionX:
       .fill TrackWalkCounter, $ff
