@@ -59,7 +59,8 @@ SPRITES: {
 
   .label ENEMY_STANDING     = $59
 
-  .label HATCHET            = $64
+  .label HATCHET            = $62
+  .label HATCHET_REV        = $64
 
   // These label will be modified with self-modification code
   .label SPRITE_0           = $bef8

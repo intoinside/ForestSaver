@@ -447,7 +447,7 @@ Level1: {
       lda SPRITES.Y2
       sta SPRITES.Y1
 
-      lda #SPRITES.HATCHET
+      lda #SPRITES.HATCHET_REV
       sta SPRITE_1
 
       EnableSprite(1, true)
@@ -467,7 +467,7 @@ Level1: {
       lda #>SPRITE_1
       sta Hatchet.ScreenMemoryAddress
 
-      CallUseTheHatchet(HatchetFrame);
+      CallUseTheHatchet(HatchetFrame, SPRITES.HATCHET_REV);
 
       lda Hatchet.UseTheHatchet.StrokeHappened
       bne StrokeHappened
@@ -672,7 +672,7 @@ Level1: {
       lda #>SPRITE_3
       sta Hatchet.ScreenMemoryAddress
 
-      CallUseTheHatchet(HatchetFrame);
+      CallUseTheHatchet(HatchetFrame, SPRITES.HATCHET);
 
       lda Hatchet.UseTheHatchet.StrokeHappened
       bne StrokeHappened
@@ -700,7 +700,7 @@ Level1: {
       EnableSprite(3, false)
 
     // Tree has been cut, remove tree
-      RemoveTree($466c, $016c)
+      RemoveTree($448d, $008d)
 
       jmp Done
 

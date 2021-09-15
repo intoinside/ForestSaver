@@ -33,6 +33,9 @@ Hatchet: {
       sta LoadHatchet2 + 2
       sta LoadHatchet3 + 2
 
+      lda FrameReference
+      sta SpriteFrameReference + 1
+
       ldx #$00
 
       inc HatchetFrame
@@ -48,6 +51,7 @@ Hatchet: {
 
     LoadHatchet1:
       lda SPRITE_PTR
+    SpriteFrameReference:
       cmp #SPRITES.HATCHET
       beq SwitchUpFrame
     LoadHatchet2:
@@ -67,6 +71,8 @@ Hatchet: {
 
     .label SPRITE_PTR   = $beef
 
+    FrameReference: .byte $00
+
     StrokeHappened:
       .byte $00
 
@@ -85,9 +91,11 @@ Hatchet: {
 }
 
 // Update hatchet frame
-.macro CallUseTheHatchet(hatchetFrame) {
+.macro CallUseTheHatchet(hatchetFrame, frameReference) {
   lda hatchetFrame
   sta Hatchet.UseTheHatchet.HatchetFrame
+  lda #frameReference
+  sta Hatchet.UseTheHatchet.FrameReference
 
   jsr Hatchet.UseTheHatchet
 
