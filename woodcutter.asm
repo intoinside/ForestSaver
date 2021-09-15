@@ -174,4 +174,64 @@ WoodCutter: {
   .label SPRITE_PTR = $beef
 }
 
+// Update woodcutter frame
+.macro CallUpdateWoodCutterFrame(directionX, directionY, woodCutterFrame, reverse) {
+  lda directionX, x
+
+  .if (reverse)
+  {
+    sec
+    sbc #2
+  }
+  sta WoodCutter.UpdateWoodCutterFrame.DirectionX
+  lda directionY, x
+  sta WoodCutter.UpdateWoodCutterFrame.DirectionY
+
+  lda woodCutterFrame
+  sta WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+
+  jsr WoodCutter.UpdateWoodCutterFrame
+
+  lda WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+  sta woodCutterFrame
+}
+
+// Set woodcutter position
+.macro CallSetPosition(trackX, trackY, xBit, spriteXLow, spriteYLow) {
+  lda trackX, x
+  sta WoodCutter.SetPosition.NewX
+  lda trackY, x
+  sta WoodCutter.SetPosition.NewY
+  lda #spriteXLow
+  sta WoodCutter.SetPosition.SpriteXLow
+  lda #spriteYLow
+  sta WoodCutter.SetPosition.SpriteYLow
+  jsr WoodCutter.SetPosition
+
+  lda SPRITES.EXTRA_BIT
+  .if (xBit==0)
+  {
+    .if (spriteXLow == $00) and #%11111110
+    .if (spriteXLow == $02) and #%11111101
+    .if (spriteXLow == $04) and #%11111011
+    .if (spriteXLow == $06) and #%11110111
+    .if (spriteXLow == $08) and #%11101111
+    .if (spriteXLow == $0a) and #%11011111
+    .if (spriteXLow == $0c) and #%10111111
+    .if (spriteXLow == $0e) and #%01111111
+  }
+  else
+  {
+    .if (spriteXLow == $00) ora #%00000001
+    .if (spriteXLow == $02) ora #%00000010
+    .if (spriteXLow == $04) ora #%00000100
+    .if (spriteXLow == $06) ora #%00001000
+    .if (spriteXLow == $08) ora #%00010000
+    .if (spriteXLow == $0a) ora #%00100000
+    .if (spriteXLow == $0c) ora #%01000000
+    .if (spriteXLow == $0e) ora #%10000000
+  }
+  sta SPRITES.EXTRA_BIT
+}
+
 #import "label.asm"

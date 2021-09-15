@@ -84,4 +84,15 @@ Hatchet: {
     .word $be00
 }
 
+// Update hatchet frame
+.macro CallUseTheHatchet(hatchetFrame) {
+  lda hatchetFrame
+  sta Hatchet.UseTheHatchet.HatchetFrame
+
+  jsr Hatchet.UseTheHatchet
+
+  lda Hatchet.UseTheHatchet.HatchetFrame
+  sta hatchetFrame
+}
+
 #import "label.asm"
