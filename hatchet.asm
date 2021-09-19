@@ -80,12 +80,6 @@ Hatchet: {
       .byte $ff
   }
 
-* = * "Hatchet UpdateHatchetFrame"
-  UpdateHatchetFrame: {
-
-    rts
-  }
-
   ScreenMemoryAddress:
     .word $be00
 }

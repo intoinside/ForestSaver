@@ -95,4 +95,3 @@ Level2: {
 }
 
 #import "main.asm"
-#import "joystick.asm"

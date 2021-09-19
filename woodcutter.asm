@@ -175,14 +175,26 @@ WoodCutter: {
 }
 
 // Update woodcutter frame
-.macro CallUpdateWoodCutterFrame(directionX, directionY, woodCutterFrame, reverse) {
+.macro CallUpdateWoodCutterFrame(directionX, directionY, woodCutterFrame) {
   lda directionX, x
+  sta WoodCutter.UpdateWoodCutterFrame.DirectionX
+  lda directionY, x
+  sta WoodCutter.UpdateWoodCutterFrame.DirectionY
 
-  .if (reverse)
-  {
-    sec
-    sbc #2
-  }
+  lda woodCutterFrame
+  sta WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+
+  jsr WoodCutter.UpdateWoodCutterFrame
+
+  lda WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+  sta woodCutterFrame
+}
+
+// Update woodcutter frame with reverse hatchet
+.macro CallUpdateWoodCutterFrameReverse(directionX, directionY, woodCutterFrame) {
+  lda directionX, x
+  sec
+  sbc #2
   sta WoodCutter.UpdateWoodCutterFrame.DirectionX
   lda directionY, x
   sta WoodCutter.UpdateWoodCutterFrame.DirectionY

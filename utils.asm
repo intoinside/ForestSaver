@@ -93,12 +93,12 @@ SpriteNumberMask:
     lda SpriteNumberMask, y
     .if (bEnable)   // Build-time condition (not run-time)
     {
-        ora VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
+      ora VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
     }
     else
     {
-        eor #$FF    // Get mask compliment
-        and VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
+      eor #$FF    // Get mask compliment
+      and VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
     }
     sta VIC.SPRITE_ENABLE       // Set the new value into the sprite enable register
 }

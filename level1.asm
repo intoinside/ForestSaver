@@ -12,8 +12,6 @@
 // * Woodcutter 1 Sprite 2
 // * Hatchet 2    Sprite 3
 // * Woodcutter 2 Sprite 4
-// * Hatchet 3    Sprite 5
-// * Woodcutter 3 Sprite 6
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -75,7 +73,7 @@ Level1: {
       lda #SPRITES.ENEMY_STANDING
       sta SPRITE_2
       sta SPRITE_4
-      sta SPRITE_6
+//      sta SPRITE_6
 
 // Ranger coordinates
       lda #$50
@@ -109,15 +107,18 @@ Level1: {
       lda #$08
       sta SPRITES.COLOR1
       sta SPRITES.COLOR3
-      sta SPRITES.COLOR5
+//      sta SPRITES.COLOR5
       lda #$02
       sta SPRITES.COLOR2
       sta SPRITES.COLOR4
-      sta SPRITES.COLOR6
+//      sta SPRITES.COLOR6
 
 // Enable the first sprite (ranger)
       lda #%00000001
       sta VIC.SPRITE_ENABLE
+
+      jsr SetWoodCutter2Track
+      jsr SetWoodCutter3Track
 
       rts
   }
@@ -191,7 +192,7 @@ Level1: {
       lda #$cf
       sta SPRITES.Y4
       lda SPRITES.EXTRA_BIT
-      ora #%00000000
+      ora #%00010000
       sta SPRITES.EXTRA_BIT
 
       EnableSprite(4, true)
@@ -200,6 +201,7 @@ Level1: {
 
       jmp Done
 
+/*
     StartEnemy4:
       jmp Done
 
@@ -211,12 +213,13 @@ Level1: {
 
     StartEnemy7:
       jmp Done
+*/
 
     Done:
       rts
 
     EnemyActive:      .byte $00
-    WaitingForEnemy:  .byte $02
+    WaitingForEnemy:  .byte $06
   }
 
   * = * "Level1 HandleEnemyMove"
@@ -229,14 +232,15 @@ Level1: {
     IsEnemyNo3Alive:
       lda AddEnemy.EnemyActive
       and #%00001000
-      beq IsEnemyNo4Alive
+      beq Done
       jsr Enemy3Manager
 
+/*
     IsEnemyNo4Alive:
     IsEnemyNo5Alive:
     IsEnemyNo6Alive:
     IsEnemyNo7Alive:
-
+*/
     Done:
       rts
   }
@@ -422,7 +426,7 @@ Level1: {
       lda #>SPRITE_2
       sta WoodCutter.ScreenMemoryAddress
 
-      CallUpdateWoodCutterFrame(DirectionX, DirectionY, WoodCutterFrame, false);
+      CallUpdateWoodCutterFrame(DirectionX, DirectionY, WoodCutterFrame);
 
       inc TrackPointer
 
@@ -447,6 +451,20 @@ Level1: {
       lda SPRITES.Y2
       sta SPRITES.Y1
 
+      lda SPRITES.EXTRA_BIT
+      and #%00000100
+      beq SetHatchetBitToZero
+      lda SPRITES.EXTRA_BIT
+      ora #%00000010
+      jmp !+
+
+    SetHatchetBitToZero:
+      lda SPRITES.EXTRA_BIT
+      and #%11111101
+
+    !:
+      sta SPRITES.EXTRA_BIT
+
       lda #SPRITES.HATCHET_REV
       sta SPRITE_1
 
@@ -461,7 +479,6 @@ Level1: {
       // SpriteCollided(0);
       // bne RangerWoodCutterMet
 
-    // When a jsr is performed, stack is populated with return address, remember
       lda #<SPRITE_1
       sta Hatchet.ScreenMemoryAddress + 1
       lda #>SPRITE_1
@@ -495,7 +512,7 @@ Level1: {
       EnableSprite(1, false)
 
     // Tree has been cut, remove tree
-      RemoveTree($456c, $016c)
+      RemoveTree(TreeStartAddress1, TreeColorStartAddress1)
 
       jmp Done
 
@@ -518,7 +535,7 @@ Level1: {
       lda #>SPRITE_2
       sta WoodCutter.ScreenMemoryAddress
 
-      CallUpdateWoodCutterFrame(DirectionX, DirectionY, WoodCutterFrame, true);
+      CallUpdateWoodCutterFrameReverse(DirectionX, DirectionY, WoodCutterFrame);
 
       dec TrackPointer
 
@@ -531,12 +548,29 @@ Level1: {
 
       EnableSprite(2, false)
 
+      // Prepare next sprite track
+      inc CurrentWoodCutter
+      lda CurrentWoodCutter
+      cmp #4
+      bpl Done
+      jsr SetWoodCutter2Track
+
+      // Clear sprite
+      lda AddEnemy.EnemyActive
+      and #%11111011
+      sta AddEnemy.EnemyActive
+
+      lda #0
+      sta HatchetShown
+      sta TrackPointer
+      sta CutCompleted
+      sta WalkInCompleted
+
     Done:
       rts
 
-    .label HatchetStrokesMax = $0f
-    HatchetStrokes:
-      .byte HatchetStrokesMax
+    .label HatchetStrokesMax = $0c
+    HatchetStrokes: .byte HatchetStrokesMax
 
     HatchetFrame:
       .byte $ff
@@ -561,24 +595,140 @@ Level1: {
     WalkInCompleted:
       .byte 0
 
-    .label TrackWalkCounter = 41
+    CurrentWoodCutter: .byte $01
 
+// Woodcutter dummy data
+    .label TrackWalkCounter = 180
     TrackWalkX:
-      .fill TrackWalkCounter, 6+i
+      .fill TrackWalkCounter, 0
     TrackWalkY:
-      .fill TrackWalkCounter, 136
+      .fill TrackWalkCounter, 0
     TrackWalkXXbit:
       .fill TrackWalkCounter, 0
-
     DirectionX:
-      .fill TrackWalkCounter, 1
+      .fill TrackWalkCounter, 0
     DirectionY:
       .fill TrackWalkCounter, 0
+
+    .label TreeStartAddress1 = $456c
+    .label TreeColorStartAddress1 = $016c
+
+// Second woodcutter track data
+    .label TreeStartAddress2 = $450c
+    .label TreeColorStartAddress2 = $010c
+
+// Third woodcutter track data
+    .label TreeStartAddress3 = $460c
+    .label TreeColorStartAddress3 = $020c
 
     DummyXBit:  .byte 0
   }
 
-    * = * "Level1 Enemy3Manager"
+    * = * "Level1 SetWoodCutter2Track"
+  SetWoodCutter2Track: {
+      ldx #0
+
+      lda Enemy2Manager.CurrentWoodCutter
+      cmp #$03
+      beq FixForWoodCutter3
+      cmp #$02
+      beq FixForWoodCutter2
+
+    FixForWoodCutter1:
+    !:
+      lda TrackWalkX1, x
+      sta Enemy2Manager.TrackWalkX, x
+      lda TrackWalkY1, x
+      sta Enemy2Manager.TrackWalkY, x
+      lda DirectionX1, x
+      sta Enemy2Manager.DirectionX, x
+      lda DirectionY1, x
+      sta Enemy2Manager.DirectionY, x
+      inx
+      cpx #TrackWalkCounter
+      bne !-
+      jmp Done
+
+    FixForWoodCutter2:
+    !:
+      lda TrackWalkX2, x
+      sta Enemy2Manager.TrackWalkX, x
+      lda TrackWalkY2, x
+      sta Enemy2Manager.TrackWalkY, x
+      lda DirectionX2, x
+      sta Enemy2Manager.DirectionX, x
+      lda DirectionY2, x
+      sta Enemy2Manager.DirectionY, x
+      inx
+      cpx #TrackWalkCounter
+      bne !-
+      jmp Done
+
+    FixForWoodCutter3:
+    !:
+      lda TrackWalkX3, x
+      sta Enemy2Manager.TrackWalkX, x
+      lda TrackWalkY3, x
+      sta Enemy2Manager.TrackWalkY, x
+      lda DirectionX3, x
+      sta Enemy2Manager.DirectionX, x
+      lda DirectionY3, x
+      sta Enemy2Manager.DirectionY, x
+      inx
+      cpx #TrackWalkCounter
+      bne !-
+
+    Done:
+      rts
+
+// Global woodcutter label
+    .label TrackWalkCounter = 180
+
+// First woodcutter track data
+    .label Walk1Offset = 66
+    TrackWalkX1:
+      .fill Walk1Offset, 0
+      .fill TrackWalkCounter - Walk1Offset, i
+    TrackWalkY1:
+      .fill TrackWalkCounter, 79
+    TrackWalkXXbit1:
+      .fill TrackWalkCounter, 0
+    DirectionX1:
+      .fill TrackWalkCounter, 1
+    DirectionY1:
+      .fill TrackWalkCounter, 0
+
+// Second woodcutter track data
+    .label Walk2Offset = 135
+    TrackWalkX2:
+      .fill Walk2Offset, 0
+      .fill TrackWalkCounter - Walk2Offset, i
+    TrackWalkY2:
+      .fill TrackWalkCounter, 136
+    TrackWalkXXbit2:
+      .fill TrackWalkCounter, 0
+    DirectionX2:
+      .fill TrackWalkCounter, 1
+    DirectionY2:
+      .fill TrackWalkCounter, 0
+
+// Third woodcutter track data
+    .label Walk3Offset = 0
+    TrackWalkX3:
+      .fill Walk3Offset, 0
+      .fill TrackWalkCounter - Walk3Offset, i
+    TrackWalkY3:
+      .fill TrackWalkCounter, 167
+    TrackWalkXXbit3:
+      .fill TrackWalkCounter, 0
+    DirectionX3:
+      .fill TrackWalkCounter, 1
+    DirectionY3:
+      .fill TrackWalkCounter, 0
+
+  }
+
+  * = * "Level1 Enemy3Manager"
   Enemy3Manager: {
       lda WoodCutterFined
       beq CutCompletedCheck
@@ -627,7 +777,7 @@ Level1: {
       lda #>SPRITE_4
       sta WoodCutter.ScreenMemoryAddress
 
-      CallUpdateWoodCutterFrame(DirectionX, DirectionY, WoodCutterFrame, false);
+      CallUpdateWoodCutterFrame(DirectionX, DirectionY, WoodCutterFrame);
 
       inc TrackPointer
 
@@ -652,6 +802,20 @@ Level1: {
       lda SPRITES.Y4
       sta SPRITES.Y3
 
+      lda SPRITES.EXTRA_BIT
+      and #%00010000
+      beq SetHatchetBitToZero
+      lda SPRITES.EXTRA_BIT
+      ora #%00001000
+      jmp !+
+
+    SetHatchetBitToZero:
+      lda SPRITES.EXTRA_BIT
+      and #%11110111
+
+    !:
+      sta SPRITES.EXTRA_BIT
+
       lda #SPRITES.HATCHET
       sta SPRITE_3
 
@@ -666,7 +830,6 @@ Level1: {
       // SpriteCollided(0);
       // bne RangerWoodCutterMet
 
-    // When a jsr is performed, stack is populated with return address, remember
       lda #<SPRITE_3
       sta Hatchet.ScreenMemoryAddress + 1
       lda #>SPRITE_3
@@ -723,7 +886,7 @@ Level1: {
       lda #>SPRITE_4
       sta WoodCutter.ScreenMemoryAddress
 
-      CallUpdateWoodCutterFrame(DirectionX, DirectionY, WoodCutterFrame, true);
+      CallUpdateWoodCutterFrameReverse(DirectionX, DirectionY, WoodCutterFrame);
 
       dec TrackPointer
 
@@ -736,10 +899,28 @@ Level1: {
 
       EnableSprite(4, false)
 
+      // Prepare next sprite track
+      inc CurrentWoodCutter
+      lda CurrentWoodCutter
+      cmp #4
+      bpl Done
+      jsr SetWoodCutter3Track
+
+      // Clear sprite
+      lda AddEnemy.EnemyActive
+      and #%11110111
+      sta AddEnemy.EnemyActive
+
+      lda #0
+      sta HatchetShown
+      sta TrackPointer
+      sta CutCompleted
+      sta WalkInCompleted
+
     Done:
       rts
 
-    .label HatchetStrokesMax = $0f
+    .label HatchetStrokesMax = $0c
     HatchetStrokes:
       .byte HatchetStrokesMax
 
@@ -766,24 +947,135 @@ Level1: {
     WalkInCompleted:
       .byte 0
 
-    .label TrackWalkCounter = 112
-    .label MaxXWithXBit = 65
+    CurrentWoodCutter: .byte $01
 
+    .label TrackWalkCounter = 210
     TrackWalkX:
-      .fill MaxXWithXBit, MaxXWithXBit - i
-      .fill TrackWalkCounter - MaxXWithXBit, 255 - i
+      .fill TrackWalkCounter, 0
     TrackWalkY:
-      .fill TrackWalkCounter, 87
+      .fill TrackWalkCounter, 0
     TrackWalkXXbit:
-      .fill MaxXWithXBit, 255
-      .fill TrackWalkCounter - MaxXWithXBit, 0
-
+      .fill TrackWalkCounter, 0
     DirectionX:
-      .fill TrackWalkCounter, $ff
+      .fill TrackWalkCounter, 0
     DirectionY:
       .fill TrackWalkCounter, 0
 
     DummyXBit:  .byte 0
+  }
+
+    * = * "Level1 SetWoodCutter3Track"
+  SetWoodCutter3Track: {
+      ldx #0
+
+      lda Enemy3Manager.CurrentWoodCutter
+      cmp #$03
+      beq FixForWoodCutter3
+      cmp #$02
+      beq FixForWoodCutter2
+
+    FixForWoodCutter1:
+    !:
+      lda TrackWalkX1, x
+      sta Enemy3Manager.TrackWalkX, x
+      lda TrackWalkY1, x
+      sta Enemy3Manager.TrackWalkY, x
+      lda TrackWalkXXbit1, x
+      sta Enemy3Manager.TrackWalkXXbit, x
+      lda DirectionX1, x
+      sta Enemy3Manager.DirectionX, x
+      lda DirectionY1, x
+      sta Enemy3Manager.DirectionY, x
+      inx
+      cpx #TrackWalkCounter
+      bne !-
+      jmp Done
+
+    FixForWoodCutter2:
+    !:
+      lda TrackWalkX2, x
+      sta Enemy3Manager.TrackWalkX, x
+      lda TrackWalkY2, x
+      sta Enemy3Manager.TrackWalkY, x
+      lda TrackWalkXXbit2, x
+      sta Enemy3Manager.TrackWalkXXbit, x
+      lda DirectionX2, x
+      sta Enemy3Manager.DirectionX, x
+      lda DirectionY2, x
+      sta Enemy3Manager.DirectionY, x
+      inx
+      cpx #TrackWalkCounter
+      bne !-
+      jmp Done
+
+    FixForWoodCutter3:
+    !:
+      lda TrackWalkX3, x
+      sta Enemy3Manager.TrackWalkX, x
+      lda TrackWalkY3, x
+      sta Enemy3Manager.TrackWalkY, x
+      lda TrackWalkXXbit3, x
+      sta Enemy3Manager.TrackWalkXXbit, x
+      lda DirectionX3, x
+      sta Enemy3Manager.DirectionX, x
+      lda DirectionY3, x
+      sta Enemy3Manager.DirectionY, x
+      inx
+      cpx #TrackWalkCounter
+      bne !-
+
+    Done:
+      rts
+
+// Global woodcutter label
+    .label TrackWalkCounter = 210
+
+// First woodcutter track data
+    .label MaxX1WithXBit = 65
+    .label Walk1Offset = 96
+    TrackWalkX1:
+      .fill Walk1Offset, 255
+      .fill MaxX1WithXBit, MaxX1WithXBit - i
+      .fill TrackWalkCounter - (Walk1Offset + MaxX1WithXBit), 255 - i
+    TrackWalkY1:
+      .fill TrackWalkCounter, 87
+    TrackWalkXXbit1:
+      .fill (Walk1Offset + MaxX1WithXBit), 255
+      .fill TrackWalkCounter - (Walk1Offset + MaxX1WithXBit), 0
+    DirectionX1:
+      .fill TrackWalkCounter, $ff
+    DirectionY1:
+      .fill TrackWalkCounter, 0
+
+// Second woodcutter track data
+    .label MaxX2WithXBit = 65
+    .label Walk2Offset = 180
+    TrackWalkX2:
+      .fill Walk2Offset, 255
+      .fill MaxX2WithXBit, MaxX2WithXBit - i
+    TrackWalkY2:
+      .fill TrackWalkCounter, 145
+    TrackWalkXXbit2:
+      .fill TrackWalkCounter, 255
+    DirectionX2:
+      .fill TrackWalkCounter, $ff
+    DirectionY2:
+      .fill TrackWalkCounter, 0
+
+// Third woodcutter track data
+    .label MaxX3WithXBit = 65
+    .label Walk3Offset = 154
+    TrackWalkX3:
+      .fill Walk3Offset, 255
+      .fill MaxX3WithXBit, MaxX3WithXBit - i
+    TrackWalkY3:
+      .fill TrackWalkCounter, 199
+    TrackWalkXXbit3:
+      .fill TrackWalkCounter, 255
+    DirectionX3:
+      .fill TrackWalkCounter, $ff
+    DirectionY3:
+      .fill TrackWalkCounter, 0
   }
 
   * = * "Level1 TimedRoutine"
@@ -852,13 +1144,14 @@ Level1: {
 // Hatchet sprite pointer
   .label SPRITE_1     = $47f9
   .label SPRITE_3     = $47fb
-  .label SPRITE_5     = $47fd
+//  .label SPRITE_5     = $47fd
 
 // Enemy sprite pointer
   .label SPRITE_2     = $47fa
   .label SPRITE_4     = $47fc
-  .label SPRITE_6     = $47fe
+//  .label SPRITE_6     = $47fe
 
+/*
   EnemyLeft:
     .byte 6
 
@@ -866,6 +1159,7 @@ Level1: {
     .byte 0
   EnemyNo5Alive:
     .byte 0
+*/
 }
 
 #import "hud.asm"
