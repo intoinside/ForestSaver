@@ -28,8 +28,17 @@ Hud: {
       sta DrawScore.SelfMod + 2
       lda ScreenMemoryAddress + 1
       sta DrawScore.SelfMod + 1
-
       jsr DrawScore
+
+      lda ScreenMemoryAddress + 1
+      adc #$16
+      sta ScreenMemoryAddress + 1
+
+      lda ScreenMemoryAddress
+      sta DrawDismissal.SelfMod + 2
+      lda ScreenMemoryAddress + 1
+      sta DrawDismissal.SelfMod + 1
+      jsr DrawDismissal
 
       rts
   }
@@ -52,9 +61,30 @@ Hud: {
       .label ScorePtr = $beef
   }
 
+  * = * "Hud DrawDismissal"
+  DrawDismissal: {
+      ldx #$00
+    LoopDismissal:
+      lda DismissalLabel, x
+    SelfMod:
+      sta DismissalPtr
+      inc SelfMod + 1
+
+      inx
+      cpx #$11
+      bne LoopDismissal
+
+      rts
+
+      .label DismissalPtr = $beef
+  }
+
   // "SCORE: "
-  ScoreMap: .byte $00
-  ScoreLabel: .byte $7d, $6d, $79, $7c, $6f, $9d, $00
+  ScoreLabel: .byte $7d, $6d, $79, $7c, $6f, $9d
+
+  // "DISMISSAL: ******"
+  DismissalLabel: .byte $6e, $73, $7d, $77, $73, $7d, $7d, $6b, $76, $9d, $00
+                  .byte $a4, $a4, $a4, $a4, $a4, $a4
 
   ScreenMemoryAddress:
     .word $be00
