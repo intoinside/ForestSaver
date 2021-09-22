@@ -53,8 +53,8 @@ MainGameSettings: {
     rts
 }
 
-#import "intro.asm"
-#import "level1.asm"
-#import "level2.asm"
-#import "allimport.asm"
-#import "label.asm"
+#import "_intro.asm"
+#import "_level1.asm"
+#import "_level2.asm"
+#import "_allimport.asm"
+#import "_label.asm"
