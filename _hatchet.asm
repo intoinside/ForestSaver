@@ -97,4 +97,4 @@ Hatchet: {
   sta hatchetFrame
 }
 
-#import "label.asm"
+#import "_label.asm"

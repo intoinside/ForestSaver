@@ -70,6 +70,6 @@ Intro: {
 
 }
 
-#import "label.asm"
-#import "joystick.asm"
+#import "_label.asm"
+#import "_joystick.asm"
 #import "main.asm"

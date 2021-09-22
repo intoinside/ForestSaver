@@ -199,4 +199,4 @@ StupidWaitRoutine: {
     rts
 }
 
-#import "allimport.asm"
+#import "_allimport.asm"

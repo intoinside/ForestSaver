@@ -1190,8 +1190,8 @@ Level1: {
 */
 }
 
-#import "hud.asm"
-#import "ranger.asm"
-#import "woodcutter.asm"
-#import "hatchet.asm"
-#import "utils.asm"
+#import "_hud.asm"
+#import "_ranger.asm"
+#import "_woodcutter.asm"
+#import "_hatchet.asm"
+#import "_utils.asm"

@@ -209,4 +209,4 @@ Ranger: {
     .word $beef
 }
 
-#import "label.asm"
+#import "_label.asm"

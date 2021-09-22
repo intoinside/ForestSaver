@@ -246,4 +246,4 @@ WoodCutter: {
   sta SPRITES.EXTRA_BIT
 }
 
-#import "label.asm"
+#import "_label.asm"

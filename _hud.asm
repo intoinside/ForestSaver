@@ -99,4 +99,4 @@ Hud: {
     .word $be00
 }
 
-#import "label.asm"
+#import "_label.asm"
