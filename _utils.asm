@@ -14,33 +14,33 @@ SpriteNumberMask:
     .byte %00000001, %00000010, %00000100, %00001000, %00010000, %00100000, %01000000, %10000000
 
 .macro RemoveTree(startAddress, colorStartAddress) {
-    ldx #$00
-    stx startAddress
-    stx startAddress + $01
-    stx startAddress + $02
-    stx startAddress + $03
+    ldx #$00                // 2b 2cy
+    stx startAddress        // 3b 4cy
+    stx startAddress + $01  // 3b 4cy
+    stx startAddress + $02  // 3b 4cy
+    stx startAddress + $03  // 3b 4cy
 
-    stx startAddress + $28
-    stx startAddress + $29
-    stx startAddress + $2a
-    stx startAddress + $2b
+    stx startAddress + $28  // 3b 4cy
+    stx startAddress + $29  // 3b 4cy
+    stx startAddress + $2a  // 3b 4cy
+    stx startAddress + $2b  // 3b 4cy
 
-    stx startAddress + $50
-    stx startAddress + $53
+    stx startAddress + $50  // 3b 4cy
+    stx startAddress + $53  // 3b 4cy
 
-    inx
-    stx startAddress + $51
-    inx
-    stx startAddress + $52
+    inx                     // 1b 2cy
+    stx startAddress + $51  // 3b 4cy
+    inx                     // 1b 2cy
+    stx startAddress + $52  // 3b 4cy
 
-    inx
-    stx startAddress + $78
-    inx
-    stx startAddress + $79
-    inx
-    stx startAddress + $7a
-    inx
-    stx startAddress + $7b
+    inx                     // 1b 2cy
+    stx startAddress + $78  // 3b 4cy
+    inx                     // 1b 2cy
+    stx startAddress + $79  // 3b 4cy
+    inx                     // 1b 2cy
+    stx startAddress + $7a  // 3b 4cy
+    inx                     // 1b 2cy
+    stx startAddress + $7b  // 3b 4cy
 
     ldx #$04
   Loop:

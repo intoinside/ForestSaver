@@ -19,25 +19,34 @@ Hud: {
       clc
       lda ScreenMemoryAddress
       adc #$03
-      sta ScreenMemoryAddress
+      //sta ScreenMemoryAddress
+      sta DrawScore.SelfMod + 2
+      sta DrawDismissal.SelfMod + 2
+
       lda ScreenMemoryAddress + 1
       adc #$98
-      sta ScreenMemoryAddress + 1
+//      sta ScreenMemoryAddress + 1
+      sta DrawScore.SelfMod + 1
+      sta DrawDismissal.SelfMod + 1
 
+/*
       lda ScreenMemoryAddress
       sta DrawScore.SelfMod + 2
       lda ScreenMemoryAddress + 1
       sta DrawScore.SelfMod + 1
+*/
       jsr DrawScore
 
-      lda ScreenMemoryAddress + 1
+      lda DrawDismissal.SelfMod + 1
       adc #$16
-      sta ScreenMemoryAddress + 1
+      sta DrawDismissal.SelfMod + 1
 
+/*
       lda ScreenMemoryAddress
       sta DrawDismissal.SelfMod + 2
       lda ScreenMemoryAddress + 1
       sta DrawDismissal.SelfMod + 1
+*/
       jsr DrawDismissal
 
       rts

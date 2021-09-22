@@ -512,8 +512,14 @@ Level1: {
       EnableSprite(1, false)
 
     // Tree has been cut, remove tree
-      RemoveTree(TreeStartAddress1, TreeColorStartAddress1)
-
+      RemoveTree(TreeStartAddress, TreeColorStartAddress)
+      /*
+      lda TreeStartAddress
+      sta RemoveTree.StartAddress
+      lda TreeStartAddress + 1
+      sta RemoveTree.StartAddress + 1
+      jsr RemoveTree
+      */
       jmp Done
 
     WalkOut:
@@ -521,6 +527,7 @@ Level1: {
       ldx TrackPointer
       beq WalkOutDone
 
+// TODO(rafs): this code can be optimized?
       lda TrackWalkXXbit, x
       bne Call2_b
     Call1_b:
@@ -610,6 +617,10 @@ Level1: {
     DirectionY:
       .fill TrackWalkCounter, 0
 
+    TreeStartAddress: .word $456c
+    TreeColorStartAddress: .word $016c
+
+/*
     .label TreeStartAddress1 = $456c
     .label TreeColorStartAddress1 = $016c
 
@@ -620,7 +631,7 @@ Level1: {
 // Third woodcutter track data
     .label TreeStartAddress3 = $460c
     .label TreeColorStartAddress3 = $020c
-
+*/
     DummyXBit:  .byte 0
   }
 
@@ -647,6 +658,10 @@ Level1: {
       inx
       cpx #TrackWalkCounter
       bne !-
+      lda TreeStartAddress1
+      sta Enemy2Manager.TreeStartAddress
+      lda TreeStartAddress1 + 1
+      sta Enemy2Manager.TreeStartAddress + 1
       jmp Done
 
     FixForWoodCutter2:
@@ -662,6 +677,10 @@ Level1: {
       inx
       cpx #TrackWalkCounter
       bne !-
+      lda #TreeStartAddress2
+      sta Enemy2Manager.TreeStartAddress
+      lda #TreeStartAddress2 + 1
+      sta Enemy2Manager.TreeStartAddress + 1
       jmp Done
 
     FixForWoodCutter3:
@@ -677,6 +696,10 @@ Level1: {
       inx
       cpx #TrackWalkCounter
       bne !-
+      lda #TreeStartAddress3
+      sta Enemy2Manager.TreeStartAddress
+      lda #TreeStartAddress3 + 1
+      sta Enemy2Manager.TreeStartAddress + 1
 
     Done:
       rts
@@ -697,6 +720,8 @@ Level1: {
       .fill TrackWalkCounter, 1
     DirectionY1:
       .fill TrackWalkCounter, 0
+    TreeStartAddress1: .word $456c
+    TreeColorStartAddress1: .word $016c
 
 // Second woodcutter track data
     .label Walk2Offset = 135
@@ -711,6 +736,8 @@ Level1: {
       .fill TrackWalkCounter, 1
     DirectionY2:
       .fill TrackWalkCounter, 0
+    .label TreeStartAddress2 = $450c
+    .label TreeColorStartAddress2 = $010c
 
 // Third woodcutter track data
     .label Walk3Offset = 0
@@ -725,7 +752,8 @@ Level1: {
       .fill TrackWalkCounter, 1
     DirectionY3:
       .fill TrackWalkCounter, 0
-
+    .label TreeStartAddress3 = $460c
+    .label TreeColorStartAddress3 = $020c
   }
 
   * = * "Level1 Enemy3Manager"

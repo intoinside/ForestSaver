@@ -1,6 +1,8 @@
+
 plugins {
-    id "com.github.c64lib.retro-assembler" version "1.3.0"
+    id "com.github.c64lib.retro-assembler" version "1.4.4"
 }
+
 
 repositories {
     mavenCentral()
@@ -11,7 +13,59 @@ retroProject {
     dialectVersion = "5.20"
     libDirs = []
     srcDirs = ["."]
+    excludes = ["**/_*.asm"]
 
     // dependencies
     //libFromGitHub "c64lib/64spec", "0.7.0pr"
 }
+/*
+preprocess {
+    // Game charset and colors
+    charpad {
+        getInput().set(file("maps/game-maps.ctm"))
+        getUseBuildDir().set(true)
+        outputs {
+            charset {
+                output = file("maps/charset.bin")
+            }
+            charsetAttributes {
+                nybbler {
+                    loOutput = file("maps/charcolors.bin")
+                }
+            }
+
+        }
+    }
+    // Intro map
+    charpad {
+        getInput().set(file("maps/intro-maps.ctm"))
+        getUseBuildDir().set(true)
+        outputs {
+            map {
+                output = file("maps/intro.bin")
+            }
+        }
+    }
+    // Levels map
+    charpad {
+        getInput().set(file("maps/game-maps.ctm"))
+        getUseBuildDir().set(true)
+        outputs {
+            map {
+                left = 0
+                top = 0
+                right = 39
+                bottom = 22
+                output = file("maps/level1.bin")
+            }
+            map {
+                left = 40
+                top = 0
+                right = 79
+                bottom = 22
+                output = file("maps/level2.bin")
+            }
+        }
+    }
+}
+*/
