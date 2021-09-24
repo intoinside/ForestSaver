@@ -14,5 +14,8 @@ jobs:
       TERM: dumb
 
     steps:
-      - checkout
-      - run: ./gradle
+      - checkout:
+          post:
+            - git submodule sync --recursive
+            - git submodule update --recursive --init
+      - run: ./gradlew build
