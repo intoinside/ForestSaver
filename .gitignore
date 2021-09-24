@@ -1,6 +1,7 @@
 *.gitignore
 bak/*
 bin/*
+.gradle/*
 *.dmp
 *.prg
 *.tmp

@@ -18,4 +18,5 @@ jobs:
           post:
             - git submodule sync --recursive
             - git submodule update --recursive --init
+
       - run: ./gradlew build

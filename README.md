@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/intoinside/ForestSaver/tree/main.svg?style=svg)](https://circleci.com/gh/intoinside/ForestSaver/tree/main)
+
 # ForestSaver
 
 A ranger has to do a lot of work to preserve the forest. He must be careful of the loggers, the industries that want to pollute the lakes and the arsonists who want space for their pastures.
@@ -56,6 +58,11 @@ Si possono ricavare altre zone di memoria (esterne al bank 1) dove posizionare e
   .import binary "./sprites/sprites.bin"
 ```
 Considerando l'inserimento degli sprite a partire da $5400, lo sprite pointer del primo sprite è $50.
+Il calcolo è il seguente:
+* $5400 (area di stoccaggio degli sprite) - $4000 (inizio del Vic bank 1) = $1400 (posizione relativa dell'area di stoccaggio rispetto al Vic Bank 1)
+* $1400 / $40 (dimensione di uno sprite + 1 byte di padding) = $50
+
+Gli altri sprite avranno un posizionamento relativo al primo, aggiungendo l'offset definito in fase di design degli sprite.
 
 Dopo l'area degli sprite, è presente la char memory, scelta nel momento di impostazione del Vic bank 1. Si trova all'indirizzo $7800:
 ```

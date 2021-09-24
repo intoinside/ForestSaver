@@ -1,3 +1,14 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Project   : ForestSaver - https://github.com/intoinside/ForestSaver
+// Target    : Commodore 64
+// Author    : Raffaele Intorcia - raffaele.intorcia@gmail.com
+//
+// Import for any external resource
+//
+////////////////////////////////////////////////////////////////////////////////
+
+#importonce
 
 // Screen map memory definition
 * = $4000 "IntroMap"
@@ -19,7 +30,10 @@
 
 // Charset and char color
 * = $7800 "Charset"
+Charset:
   .import binary "./maps/charset.bin"
 * = $c000 "CharColors"
 CharColors:
   .import binary "./maps/charcolors.bin"
+
+#import "main.asm"

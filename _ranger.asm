@@ -4,23 +4,42 @@
 // Target    : Commodore 64
 // Author    : Raffaele Intorcia - raffaele.intorcia@gmail.com
 //
-// Manager for level 1.
+// Ranger sprite handler
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-Level1: {
+#importonce
 
-// Manager of level 1
-  * = * "Level1 Manager"
-  Manager: {
-      jsr Init
-      jsr AddColorToMap
-      jsr StupidWaitRoutine
+Ranger: {
+  * = * "Ranger Init"
+  Init: {
+      clc
+      lda ScreenMemoryAddress
+      adc #$03
+      sta ScreenMemoryAddress
 
-    JoystickMovement:
-      jsr WaitRoutine
-      jsr GetJoystickMove
+// Self modify code to use current screen memotry address, update hibyte
+      lda ScreenMemoryAddress
+      sta Init.LoadSprite1 + 2
+      sta UpdateRangerFrame.LoadSprite1 + 2
+      sta UpdateRangerFrame.LoadSprite2 + 2
+      sta UpdateRangerFrame.LoadSprite3 + 2
+      sta UpdateRangerFrame.LoadSprite4 + 2
+      sta UpdateRangerFrame.StoreSprite1 + 2
+      sta UpdateRangerFrame.StoreSprite2 + 2
+      sta UpdateRangerFrame.StoreSprite3 + 2
+      sta UpdateRangerFrame.StoreSprite4 + 2
 
+// No need to update lobyte because ranger is always sprite 0
+      lda #SPRITES.RANGER_STANDING
+    LoadSprite1:
+      sta SPRITES.SPRITE_0
+
+      rts
+  }
+
+  * = * "Ranger HandleRangerMove"
+  HandleRangerMove: {
       lda Direction
       beq CheckDirectionY
 
@@ -69,7 +88,7 @@ Level1: {
 
     CheckDirectionY:
       lda DirectionY
-      beq CheckFirePressed
+      beq Done
 
       jsr UpdateRangerFrame
 
@@ -82,27 +101,22 @@ Level1: {
     MoveToDown:
       iny
       cpy #LIMIT_DOWN
-      bcs CheckFirePressed
+      bcs Done
       sty SPRITES.Y0
 
-      jmp CheckFirePressed
+      jmp Done
 
     MoveToUp:
       dey
       cpy #LIMIT_UP
-      bcc CheckFirePressed
+      bcc Done
       sty SPRITES.Y0
 
-    CheckFirePressed:
-      lda FirePressed
-      beq JoystickMovement
-
-      jsr Finalize
-
+    Done:
       rts
   }
 
-  * = * "Level1 UpdateRangerFrame"
+  * = * "Ranger UpdateRangerFrame"
   UpdateRangerFrame: {
       inc RangerFrame
       lda RangerFrame
@@ -121,27 +135,31 @@ Level1: {
       beq Left
 
     Right:
-      ldx #RANGER_STANDING + 5
-      lda SPRITE_0
-      cmp #RANGER_STANDING + 6
+      ldx #SPRITES.RANGER_STANDING + 5
+    LoadSprite1:
+      lda SPRITES.SPRITE_0
+      cmp #SPRITES.RANGER_STANDING + 6
       beq RightUpdate
       inx
 
     RightUpdate:
       // If right frame edit occours, no other frame switch will be performed
-      stx SPRITE_0
+    StoreSprite1:
+      stx SPRITES.SPRITE_0
       jmp NoMove
 
     Left:
-      ldx #RANGER_STANDING + 7
-      lda SPRITE_0
-      cmp #RANGER_STANDING + 8
+      ldx #SPRITES.RANGER_STANDING + 7
+    LoadSprite2:
+      lda SPRITES.SPRITE_0
+      cmp #SPRITES.RANGER_STANDING + 8
       beq LeftUpdate
       inx
 
     LeftUpdate:
       // If left frame edit occours, no other frame switch will be performed
-      stx SPRITE_0
+    StoreSprite2:
+      stx SPRITES.SPRITE_0
       jmp NoMove
 
     CheckVerticalMove:
@@ -151,25 +169,29 @@ Level1: {
       beq Up
 
     Down:
-      ldx #RANGER_STANDING + 1
-      lda SPRITE_0
-      cmp #RANGER_STANDING + 2
+      ldx #SPRITES.RANGER_STANDING + 1
+    LoadSprite3:
+      lda SPRITES.SPRITE_0
+      cmp #SPRITES.RANGER_STANDING + 2
       beq UpUpdate
       inx
 
     DownUpdate:
-      stx SPRITE_0
+    StoreSprite3:
+      stx SPRITES.SPRITE_0
       jmp NoMove
 
     Up:
-      ldx #RANGER_STANDING + 3
-      lda SPRITE_0
-      cmp #RANGER_STANDING + 4
+      ldx #SPRITES.RANGER_STANDING + 3
+    LoadSprite4:
+      lda SPRITES.SPRITE_0
+      cmp #SPRITES.RANGER_STANDING + 4
       beq UpUpdate
       inx
 
     UpUpdate:
-      stx SPRITE_0
+    StoreSprite4:
+      stx SPRITES.SPRITE_0
 
     NoMove:
       rts
@@ -178,72 +200,13 @@ Level1: {
       .byte $ff
   }
 
-  // Initialization of intro screen
-  * = * "Level1 Init"
-  Init: {
-
-// Set background and border color to brown
-      lda #$09
-      sta VIC.BORDER_COLOR
-      sta VIC.BACKGROUND_COLOR
-
-      lda #$00
-      sta VIC.EXTRA_BACKGROUND1
-      lda #$01
-      sta VIC.EXTRA_BACKGROUND2
-
-// Set pointer to char memory to $7800-$7fff (xxxx111x)
-// and pointer to screen memory to $4400-$47ff (0001xxxx)
-      lda #%00011110
-      sta VIC.MEMORY_SETUP
-
-// Init ranger
-      lda #RANGER_STANDING
-      sta SPRITE_0
-
-      lda #$50
-      sta SPRITES.X0
-      lda #$40
-      sta SPRITES.Y0
-
-      lda #$0a
-      sta SPRITES.EXTRACOLOR1
-
-      lda #$00
-      sta SPRITES.EXTRACOLOR2
-
-      lda #$07
-      sta SPRITES.COLOR0
-
-// Enable the first sprite (just for test)
-      lda #$01
-      sta VIC.SPRITE_MULTICOLOR
-      sta VIC.SPRITE_ENABLE
-
-      rts
-  }
-
-  Finalize: {
-      lda #$00
-      sta VIC.SPRITE_ENABLE
-
-      rts
-  }
-
-  AddColorToMap: {
-// TODO(intoinside): don't like this macro, maybe changed with a function
-// (there's no need to be fast but there is a need to have smaller code)
-    SetColorToChars($4400)
-
-    rts
-  }
-
-  .label SPRITE_0     = $47f8
   .label LIMIT_UP     = $32
-  .label LIMIT_DOWN   = $e7
+  .label LIMIT_DOWN   = $e0
   .label LIMIT_LEFT   = $16
   .label LIMIT_RIGHT  = $46
 
-  .label RANGER_STANDING  = $50
-
+  ScreenMemoryAddress:
+    .word $beef
 }
+
+#import "_label.asm"

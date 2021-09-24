@@ -8,6 +8,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#importonce
+
 Intro: {
 
 // Manager of intro screen
@@ -54,22 +56,20 @@ Intro: {
       lda #$00
       sta GameEnded
 
-      // Reset player orientation and direction
-      sta Direction
-      sta DirectionY
-
-      lda #$01
-      sta Orientation
-
       rts
   }
 
   AddColorToMap: {
-// TODO(intoinside): don't like this macro, maybe changed with a function
-// (there's no need to be fast but there is a need to have smaller code)
-      SetColorToChars($4000)
+      lda #$40
+      sta SetColorToChars.ScreenMemoryAddress
+
+      jsr SetColorToChars
 
       rts
   }
 
 }
+
+#import "_label.asm"
+#import "_joystick.asm"
+#import "main.asm"

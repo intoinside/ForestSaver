@@ -8,6 +8,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#importonce
+
 BasicUpstart2(Entry)
 
 * = * "Entry"
@@ -18,13 +20,6 @@ Entry: {
 
 GameEnded:          // $00 - Game in progress
   .byte $00         // $ff - Played dead, game ended
-
-Orientation:        // Player sprite orientation
-    .byte $01       // $01 - right, $ff - left
-Direction:          // Player sprite direction
-    .byte $01       // $00 - no move, $01 - right, $ff - left
-DirectionY:         // Player sprite vertical direction
-    .byte $ff       // $00 - no move, $01 - down, $ff - up
 
 * = * "Main GamePlay"
 GamePlay: {
@@ -52,13 +47,14 @@ MainGameSettings: {
     lda #%00011000
     sta VIC.SCREEN_CONTROL_2
 
+    lda #$ff
+    sta VIC.SPRITE_MULTICOLOR
+
     rts
 }
 
-#import "label.asm"
-#import "utils.asm"
-#import "joystick.asm"
-#import "intro.asm"
-#import "level1.asm"
-#import "level2.asm"
-#import "allimport.asm"
+#import "_intro.asm"
+#import "_level1.asm"
+#import "_level2.asm"
+#import "_allimport.asm"
+#import "_label.asm"
