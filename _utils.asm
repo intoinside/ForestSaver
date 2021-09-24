@@ -13,7 +13,234 @@
 SpriteNumberMask:
     .byte %00000001, %00000010, %00000100, %00001000, %00010000, %00100000, %01000000, %10000000
 
-.macro RemoveTree(startAddress, colorStartAddress) {
+#import "common/lib/math-global.asm"
+
+* = * "Utils RemoveTree"
+RemoveTree: {
+// Row #1
+    lda StartAddress
+    sta SelfMod1 + 1
+    lda StartAddress + 1
+    sta SelfMod1 + 2
+
+    c64lib_inc16(StartAddress)
+    lda StartAddress
+    sta SelfMod2 + 1
+    lda StartAddress + 1
+    sta SelfMod2 + 2
+
+    c64lib_inc16(StartAddress)
+    lda StartAddress
+    sta SelfMod3 + 1
+    lda StartAddress + 1
+    sta SelfMod3 + 2
+
+    c64lib_inc16(StartAddress)
+    lda StartAddress
+    sta SelfMod4 + 1
+    lda StartAddress + 1
+    sta SelfMod4 + 2
+
+// Row #2
+    c64lib_add16($0025, StartAddress)
+    lda StartAddress
+    sta SelfMod5 + 1
+    lda StartAddress + 1
+    sta SelfMod5 + 2
+
+    c64lib_inc16(StartAddress)
+    lda StartAddress
+    sta SelfMod6 + 1
+    lda StartAddress + 1
+    sta SelfMod6 + 2
+
+    c64lib_inc16(StartAddress)
+    lda StartAddress
+    sta SelfMod7 + 1
+    lda StartAddress + 1
+    sta SelfMod7 + 2
+
+    c64lib_inc16(StartAddress)
+    lda StartAddress
+    sta SelfMod8 + 1
+    lda StartAddress + 1
+    sta SelfMod8 + 2
+
+// Row #3
+    c64lib_add16($0025, StartAddress)
+    lda StartAddress
+    sta SelfMod9 + 1
+    lda StartAddress + 1
+    sta SelfMod9 + 2
+
+    c64lib_inc16(StartAddress)
+    lda StartAddress
+    sta SelfMod10 + 1
+    lda StartAddress + 1
+    sta SelfMod10 + 2
+
+    c64lib_inc16(StartAddress)
+    lda StartAddress
+    sta SelfMod11 + 1
+    lda StartAddress + 1
+    sta SelfMod11 + 2
+
+    c64lib_inc16(StartAddress)
+    lda StartAddress
+    sta SelfMod12 + 1
+    lda StartAddress + 1
+    sta SelfMod12 + 2
+
+// Row #4
+    c64lib_add16($0025, StartAddress)
+    lda StartAddress
+    sta SelfMod13 + 1
+    lda StartAddress + 1
+    sta SelfMod13 + 2
+
+    c64lib_inc16(StartAddress)
+    lda StartAddress
+    sta SelfMod14 + 1
+    lda StartAddress + 1
+    sta SelfMod14 + 2
+
+    c64lib_inc16(StartAddress)
+    lda StartAddress
+    sta SelfMod15 + 1
+    lda StartAddress + 1
+    sta SelfMod15 + 2
+
+    c64lib_inc16(StartAddress)
+    lda StartAddress
+    sta SelfMod16 + 1
+    lda StartAddress + 1
+    sta SelfMod16 + 2
+
+    ldx #$00                // 2b 2cy
+  SelfMod1:
+    stx $beef
+  SelfMod2:
+    stx $beef
+  SelfMod3:
+    stx $beef
+  SelfMod4:
+    stx $beef
+
+  SelfMod5:
+    stx $beef
+  SelfMod6:
+    stx $beef
+  SelfMod7:
+    stx $beef
+  SelfMod8:
+    stx $beef
+
+  SelfMod9:
+    stx $beef
+  SelfMod12:
+    stx $beef
+    inx
+  SelfMod10:
+    stx $beef
+    inx
+  SelfMod11:
+    stx $beef
+
+    inx
+  SelfMod13:
+    stx $beef
+    inx
+  SelfMod14:
+    stx $beef
+    inx
+  SelfMod15:
+    stx $beef
+    inx
+  SelfMod16:
+    stx $beef
+
+/*
+    c64lib_add16($d800, ColorStartAddress)
+
+    c64lib_sub16($007b, StartAddress)
+    lda StartAddress
+    sta SelfMod_p2_1 + 1
+    lda StartAddress + 1
+    sta SelfMod_p2_1 + 2
+
+    c64lib_add16($0028, StartAddress)
+    lda StartAddress
+    sta SelfMod_p2_2 + 1
+    lda StartAddress + 1
+    sta SelfMod_p2_2 + 2
+
+    c64lib_add16($0028, StartAddress)
+    lda StartAddress
+    sta SelfMod_p2_3 + 1
+    lda StartAddress + 1
+    sta SelfMod_p2_3 + 2
+
+    c64lib_add16($0028, StartAddress)
+    lda StartAddress
+    sta SelfMod_p2_4 + 1
+    lda StartAddress + 1
+    sta SelfMod_p2_4 + 2
+
+    c64lib_add16($0004, ColorStartAddress)
+    ldx #$04
+  !Loop:
+  SelfMod_p2_1:
+    ldy $beef
+    lda CharColors, y
+    c64lib_dec16(ColorStartAddress)
+    sta ColorStartAddress
+    dex
+    bne !Loop-
+
+    c64lib_add16($0028, ColorStartAddress)
+    ldx #$04
+  !Loop:
+  SelfMod_p2_2:
+    ldy $beef
+    lda CharColors, y
+    c64lib_dec16(ColorStartAddress)
+    sta ColorStartAddress
+    dex
+    bne !Loop-
+
+    c64lib_add16($0028, ColorStartAddress)
+    ldx #$04
+  !Loop:
+  SelfMod_p2_3:
+    ldy $beef
+    lda CharColors, y
+    c64lib_dec16(ColorStartAddress)
+    sta ColorStartAddress
+    dex
+    bne !Loop-
+
+    c64lib_add16($0028, ColorStartAddress)
+    ldx #$04
+  !Loop:
+  SelfMod_p2_4:
+    ldy $beef
+    lda CharColors, y
+    c64lib_dec16(ColorStartAddress)
+    sta ColorStartAddress
+    dex
+    bne !Loop-
+
+*/
+    rts
+
+    StartAddress: .word $beef
+    ColorStartAddress: .word $beef
+}
+
+//Trasformare in subroutine, passare l'indirizzo di partenza in una variabile
+// interna, fare un selfmod code, usare inc e adc per ottenere gli indirizzi
+// successivi
+/*.macro RemoveTree(startAddress, colorStartAddress) {
     ldx #$00                // 2b 2cy
     stx startAddress        // 3b 4cy
     stx startAddress + $01  // 3b 4cy
@@ -74,6 +301,7 @@ SpriteNumberMask:
     dex
     bne Loop4
 }
+*/
 
 // Fill screen with $20 char (preserve sprite pointer memory area)
 .macro ClearScreen(screenram) {

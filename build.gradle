@@ -11,12 +11,12 @@ repositories {
 retroProject {
     dialect = "KickAssembler"
     dialectVersion = "5.20"
-    libDirs = []
+    libDirs = ["libs"]
     srcDirs = ["."]
-    excludes = ["**/_*.asm"]
+    excludes = ["**/_*.asm", "libs/*.*"]
 
     // dependencies
-    //libFromGitHub "c64lib/64spec", "0.7.0pr"
+    libFromGitHub "c64lib/common", "0.2.0"
 }
 
 /*
