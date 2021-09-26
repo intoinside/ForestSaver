@@ -21,7 +21,7 @@ retroProject {
 }
 
 preprocess {
-    // Game charset and colors
+    // Game charset, colors and maps
     charpad {
         getInput().set(file("./maps/game-maps.ctm"))
         getUseBuildDir().set(false)

@@ -2,6 +2,7 @@
 bak/*
 bin/*
 build/*
+maps/*.bin
 .ra/*
 .gradle/*
 *.dmp
