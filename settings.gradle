@@ -12,3 +12,11 @@
 //   }
 // }
 
+pluginManagement {
+    repositories {
+//        maven {
+//            url 'file://C:/prj/cbm/c64lib/consuming/maven-repo'
+//        }
+        gradlePluginPortal()
+    }
+}

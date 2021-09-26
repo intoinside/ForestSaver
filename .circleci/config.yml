@@ -4,6 +4,7 @@ jobs:
     branches:
       only:
         - main
+        - develop
     docker:
       - image: maciejmalecki/c64libci:0.1.4
 
