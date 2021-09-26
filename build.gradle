@@ -1,8 +1,7 @@
 
 plugins {
-    id "com.github.c64lib.retro-assembler" version "1.1.0-rc01"
+    id "com.github.c64lib.retro-assembler" version "1.4.4"
 }
-
 
 repositories {
     mavenCentral()
@@ -21,54 +20,57 @@ retroProject {
     libFromGitHub "c64lib/common", "0.2.0"
 }
 
-/*
 preprocess {
     // Game charset and colors
     charpad {
-        getInput().set(file("maps/game-maps.ctm"))
-        getUseBuildDir().set(true)
+        getInput().set(file("./maps/game-maps.ctm"))
+        getUseBuildDir().set(false)
         outputs {
             charset {
-                output = file("maps/charset.bin")
+                output = file("./maps/charset.bin")
             }
             charsetAttributes {
                 nybbler {
-                    loOutput = file("maps/charcolors.bin")
+                    loOutput = file("./maps/charcolors.bin")
                 }
             }
 
-        }
-    }
     // Intro map
-    charpad {
-        getInput().set(file("maps/intro-maps.ctm"))
-        getUseBuildDir().set(true)
-        outputs {
-            map {
-                output = file("maps/intro.bin")
-            }
-        }
-    }
-    // Levels map
-    charpad {
-        getInput().set(file("maps/game-maps.ctm"))
-        getUseBuildDir().set(true)
-        outputs {
             map {
                 left = 0
                 top = 0
-                right = 39
+                right = 40
                 bottom = 22
-                output = file("maps/level1.bin")
+                interleaver {
+                    output = file("maps/intro.bin")
+                }
+                interleaver {
+                }
             }
+
+    // Levels maps
             map {
                 left = 40
                 top = 0
-                right = 79
+                right = 80
                 bottom = 22
-                output = file("maps/level2.bin")
+                interleaver {
+                    output = file("maps/level1.bin")
+                }
+                interleaver {
+                }
+            }
+            map {
+                left = 80
+                top = 0
+                right = 120
+                bottom = 22
+                interleaver {
+                    output = file("maps/level2.bin")
+                }
+                interleaver {
+                }
             }
         }
     }
 }
-*/
