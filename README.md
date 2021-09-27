@@ -13,10 +13,31 @@ A ranger has to do a lot of work to preserve the forest. He must be careful of t
 * Gradle build tool https://gradle.org/
 * c64lib https://github.com/c64lib
 * c64lib.retro-assembler https://github.com/c64lib/gradle-retro-assembler-plugin
+* Circle.ci https://circleci.com/
 
 ## Build info
-You can use `gradlew build` and then put main.prg on Vice.
+
+### Download ForestSaver for build and play
+
+* Clone repository on your folder
+`git clone https://github.com/intoinside/ForestSaver.git`
+* Switch to game folder
+`cd ForestSaver`
+* Run `gradlew build`
+* Take `main.prg` and run it on Vice
+
+### Download ForestSaver for develop
+
+* Clone repository on your folder
+`git clone https://github.com/intoinside/ForestSaver.git`
+* Switch to game folder
+`cd ForestSaver`
+* Clone libraries
+`git clone https://github.com/c64lib/common.git --branch 0.2.0`
+
+At this point you should be able to build project inside KickAssembler.
 
 ## Tech information (ita and then eng)
 
 Moved to wiki
+https://github.com/intoinside/ForestSaver/wiki
