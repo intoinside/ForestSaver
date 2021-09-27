@@ -116,7 +116,7 @@ RemoveTree: {
     lda StartAddress + 1
     sta SelfMod16 + 2
 
-    ldx #$00                // 2b 2cy
+    ldx #$00
   SelfMod1:
     stx $beef
   SelfMod2:
@@ -159,149 +159,12 @@ RemoveTree: {
   SelfMod16:
     stx $beef
 
-/*
-    c64lib_add16($d800, ColorStartAddress)
+    jsr SetColorToChars
 
-    c64lib_sub16($007b, StartAddress)
-    lda StartAddress
-    sta SelfMod_p2_1 + 1
-    lda StartAddress + 1
-    sta SelfMod_p2_1 + 2
-
-    c64lib_add16($0028, StartAddress)
-    lda StartAddress
-    sta SelfMod_p2_2 + 1
-    lda StartAddress + 1
-    sta SelfMod_p2_2 + 2
-
-    c64lib_add16($0028, StartAddress)
-    lda StartAddress
-    sta SelfMod_p2_3 + 1
-    lda StartAddress + 1
-    sta SelfMod_p2_3 + 2
-
-    c64lib_add16($0028, StartAddress)
-    lda StartAddress
-    sta SelfMod_p2_4 + 1
-    lda StartAddress + 1
-    sta SelfMod_p2_4 + 2
-
-    c64lib_add16($0004, ColorStartAddress)
-    ldx #$04
-  !Loop:
-  SelfMod_p2_1:
-    ldy $beef
-    lda CharColors, y
-    c64lib_dec16(ColorStartAddress)
-    sta ColorStartAddress
-    dex
-    bne !Loop-
-
-    c64lib_add16($0028, ColorStartAddress)
-    ldx #$04
-  !Loop:
-  SelfMod_p2_2:
-    ldy $beef
-    lda CharColors, y
-    c64lib_dec16(ColorStartAddress)
-    sta ColorStartAddress
-    dex
-    bne !Loop-
-
-    c64lib_add16($0028, ColorStartAddress)
-    ldx #$04
-  !Loop:
-  SelfMod_p2_3:
-    ldy $beef
-    lda CharColors, y
-    c64lib_dec16(ColorStartAddress)
-    sta ColorStartAddress
-    dex
-    bne !Loop-
-
-    c64lib_add16($0028, ColorStartAddress)
-    ldx #$04
-  !Loop:
-  SelfMod_p2_4:
-    ldy $beef
-    lda CharColors, y
-    c64lib_dec16(ColorStartAddress)
-    sta ColorStartAddress
-    dex
-    bne !Loop-
-
-*/
     rts
 
     StartAddress: .word $beef
-    ColorStartAddress: .word $beef
 }
-
-//Trasformare in subroutine, passare l'indirizzo di partenza in una variabile
-// interna, fare un selfmod code, usare inc e adc per ottenere gli indirizzi
-// successivi
-/*.macro RemoveTree(startAddress, colorStartAddress) {
-    ldx #$00                // 2b 2cy
-    stx startAddress        // 3b 4cy
-    stx startAddress + $01  // 3b 4cy
-    stx startAddress + $02  // 3b 4cy
-    stx startAddress + $03  // 3b 4cy
-
-    stx startAddress + $28  // 3b 4cy
-    stx startAddress + $29  // 3b 4cy
-    stx startAddress + $2a  // 3b 4cy
-    stx startAddress + $2b  // 3b 4cy
-
-    stx startAddress + $50  // 3b 4cy
-    stx startAddress + $53  // 3b 4cy
-
-    inx                     // 1b 2cy
-    stx startAddress + $51  // 3b 4cy
-    inx                     // 1b 2cy
-    stx startAddress + $52  // 3b 4cy
-
-    inx                     // 1b 2cy
-    stx startAddress + $78  // 3b 4cy
-    inx                     // 1b 2cy
-    stx startAddress + $79  // 3b 4cy
-    inx                     // 1b 2cy
-    stx startAddress + $7a  // 3b 4cy
-    inx                     // 1b 2cy
-    stx startAddress + $7b  // 3b 4cy
-
-    ldx #$04
-  Loop:
-    ldy startAddress
-    lda CharColors, y
-    sta colorStartAddress + $d800, x
-    dex
-    bne Loop
-
-    ldx #$04
-  Loop2:
-    ldy startAddress + $28
-    lda CharColors, y
-    sta colorStartAddress + $d800 + $28, x
-    dex
-    bne Loop2
-
-    ldx #$04
-  Loop3:
-    ldy startAddress + $50
-    lda CharColors, y
-    sta colorStartAddress + $d800 + $50, x
-    dex
-    bne Loop3
-
-    ldx #$04
-  Loop4:
-    ldy startAddress + $78
-    lda CharColors, y
-    sta colorStartAddress + $d800 + $78, x
-    dex
-    bne Loop4
-}
-*/
 
 // Fill screen with $20 char (preserve sprite pointer memory area)
 .macro ClearScreen(screenram) {

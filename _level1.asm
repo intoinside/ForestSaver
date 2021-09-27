@@ -616,7 +616,6 @@ Level1: {
       .fill TrackWalkCounter, 0
 
     TreeStartAddress: .word $beef
-    TreeColorStartAddress: .word $beef
   }
 
     * = * "Level1 SetWoodCutter2Track"
@@ -705,7 +704,6 @@ Level1: {
     DirectionY1:
       .fill TrackWalkCounter, 0
     TreeStartAddress1: .word $445c
-    TreeColorStartAddress1: .word $005c
 
 // Second woodcutter track data
     .label Walk2Offset = 135
@@ -721,7 +719,6 @@ Level1: {
     DirectionY2:
       .fill TrackWalkCounter, 0
     TreeStartAddress2: .word $456c
-    TreeColorStartAddress2: .word $016c
 
 // Third woodcutter track data
     .label Walk3Offset = 0
@@ -737,7 +734,6 @@ Level1: {
     DirectionY3:
       .fill TrackWalkCounter, 0
     TreeStartAddress3: .word $461c
-    TreeColorStartAddress3: .word $021c
   }
 
   * = * "Level1 Enemy3Manager"
@@ -978,7 +974,6 @@ Level1: {
       .fill TrackWalkCounter, 0
 
     TreeStartAddress: .word $beef
-    TreeColorStartAddress: .word $beef
   }
 
     * = * "Level1 SetWoodCutter3Track"
@@ -986,10 +981,10 @@ Level1: {
       ldx #0
 
       lda Enemy3Manager.CurrentWoodCutter
-      cmp #$03
-      beq FixForWoodCutter3
       cmp #$02
       beq FixForWoodCutter2
+      cmp #$03
+      beq FixForWoodCutter3
 
     FixForWoodCutter1:
     !:
@@ -1076,7 +1071,6 @@ Level1: {
     DirectionY1:
       .fill TrackWalkCounter, 0
     TreeStartAddress1: .word $448d
-    TreeColorStartAddress1: .word $008d
 
 // Second woodcutter track data
     .label MaxX2WithXBit = 65
@@ -1093,7 +1087,6 @@ Level1: {
     DirectionY2:
       .fill TrackWalkCounter, 0
     TreeStartAddress2: .word $45b0
-    TreeColorStartAddress2: .word $01b0
 
 // Third woodcutter track data
     .label MaxX3WithXBit = 65
@@ -1110,7 +1103,6 @@ Level1: {
     DirectionY3:
       .fill TrackWalkCounter, 0
     TreeStartAddress3: .word $46c4
-    TreeColorStartAddress3: .word $02c4
   }
 
   * = * "Level1 TimedRoutine"
