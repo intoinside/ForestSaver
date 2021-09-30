@@ -22,5 +22,5 @@ jobs:
 
       - run: ./gradlew build
       - store_artifacts:
-          path: ~/root/repo/main.prg
+          path: ~/repo/main.prg
           destination: ForestSaver.prg
