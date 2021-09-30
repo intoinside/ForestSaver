@@ -21,3 +21,6 @@ jobs:
             - git submodule update --recursive --init
 
       - run: ./gradlew build
+      - store_artifacts:
+          path: ~/root/repo/main.prg
+          destination: ForestSaver.prg
