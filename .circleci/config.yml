@@ -4,6 +4,7 @@ jobs:
     branches:
       only:
         - main
+        - develop
     docker:
       - image: maciejmalecki/c64libci:0.1.4
 
@@ -20,3 +21,6 @@ jobs:
             - git submodule update --recursive --init
 
       - run: ./gradlew build
+      - store_artifacts:
+          path: /root/repo/main.prg
+          destination: ForestSaver.prg
