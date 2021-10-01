@@ -17,6 +17,8 @@ SpriteNumberMask:
 
 * = * "Utils RemoveTree"
 RemoveTree: {
+    .assert "RemoveTree.StartAddress not beef", StartAddress != $beef, true
+
 // Row #1
     lda StartAddress
     sta SelfMod1 + 1
@@ -194,10 +196,98 @@ RemoveTree: {
     sta VIC.SPRITE_ENABLE       // Set the new value into the sprite enable register
 }
 
-.macro SpriteCollided(spriteNumber) {
-    ldy spriteNumber
-    lda SpriteNumberMask, y
+.macro bpl16(value, low) {
+  lda value + 1
+  cmp low + 1
+  bpl end     // branch to end if value is bigger
+  lda value
+  cmp low
+end:
+}
+
+.macro bmi16(value, low) {
+  lda value + 1
+  cmp low + 1
+  bmi end     // branch to end if value is smaller
+  lda value
+  cmp low
+end:
+}
+
+* = * "Utils SpriteCollision"
+SpriteCollision: {
+
+    lda #%00000001
     and SPRITES.COLLISION_REGISTER
+    bne CollisionHappened
+    jmp NoCollisionDetected
+
+// Sprite 0 collided with someone, detect sprite0 corner
+  CollisionHappened:
+    lda SPRITES.EXTRA_BIT
+    cmp #%00000001
+    beq SetExtraBit
+    lda #$00
+    jmp NextArg
+  SetExtraBit:
+    lda #$01
+  NextArg:
+    sta X1 + 1
+
+    lda SPRITES.X0
+    sta X1
+    clc
+    adc #$08
+    sta X2
+    bcc !+
+    lda #$01
+    jmp !Next+
+  !:
+    lda #$00
+  !Next:
+    sta X2 + 1
+
+    lda SPRITES.Y0
+    sta Y1
+    clc
+    adc #$08
+    sta Y2
+
+// REMIND: BMI means jump if a is lower than b
+    bmi16(I1, X1)
+    bmi NoCollisionDetected
+    bmi16(X2, I1)
+    bmi NoCollisionDetected
+
+    bmi16(J1, Y1)
+    bmi NoCollisionDetected
+    bmi16(Y2, J1)
+    bmi NoCollisionDetected
+
+  CollisionDetected:
+    lda #$01
+    jmp Done
+
+  NoCollisionDetected:
+    lda #$00
+
+  Done:
+    sta Collision
+    rts
+
+  SpriteNumber: .byte $00
+
+// Woodcutter square
+  X1: .word $0000
+  X2: .word $0000
+  Y1: .word $0000
+  Y2: .word $0000
+
+// Other sprite initial coordinate
+  I1: .word $0000
+  J1: .word $0000
+
+  Collision: .byte $00
 }
 
 * = * "SetColorToChars"

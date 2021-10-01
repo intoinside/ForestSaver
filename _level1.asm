@@ -475,9 +475,24 @@ Level1: {
       jmp Done
 
     HatchetStrike:
-// TODO(rafs): need to setup a new collision detector
-      // SpriteCollided(0);
-      // bne RangerWoodCutterMet
+      lda #$1
+      sta SpriteCollision.SpriteNumber
+      lda SPRITES.EXTRA_BIT
+      cmp #%00000010
+      beq SetExtraBit
+      lda #$00
+      jmp NextArg
+    SetExtraBit:
+      lda #$01
+    NextArg:
+      sta SpriteCollision.I1 + 1
+      lda SPRITES.X1
+      sta SpriteCollision.I1
+      lda SPRITES.Y1
+      sta SpriteCollision.J1
+      jsr SpriteCollision
+      lda SpriteCollision.Collision
+      bne RangerWoodCutterMet
 
       lda #<SPRITE_1
       sta Hatchet.ScreenMemoryAddress + 1
