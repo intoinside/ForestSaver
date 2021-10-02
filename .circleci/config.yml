@@ -24,3 +24,13 @@ jobs:
       - store_artifacts:
           path: ~/repo/main.prg
           destination: ForestSaver.prg
+  publish-github-release:
+    requires:
+      - build
+    filters:
+      branches:
+        only:
+          - main
+          - develop
+#      tags:
+#        only: /^\d+\.\d+\.\d+$/
