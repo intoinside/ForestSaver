@@ -216,7 +216,6 @@ end:
 
 * = * "Utils SpriteCollision"
 SpriteCollision: {
-
     lda #%00000001
     and SPRITES.COLLISION_REGISTER
     bne CollisionHappened
@@ -275,8 +274,6 @@ SpriteCollision: {
     sta Collision
     rts
 
-  SpriteNumber: .byte $00
-
 // Woodcutter square
   X1: .word $0000
   X2: .word $0000
@@ -288,6 +285,137 @@ SpriteCollision: {
   J1: .word $0000
 
   Collision: .byte $00
+}
+
+.macro add16(value, dest) {
+  clc
+  lda dest
+  adc value
+  sta dest
+  lda dest + 1
+  adc value + 1
+  sta dest + 1
+}
+
+.macro add16byte(value, dest) {
+  clc
+  lda dest
+  adc value
+  sta dest
+  bcc !+
+  inc dest + 1
+!:
+}
+
+.macro add16value(value, dest) {
+  clc
+  lda dest
+  adc #<value
+  sta dest
+  lda dest + 1
+  adc #>value
+  sta dest + 1
+}
+
+.macro sub16byte(value, low) {
+  sec
+  lda low
+  sbc value
+  sta low
+  lda low + 1
+  sbc #$00
+  sta low + 1
+}
+
+* = * "Utils HandleWoodCutterFined"
+HandleWoodCutterFined: {
+// Char self mod
+    lda ComplainChars
+    sta EditMap1 + 1
+    lda ComplainChars + 1
+    sta EditMap2 + 1
+    lda ComplainChars + 2
+    sta EditMap3 + 1
+
+    lda ComplainChars + 3
+    sta EditMap4 + 1
+    lda ComplainChars + 4
+    sta EditMap5 + 1
+    lda ComplainChars + 5
+    sta EditMap6 + 1
+
+    lda AddOrSub
+    beq !Add+
+  !Sub:
+    sub16byte(Offset, MapComplain)
+    jmp MapSelfModArea1Row
+
+  !Add:
+    add16byte(Offset, MapComplain)
+
+  MapSelfModArea1Row:
+    lda MapComplain
+    sta EditMap1 + 3
+    lda MapComplain + 1
+    sta EditMap1 + 4
+    c64lib_inc16(MapComplain);
+
+    lda MapComplain
+    sta EditMap2 + 3
+    lda MapComplain + 1
+    sta EditMap2 + 4
+    c64lib_inc16(MapComplain);
+
+    lda MapComplain
+    sta EditMap3 + 3
+    lda MapComplain + 1
+    sta EditMap3 + 4
+
+    add16value($0026, MapComplain)
+
+    lda MapComplain
+    sta EditMap4 + 3
+    lda MapComplain + 1
+    sta EditMap4 + 4
+    c64lib_inc16(MapComplain);
+
+    lda MapComplain
+    sta EditMap5 + 3
+    lda MapComplain + 1
+    sta EditMap5 + 4
+    c64lib_inc16(MapComplain);
+
+    lda MapComplain
+    sta EditMap6 + 3
+    lda MapComplain + 1
+    sta EditMap6 + 4
+
+  EditMap1:
+    lda #$00
+    sta $beef
+  EditMap2:
+    lda #$00
+    sta $beef
+  EditMap3:
+    lda #$00
+    sta $beef
+
+  EditMap4:
+    lda #$00
+    sta $beef
+  EditMap5:
+    lda #$00
+    sta $beef
+  EditMap6:
+    lda #$00
+    sta $beef
+
+    rts
+
+  ComplainChars:  .byte $64, $65, $66, $67, $68, $69
+  AddOrSub:       .byte $00   // $00 means add, otherwise sub
+  Offset:         .byte $00
+  MapComplain:    .word $4569 //, $456a, $456b, $4591, $4592, $4593
 }
 
 * = * "SetColorToChars"

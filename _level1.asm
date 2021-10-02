@@ -245,84 +245,6 @@ Level1: {
       rts
   }
 
-  * = * "Level1 HandleWoodCutterFined"
-  HandleWoodCutterFined: {
-// Char self mod
-      lda ComplainChars
-      sta EditMap1 + 1
-      lda ComplainChars + 1
-      sta EditMap2 + 1
-      lda ComplainChars + 2
-      sta EditMap3 + 1
-
-      lda ComplainChars + 3
-      sta EditMap4 + 1
-      lda ComplainChars + 4
-      sta EditMap5 + 1
-      lda ComplainChars + 5
-      sta EditMap6 + 1
-
-// Map self mod
-      lda MapComplain
-      sta EditMap1 + 3
-      lda MapComplain + 1
-      sta EditMap1 + 4
-
-      lda MapComplain + 2
-      sta EditMap2 + 3
-      lda MapComplain + 3
-      sta EditMap2 + 4
-
-      lda MapComplain + 4
-      sta EditMap3 + 3
-      lda MapComplain + 5
-      sta EditMap3 + 4
-
-      lda MapComplain + 6
-      sta EditMap4 + 3
-      lda MapComplain + 7
-      sta EditMap4 + 4
-
-      lda MapComplain + 8
-      sta EditMap5 + 3
-      lda MapComplain + 9
-      sta EditMap5 + 4
-
-      lda MapComplain + 10
-      sta EditMap6 + 3
-      lda MapComplain + 11
-      sta EditMap6 + 4
-
-    Stage1:
-// WoodCutter and Ranger met, hide hatchet
-      EnableSprite(1, false)
-
-    EditMap1:
-      lda #$00
-      sta $beef
-    EditMap2:
-      lda #$00
-      sta $beef
-    EditMap3:
-      lda #$00
-      sta $beef
-
-    EditMap4:
-      lda #$00
-      sta $beef
-    EditMap5:
-      lda #$00
-      sta $beef
-    EditMap6:
-      lda #$00
-      sta $beef
-
-      rts
-
-    ComplainChars:  .byte $64, $65, $66, $67, $68, $69
-    MapComplain:    .word $4569, $456a, $456b, $4591, $4592, $4593
-  }
-
   * = * "Level1 HandleWoodCutterFinedOut"
   HandleWoodCutterFinedOut: {
       lda MapComplain
@@ -384,6 +306,16 @@ Level1: {
       lda ComplaintShown
       bne GoToWalkOutFar
 
+      EnableSprite(1, false)
+
+      lda TreeStartAddress
+      sta HandleWoodCutterFined.MapComplain
+      lda TreeStartAddress + 1
+      sta HandleWoodCutterFined.MapComplain + 1
+      lda #$01
+      sta HandleWoodCutterFined.AddOrSub
+      lda #$03
+      sta HandleWoodCutterFined.Offset
       jsr HandleWoodCutterFined
       inc ComplaintShown
 
@@ -475,8 +407,6 @@ Level1: {
       jmp Done
 
     HatchetStrike:
-      lda #$1
-      sta SpriteCollision.SpriteNumber
       lda SPRITES.EXTRA_BIT
       cmp #%00000010
       beq SetExtraBit
@@ -758,6 +688,16 @@ Level1: {
       lda ComplaintShown
       bne GoToWalkOutFar
 
+      EnableSprite(3, false)
+
+      lda TreeStartAddress
+      sta HandleWoodCutterFined.MapComplain
+      lda TreeStartAddress + 1
+      sta HandleWoodCutterFined.MapComplain + 1
+      lda #$00
+      sta HandleWoodCutterFined.AddOrSub
+      lda #$05
+      sta HandleWoodCutterFined.Offset
       jsr HandleWoodCutterFined
       inc ComplaintShown
 
@@ -849,9 +789,22 @@ Level1: {
       jmp Done
 
     HatchetStrike:
-// TODO(rafs): need to setup a new collision detector
-      // SpriteCollided(0);
-      // bne RangerWoodCutterMet
+      lda SPRITES.EXTRA_BIT
+      cmp #%00001000
+      beq SetExtraBit
+      lda #$00
+      jmp NextArg
+    SetExtraBit:
+      lda #$01
+    NextArg:
+      sta SpriteCollision.I1 + 1
+      lda SPRITES.X3
+      sta SpriteCollision.I1
+      lda SPRITES.Y3
+      sta SpriteCollision.J1
+      jsr SpriteCollision
+      lda SpriteCollision.Collision
+      bne RangerWoodCutterMet
 
       lda #<SPRITE_3
       sta Hatchet.ScreenMemoryAddress + 1
