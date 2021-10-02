@@ -348,12 +348,12 @@ HandleWoodCutterFined: {
     beq !Add+
   !Sub:
     sub16byte(Offset, MapComplain)
-    jmp MapSelfModArea1Row
+    jmp MapSelfModAreaRow1
 
   !Add:
     add16byte(Offset, MapComplain)
 
-  MapSelfModArea1Row:
+  MapSelfModAreaRow1:
     lda MapComplain
     sta EditMap1 + 3
     lda MapComplain + 1
@@ -371,6 +371,7 @@ HandleWoodCutterFined: {
     lda MapComplain + 1
     sta EditMap3 + 4
 
+  MapSelfModAreaRow2:
     add16value($0026, MapComplain)
 
     lda MapComplain
@@ -415,7 +416,80 @@ HandleWoodCutterFined: {
   ComplainChars:  .byte $64, $65, $66, $67, $68, $69
   AddOrSub:       .byte $00   // $00 means add, otherwise sub
   Offset:         .byte $00
-  MapComplain:    .word $4569 //, $456a, $456b, $4591, $4592, $4593
+  MapComplain:    .word $4569
+}
+
+* = * "Utils HandleWoodCutterFinedOut"
+HandleWoodCutterFinedOut: {
+    lda AddOrSub
+    beq !Add+
+  !Sub:
+    sub16byte(Offset, MapComplain)
+    jmp MapSelfModAreaRow1
+
+  !Add:
+    add16byte(Offset, MapComplain)
+
+  MapSelfModAreaRow1:
+    lda MapComplain
+    sta EditMap1 + 1
+    lda MapComplain + 1
+    sta EditMap1 + 2
+    c64lib_inc16(MapComplain);
+
+    lda MapComplain
+    sta EditMap2 + 1
+    lda MapComplain + 1
+    sta EditMap2 + 2
+    c64lib_inc16(MapComplain);
+
+    lda MapComplain
+    sta EditMap3 + 1
+    lda MapComplain + 1
+    sta EditMap3 + 2
+
+  MapSelfModAreaRow2:
+    add16value($0026, MapComplain)
+
+    lda MapComplain
+    sta EditMap4 + 1
+    lda MapComplain + 1
+    sta EditMap4 + 2
+    c64lib_inc16(MapComplain);
+
+    lda MapComplain
+    sta EditMap5 + 1
+    lda MapComplain + 1
+    sta EditMap5 + 2
+    c64lib_inc16(MapComplain);
+
+    lda MapComplain
+    sta EditMap6 + 1
+    lda MapComplain + 1
+    sta EditMap6 + 2
+
+  EditCharMap1:
+    lda FixComplainChars
+  EditMap1:
+    sta $beef
+  EditMap2:
+    sta $beef
+  EditMap3:
+    sta $beef
+
+  EditMap4:
+    sta $beef
+  EditMap5:
+    sta $beef
+  EditMap6:
+    sta $beef
+
+    rts
+
+  FixComplainChars: .byte $00
+  AddOrSub:         .byte $00   // $00 means add, otherwise sub
+  Offset:           .byte $00
+  MapComplain:      .word $4569 //, $456a, $456b, $4591, $4592, $4593
 }
 
 * = * "SetColorToChars"

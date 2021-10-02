@@ -245,60 +245,6 @@ Level1: {
       rts
   }
 
-  * = * "Level1 HandleWoodCutterFinedOut"
-  HandleWoodCutterFinedOut: {
-      lda MapComplain
-      sta EditMap1 + 1
-      lda MapComplain + 1
-      sta EditMap1 + 2
-
-      lda MapComplain + 2
-      sta EditMap2 + 1
-      lda MapComplain + 3
-      sta EditMap2 + 2
-
-      lda MapComplain + 4
-      sta EditMap3 + 1
-      lda MapComplain + 5
-      sta EditMap3 + 2
-
-      lda MapComplain + 6
-      sta EditMap4 + 1
-      lda MapComplain + 7
-      sta EditMap4 + 2
-
-      lda MapComplain + 8
-      sta EditMap5 + 1
-      lda MapComplain + 9
-      sta EditMap5 + 2
-
-      lda MapComplain + 10
-      sta EditMap6 + 1
-      lda MapComplain + 11
-      sta EditMap6 + 2
-
-    EditCharMap1:
-      lda FixComplainChars
-    EditMap1:
-      sta $beef
-    EditMap2:
-      sta $beef
-    EditMap3:
-      sta $beef
-
-    EditMap4:
-      sta $beef
-    EditMap5:
-      sta $beef
-    EditMap6:
-      sta $beef
-
-      rts
-
-    FixComplainChars: .byte $00
-    MapComplain:      .word $4569, $456a, $456b, $4591, $4592, $4593
-  }
-
   * = * "Level1 Enemy2Manager"
   Enemy2Manager: {
       lda WoodCutterFined
@@ -492,9 +438,15 @@ Level1: {
       jmp Done
 
     WalkOutDone:
-      lda ComplaintHidden
+      lda TreeStartAddress
+      sta HandleWoodCutterFinedOut.MapComplain
+      lda TreeStartAddress + 1
+      sta HandleWoodCutterFinedOut.MapComplain + 1
+      lda #$01
+      sta HandleWoodCutterFinedOut.AddOrSub
+      lda #$03
+      sta HandleWoodCutterFinedOut.Offset
       jsr HandleWoodCutterFinedOut
-      inc ComplaintHidden
 
       EnableSprite(2, false)
 
@@ -515,6 +467,11 @@ Level1: {
       sta TrackPointer
       sta CutCompleted
       sta WalkInCompleted
+      sta ComplaintShown
+      sta WoodCutterFined
+
+      lda #HatchetStrokesMax
+      sta HatchetStrokes
 
     Done:
       rts
@@ -532,8 +489,6 @@ Level1: {
       .byte $00
 
     ComplaintShown:
-      .byte 0
-    ComplaintHidden:
       .byte 0
 
     HatchetShown:
@@ -873,9 +828,15 @@ Level1: {
       jmp Done
 
     WalkOutDone:
-      lda ComplaintHidden
+      lda TreeStartAddress
+      sta HandleWoodCutterFinedOut.MapComplain
+      lda TreeStartAddress + 1
+      sta HandleWoodCutterFinedOut.MapComplain + 1
+      lda #$00
+      sta HandleWoodCutterFinedOut.AddOrSub
+      lda #$05
+      sta HandleWoodCutterFinedOut.Offset
       jsr HandleWoodCutterFinedOut
-      inc ComplaintHidden
 
       EnableSprite(4, false)
 
@@ -896,6 +857,11 @@ Level1: {
       sta TrackPointer
       sta CutCompleted
       sta WalkInCompleted
+      sta ComplaintShown
+      sta WoodCutterFined
+
+      lda #HatchetStrokesMax
+      sta HatchetStrokes
 
     Done:
       rts
@@ -914,8 +880,6 @@ Level1: {
       .byte $00
 
     ComplaintShown:
-      .byte 0
-    ComplaintHidden:
       .byte 0
 
     HatchetShown:
