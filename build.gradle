@@ -11,7 +11,7 @@ apply plugin: "com.github.c64lib.retro-assembler"
 
 retroProject {
     dialect = "KickAssembler"
-    dialectVersion = "5.21"
+    dialectVersion = "5.22"
     libDirs = [".ra/deps/c64lib"]
     srcDirs = ["."]
     excludes = ["**/_*.asm", ".ra/**/*", "libs/*"]
