@@ -24,13 +24,15 @@ jobs:
       - store_artifacts:
           path: ~/repo/main.prg
           destination: ForestSaver.prg
+
   publish-github-release:
-    requires:
-      - build
-    filters:
-      branches:
-        only:
-          - main
-          - develop
+    docker:
+      - image: cibuilds/github:0.12
+    steps:
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} ~/repo/ForestSaver.prg
+
 #      tags:
 #        only: /^\d+\.\d+\.\d+$/
