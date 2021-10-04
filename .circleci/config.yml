@@ -17,7 +17,7 @@ jobs:
                 at: ./artifacts
             - run: mkdir out
             - run: ./gradlew build
-            - run: cd src && cp ForestSaver.prg ../out
+            - run: cp main.prg ../out/ForestSaver.prg
             - persist-to-workspace:
                 root: .
                 paths:
