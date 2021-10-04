@@ -33,7 +33,7 @@ jobs:
                 name: "Publish PRG on GitHub"
                 command: |
                     ls ./artifacts/out
-                    ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -replace ${CIRCLE_TAG} ./artifacts/out
+                    ghr -t "${GITHUB_TOKEN}" -u "${CIRCLE_PROJECT_USERNAME}" -r "${CIRCLE_PROJECT_REPONAME}" -c "${CIRCLE_SHA1}" -replace "${CIRCLE_TAG}" ./artifacts/out
 
 workflows:
     version: 2

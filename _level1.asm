@@ -144,20 +144,6 @@ Level1: {
       cmp #$03
       beq StartEnemy3
 
-/*
-      cmp #$04
-      beq StartEnemy4
-
-      cmp #$03
-      beq StartEnemy4
-
-      cmp #$02
-      beq StartEnemy5
-
-      cmp #$01
-      beq StartEnemy7
-*/
-
       jmp Done
 
     StartEnemy2:
@@ -201,20 +187,6 @@ Level1: {
 
       jmp Done
 
-/*
-    StartEnemy4:
-      jmp Done
-
-    StartEnemy5:
-      jmp Done
-
-    StartEnemy6:
-      jmp Done
-
-    StartEnemy7:
-      jmp Done
-*/
-
     Done:
       rts
 
@@ -235,12 +207,6 @@ Level1: {
       beq Done
       jsr Enemy3Manager
 
-/*
-    IsEnemyNo4Alive:
-    IsEnemyNo5Alive:
-    IsEnemyNo6Alive:
-    IsEnemyNo7Alive:
-*/
     Done:
       rts
   }
@@ -273,6 +239,10 @@ Level1: {
       jmp CutNotCompleted
 
     GoToWalkOutFar:
+      ldx CurrentWoodCutter
+      dex
+      lda #$01
+      sta TreeAlreadyCut, x
       jmp WalkOut
 
     CutNotCompleted:
@@ -451,10 +421,23 @@ Level1: {
       EnableSprite(2, false)
 
       // Prepare next sprite track
-      inc CurrentWoodCutter
-      lda CurrentWoodCutter
-      cmp #4
-      bpl Done
+      ldx #$00
+    LookForTreeAvailable:
+      lda TreeAlreadyCut, x
+      beq CheckNextWoodCutter
+      iny
+    !Next:
+      inx
+      cpx #$03
+      bne LookForTreeAvailable
+      jmp Done
+    CheckNextWoodCutter:
+      GetRandomUpTo(3)
+      tax
+      lda TreeAlreadyCut, x
+      bne CheckNextWoodCutter
+      inx
+      stx CurrentWoodCutter
       jsr SetWoodCutter2Track
 
       // Clear sprite
@@ -475,6 +458,8 @@ Level1: {
 
     Done:
       rts
+
+    TreeAlreadyCut: .byte $00, $00, $00
 
     .label HatchetStrokesMax = $0c
     HatchetStrokes: .byte HatchetStrokesMax
@@ -518,7 +503,7 @@ Level1: {
     TreeStartAddress: .word $beef
   }
 
-    * = * "Level1 SetWoodCutter2Track"
+  * = * "Level1 SetWoodCutter2Track"
   SetWoodCutter2Track: {
       ldx #0
 
@@ -1103,22 +1088,11 @@ Level1: {
 // Hatchet sprite pointer
   .label SPRITE_1     = $47f9
   .label SPRITE_3     = $47fb
-//  .label SPRITE_5     = $47fd
 
 // Enemy sprite pointer
   .label SPRITE_2     = $47fa
   .label SPRITE_4     = $47fc
-//  .label SPRITE_6     = $47fe
 
-/*
-  EnemyLeft:
-    .byte 6
-
-  EnemyNo6Alive:
-    .byte 0
-  EnemyNo5Alive:
-    .byte 0
-*/
 }
 
 #import "_hud.asm"
