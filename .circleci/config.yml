@@ -25,14 +25,39 @@ jobs:
           path: ~/repo/main.prg
           destination: ForestSaver.prg
 
-  publish-github-release:
-    docker:
-      - image: cibuilds/github:0.12
-    steps:
-      - run:
-          name: "Publish Release on GitHub"
-          command: |
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} ~/repo/ForestSaver.prg
+        publish:
+          docker:
+            - image: cibuilds/github:0.10
+          steps:
+            - attach_workspace:
+                at: ~/repo
+            - run:
+                name: "Publish PRG on GitHub"
+                command: |
+                    ls ~/repo
+                    ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -replace ${CIRCLE_TAG} ~/repo/
 
-#      tags:
-#        only: /^\d+\.\d+\.\d+$/
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - main
+                - develop
+#          tags:
+#              only:
+#                  - /^([0-9]+)\.([0-9]+)\.([0-9]+)$/
+      - publish:
+          filters:
+            branches:
+              ignore:
+                - main
+                - develop
+#              tags:
+#                only:
+#                  - /^([0-9]+)\.([0-9]+)\.([0-9]+)$/
+          requires:
+            - build
