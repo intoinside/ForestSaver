@@ -19,8 +19,6 @@ WoodCutter: {
       sta ScreenMemoryAddress
 
 // Self modify code to use current screen memotry address, update hibyte
-      lda ScreenMemoryAddress
-      sta LoadSprite1 + 2
       sta UpdateWoodCutterFrame.LoadSprite1 + 2
       sta UpdateWoodCutterFrame.LoadSprite2 + 2
       sta UpdateWoodCutterFrame.LoadSprite3 + 2
@@ -29,14 +27,6 @@ WoodCutter: {
       sta UpdateWoodCutterFrame.StoreSprite2 + 2
       sta UpdateWoodCutterFrame.StoreSprite3 + 2
       sta UpdateWoodCutterFrame.StoreSprite4 + 2
-
-// Update lobyte
-      lda ScreenMemoryAddress + 1
-      sta LoadSprite1 + 1
-
-      lda #SPRITES.ENEMY_STANDING
-    LoadSprite1:
-      sta SPRITE_PTR
 
       rts
   }
