@@ -379,6 +379,8 @@ Level1: {
       sta RemoveTree.StartAddress + 1
       jsr RemoveTree
 
+      jsr Hud.ReduceDismissalCounter
+
       jmp Done
 
     WalkOut:
@@ -649,6 +651,10 @@ Level1: {
       jmp CutNotCompleted
 
     GoToWalkOutFar:
+      ldx CurrentWoodCutter
+      dex
+      lda #$01
+      sta TreeAlreadyCut, x
       jmp WalkOut
 
     CutNotCompleted:
@@ -785,6 +791,8 @@ Level1: {
       sta RemoveTree.StartAddress + 1
       jsr RemoveTree
 
+      jsr Hud.ReduceDismissalCounter
+
       jmp Done
 
     WalkOut:
@@ -826,10 +834,23 @@ Level1: {
       EnableSprite(4, false)
 
       // Prepare next sprite track
-      inc CurrentWoodCutter
-      lda CurrentWoodCutter
-      cmp #4
-      bpl Done
+      ldx #$00
+    LookForTreeAvailable:
+      lda TreeAlreadyCut, x
+      beq CheckNextWoodCutter
+      iny
+    !Next:
+      inx
+      cpx #$03
+      bne LookForTreeAvailable
+      jmp Done
+    CheckNextWoodCutter:
+      GetRandomUpTo(3)
+      tax
+      lda TreeAlreadyCut, x
+      bne CheckNextWoodCutter
+      inx
+      stx CurrentWoodCutter
       jsr SetWoodCutter3Track
 
       // Clear sprite
@@ -850,6 +871,8 @@ Level1: {
 
     Done:
       rts
+
+    TreeAlreadyCut: .byte $00, $00, $00
 
     .label HatchetStrokesMax = $0c
     HatchetStrokes:

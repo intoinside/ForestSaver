@@ -19,36 +19,46 @@ Hud: {
       clc
       lda ScreenMemoryAddress
       adc #$03
-      //sta ScreenMemoryAddress
       sta DrawScore.SelfMod + 2
       sta DrawDismissal.SelfMod + 2
 
       lda ScreenMemoryAddress + 1
       adc #$98
-//      sta ScreenMemoryAddress + 1
       sta DrawScore.SelfMod + 1
       sta DrawDismissal.SelfMod + 1
 
-/*
-      lda ScreenMemoryAddress
-      sta DrawScore.SelfMod + 2
-      lda ScreenMemoryAddress + 1
-      sta DrawScore.SelfMod + 1
-*/
       jsr DrawScore
 
       lda DrawDismissal.SelfMod + 1
       adc #$16
       sta DrawDismissal.SelfMod + 1
 
-/*
-      lda ScreenMemoryAddress
-      sta DrawDismissal.SelfMod + 2
-      lda ScreenMemoryAddress + 1
-      sta DrawDismissal.SelfMod + 1
-*/
       jsr DrawDismissal
 
+      rts
+  }
+
+  * = * "Hud ReduceDismissalCounter"
+  ReduceDismissalCounter: {
+      ldx #$10
+    !:
+      lda DismissalLabel, x
+      cmp #DismissalAliveChar
+      beq Reduce
+      dex
+      cpx #$09
+      bne !-
+
+      // Dismissal NOW!!!!
+    RangerDismissal:
+      jmp Done
+
+    Reduce:
+      lda #$00
+      sta DismissalLabel, x
+
+    Done:
+      jsr DrawDismissal
       rts
   }
 
@@ -64,6 +74,10 @@ Hud: {
       inx
       cpx #$06
       bne LoopScore
+
+      lda SelfMod + 1
+      sbc #$06
+      sta SelfMod + 1
 
       rts
 
@@ -83,6 +97,10 @@ Hud: {
       cpx #$11
       bne LoopDismissal
 
+      lda SelfMod + 1
+      sbc #$11
+      sta SelfMod + 1
+
       rts
 
       .label DismissalPtr = $beef
@@ -93,7 +111,10 @@ Hud: {
 
   // "DISMISSAL: ******"
   DismissalLabel: .byte $6e, $73, $7d, $77, $73, $7d, $7d, $6b, $76, $9d, $00
-                  .byte $a4, $a4, $a4, $a4, $a4, $a4
+                  .byte DismissalAliveChar, DismissalAliveChar, DismissalAliveChar
+                  .byte DismissalAliveChar, DismissalAliveChar, DismissalAliveChar
+
+  .label DismissalAliveChar = $a4
 
   ScreenMemoryAddress:
     .word $be00
