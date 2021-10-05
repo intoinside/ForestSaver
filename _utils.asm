@@ -141,7 +141,7 @@ RemoveTree: {
     stx $beef
   SelfMod12:
     stx $beef
-    inx
+    ldx #$3a
   SelfMod10:
     stx $beef
     inx
@@ -190,7 +190,7 @@ RemoveTree: {
     }
     else
     {
-      eor #$FF    // Get mask compliment
+      eor #$ff    // Get mask compliment
       and VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
     }
     sta VIC.SPRITE_ENABLE       // Set the new value into the sprite enable register
@@ -413,9 +413,9 @@ HandleWoodCutterFined: {
 
     rts
 
-  ComplainChars:  .byte $64, $65, $66, $67, $68, $69
+  ComplainChars:  .byte $a0, $a1, $a2, $a3, $a4, $a5
   AddOrSub:       .byte $00   // $00 means add, otherwise sub
-  Offset:         .byte $00
+  Offset:         .byte $00   // Offset (to add or sub) from the tree position
   MapComplain:    .word $4569
 }
 
@@ -540,6 +540,7 @@ SetColorToChars: {
     .byte $03
 }
 
+// Generates a random number up to maxNumber (excluded)
 .macro GetRandomUpTo(maxNumber) {
     lda #maxNumber
     sta GetRandom.GeneratorMax

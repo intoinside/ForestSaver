@@ -141,15 +141,15 @@ Hud: {
   }
 
   // "SCORE: 0000"
-  ScoreLabel: .byte $7d, $6d, $79, $7c, $6f, $9d, $00
-              .byte $93, $93, $93, $93
+  ScoreLabel: .byte $14, $04, $10, $13, $06, $34, $00
+              .byte $2a, $2a, $2a, $2a
 
   // "DISMISSAL: ******"
-  DismissalLabel: .byte $6e, $73, $7d, $77, $73, $7d, $7d, $6b, $76, $9d, $00
+  DismissalLabel: .byte $05, $0a, $14, $0e, $0a, $14, $14, $02, $0d, $34, $00
                   .byte DismissalAliveChar, DismissalAliveChar, DismissalAliveChar
                   .byte DismissalAliveChar, DismissalAliveChar, DismissalAliveChar
 
-  .label DismissalAliveChar = $a4
+  .label DismissalAliveChar = $a6
 
   ScreenMemoryAddress:
     .word $be00
