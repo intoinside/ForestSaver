@@ -73,7 +73,6 @@ Level1: {
       lda #SPRITES.ENEMY_STANDING
       sta SPRITE_2
       sta SPRITE_4
-//      sta SPRITE_6
 
 // Ranger coordinates
       lda #$50
@@ -107,15 +106,18 @@ Level1: {
       lda #$08
       sta SPRITES.COLOR1
       sta SPRITES.COLOR3
-//      sta SPRITES.COLOR5
       lda #$02
       sta SPRITES.COLOR2
       sta SPRITES.COLOR4
-//      sta SPRITES.COLOR6
 
 // Enable the first sprite (ranger)
       lda #%00000001
       sta VIC.SPRITE_ENABLE
+
+      GetRandomUpTo(3)
+      sta Enemy2Manager.CurrentWoodCutter
+      GetRandomUpTo(3)
+      sta Enemy3Manager.CurrentWoodCutter
 
       jsr SetWoodCutter2Track
       jsr SetWoodCutter3Track
@@ -133,9 +135,6 @@ Level1: {
 
   * = * "Level1 AddEnemy"
   AddEnemy: {
-      lda WaitingForEnemy
-      beq Done
-
       GetRandomUpTo(6)
 
       cmp #$02
@@ -161,8 +160,6 @@ Level1: {
 
       EnableSprite(2, true)
 
-      dec WaitingForEnemy
-
       jmp Done
 
     StartEnemy3:
@@ -183,15 +180,12 @@ Level1: {
 
       EnableSprite(4, true)
 
-      dec WaitingForEnemy
-
       jmp Done
 
     Done:
       rts
 
     EnemyActive:      .byte $00
-    WaitingForEnemy:  .byte $06
   }
 
   * = * "Level1 HandleEnemyMove"
@@ -231,6 +225,8 @@ Level1: {
       jsr HandleWoodCutterFined
       inc ComplaintShown
 
+      AddPoints(0, 0, 1, 0);
+
       jmp Done
 
     CutCompletedCheck:
@@ -239,10 +235,6 @@ Level1: {
       jmp CutNotCompleted
 
     GoToWalkOutFar:
-      ldx CurrentWoodCutter
-      dex
-      lda #$01
-      sta TreeAlreadyCut, x
       jmp WalkOut
 
     CutNotCompleted:
@@ -379,6 +371,10 @@ Level1: {
       sta RemoveTree.StartAddress + 1
       jsr RemoveTree
 
+      ldx CurrentWoodCutter
+      lda #$01
+      sta TreeAlreadyCut, x
+
       jsr Hud.ReduceDismissalCounter
 
       jmp Done
@@ -438,7 +434,6 @@ Level1: {
       tax
       lda TreeAlreadyCut, x
       bne CheckNextWoodCutter
-      inx
       stx CurrentWoodCutter
       jsr SetWoodCutter2Track
 
@@ -487,7 +482,7 @@ Level1: {
     WalkInCompleted:
       .byte 0
 
-    CurrentWoodCutter: .byte $01
+    CurrentWoodCutter: .byte $00
 
 // Woodcutter dummy data
     .label TrackWalkCounter = 180
@@ -510,9 +505,9 @@ Level1: {
       ldx #0
 
       lda Enemy2Manager.CurrentWoodCutter
-      cmp #$03
-      beq FixForWoodCutter3
       cmp #$02
+      beq FixForWoodCutter3
+      cmp #$01
       beq FixForWoodCutter2
 
     FixForWoodCutter1:
@@ -643,6 +638,8 @@ Level1: {
       jsr HandleWoodCutterFined
       inc ComplaintShown
 
+      AddPoints(0, 0, 1, 0);
+
       jmp Done
 
     CutCompletedCheck:
@@ -651,10 +648,6 @@ Level1: {
       jmp CutNotCompleted
 
     GoToWalkOutFar:
-      ldx CurrentWoodCutter
-      dex
-      lda #$01
-      sta TreeAlreadyCut, x
       jmp WalkOut
 
     CutNotCompleted:
@@ -791,6 +784,10 @@ Level1: {
       sta RemoveTree.StartAddress + 1
       jsr RemoveTree
 
+      ldx CurrentWoodCutter
+      lda #$01
+      sta TreeAlreadyCut, x
+
       jsr Hud.ReduceDismissalCounter
 
       jmp Done
@@ -849,7 +846,6 @@ Level1: {
       tax
       lda TreeAlreadyCut, x
       bne CheckNextWoodCutter
-      inx
       stx CurrentWoodCutter
       jsr SetWoodCutter3Track
 
@@ -899,7 +895,7 @@ Level1: {
     WalkInCompleted:
       .byte 0
 
-    CurrentWoodCutter: .byte $01
+    CurrentWoodCutter: .byte $00
 
     .label TrackWalkCounter = 210
     TrackWalkX:
@@ -921,9 +917,9 @@ Level1: {
       ldx #0
 
       lda Enemy3Manager.CurrentWoodCutter
-      cmp #$02
+      cmp #$01
       beq FixForWoodCutter2
-      cmp #$03
+      cmp #$02
       beq FixForWoodCutter3
 
     FixForWoodCutter1:

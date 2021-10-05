@@ -12,6 +12,19 @@
 
 #importonce
 
+.macro AddPoints(digit4, digit3, digit2, digit1) {
+  lda #digit1
+  sta Hud.AddScore.Points + 3
+  lda #digit2
+  sta Hud.AddScore.Points + 2
+  lda #digit3
+  sta Hud.AddScore.Points + 1
+  lda #digit4
+  sta Hud.AddScore.Points
+
+  jsr Hud.AddScore
+}
+
 Hud: {
   * = * "Hud Init"
   Init: {
@@ -38,28 +51,25 @@ Hud: {
       rts
   }
 
-  * = * "Hud ReduceDismissalCounter"
-  ReduceDismissalCounter: {
-      ldx #$10
+  * = * "Hud AddScore"
+  AddScore: {
+      ldx #$07
+      ldy #$00
+      clc
     !:
-      lda DismissalLabel, x
-      cmp #DismissalAliveChar
-      beq Reduce
-      dex
-      cpx #$09
+      lda ScoreLabel, x
+      adc Points, y
+      sta ScoreLabel, x
+      inx
+      iny
+      cpy #$04
       bne !-
 
-      // Dismissal NOW!!!!
-    RangerDismissal:
-      jmp Done
-
-    Reduce:
-      lda #$00
-      sta DismissalLabel, x
-
     Done:
-      jsr DrawDismissal
+      jsr DrawScore
       rts
+
+    Points: .byte $00, $00, $00, $00
   }
 
   * = * "Hud DrawScore"
@@ -72,16 +82,40 @@ Hud: {
       inc SelfMod + 1
 
       inx
-      cpx #$06
+      cpx #$0b
       bne LoopScore
 
       lda SelfMod + 1
-      sbc #$06
+      sbc #$0b
       sta SelfMod + 1
 
       rts
 
       .label ScorePtr = $beef
+  }
+
+  * = * "Hud ReduceDismissalCounter"
+  ReduceDismissalCounter: {
+      ldx #$10
+    !:
+      lda DismissalLabel, x
+      cmp #DismissalAliveChar
+      beq Reduce
+      dex
+      cpx #$09
+      bne !-
+
+      // TODO(intoinside): Dismissal NOW!!!! (need gameplay end support)
+    RangerDismissal:
+      jmp Done
+
+    Reduce:
+      lda #$00
+      sta DismissalLabel, x
+
+    Done:
+      jsr DrawDismissal
+      rts
   }
 
   * = * "Hud DrawDismissal"
@@ -106,8 +140,9 @@ Hud: {
       .label DismissalPtr = $beef
   }
 
-  // "SCORE: "
-  ScoreLabel: .byte $7d, $6d, $79, $7c, $6f, $9d
+  // "SCORE: 0000"
+  ScoreLabel: .byte $7d, $6d, $79, $7c, $6f, $9d, $00
+              .byte $93, $93, $93, $93
 
   // "DISMISSAL: ******"
   DismissalLabel: .byte $6e, $73, $7d, $77, $73, $7d, $7d, $6b, $76, $9d, $00
