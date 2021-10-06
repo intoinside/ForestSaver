@@ -50,6 +50,14 @@ Intro: {
       lda #%00001110
       sta VIC.MEMORY_SETUP
 
+      lda #$43
+      sta DrawHiScore.SelfMod + 2
+
+      lda #$9a
+      sta DrawHiScore.SelfMod + 1
+
+      jsr DrawHiScore
+
       rts
   }
 
@@ -168,6 +176,28 @@ Intro: {
       rts
   }
 
+  * = * "Intro DrawScore"
+  DrawHiScore: {
+      ldx #$00
+    LoopScore:
+      lda HiScoreLabel, x
+    SelfMod:
+      sta ScorePtr
+      inc SelfMod + 1
+
+      inx
+      cpx #$0e
+      bne LoopScore
+
+      lda SelfMod + 1
+      sbc #$0e
+      sta SelfMod + 1
+
+      rts
+
+      .label ScorePtr = $beef
+  }
+
   AddColorToMap: {
       lda #$40
       sta SetColorToChars.ScreenMemoryAddress
@@ -228,6 +258,10 @@ Intro: {
     DelayRequested:
       .byte 50                  // 1 second delay
   }
+
+  // "HI-SCORE: 0000"
+  HiScoreLabel: .byte $09, $0a, $27, $14, $04, $10, $13, $06, $34, $00
+                .byte $2a, $2a, $2a, $2a
 
 }
 
