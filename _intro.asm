@@ -19,6 +19,8 @@ Intro: {
       jsr AddColorToMap
 
     CheckFire:
+      jsr WaitRoutine
+      jsr TimedRoutine
       jsr GetJoystickMove
 
       lda FirePressed
@@ -59,6 +61,113 @@ Intro: {
       rts
   }
 
+  * = * "Intro AnimateIntro1"
+  AnimateIntro1: {
+      lda $4093
+      cmp #$5f
+      beq !+
+      ldx #$5f
+      jmp !Set+
+    !:
+      ldx #$65
+
+    !Set:
+      stx $4093
+
+      lda $40ba
+      cmp #$66
+      beq !+
+      ldx #$66
+      jmp !Set+
+    !:
+      ldx #$62
+
+    !Set:
+      stx $40ba
+      rts
+  }
+
+  * = * "Intro AnimateIntro2"
+  AnimateIntro2: {
+      lda $420c
+      cmp #$62
+      beq !+
+      ldx #$62
+      jmp !Set+
+    !:
+      ldx #$66
+
+    !Set:
+      stx $420c
+
+      lda $420d
+      cmp #$63
+      beq !+
+      ldx #$63
+      jmp !Set+
+    !:
+      ldx #$67
+
+    !Set:
+      stx $420d
+
+      rts
+  }
+
+  * = * "Intro AnimateIntro3"
+  AnimateIntro3: {
+      lda $432d
+      cmp #$63
+      beq !+
+      ldx #$63
+      jmp !Set+
+    !:
+      ldx #$67
+
+    !Set:
+      stx $432d
+
+      lda $4305
+      cmp #$5f
+      beq !+
+      ldx #$5f
+      jmp !Set+
+    !:
+      ldx #$65
+
+    !Set:
+      stx $4305
+
+      rts
+  }
+
+  * = * "Intro AnimateIntro4"
+  AnimateIntro4: {
+      lda $431b
+      cmp #$62
+      beq !+
+      ldx #$62
+      jmp !Set+
+    !:
+      ldx #$66
+
+    !Set:
+      stx $431b
+
+      lda $431c
+      cmp #$63
+      beq !+
+      ldx #$63
+      jmp !Set+
+    !:
+      ldx #$67
+
+    !Set:
+      stx $431c
+
+      rts
+  }
+
   AddColorToMap: {
       lda #$40
       sta SetColorToChars.ScreenMemoryAddress
@@ -66,6 +175,58 @@ Intro: {
       jsr SetColorToChars
 
       rts
+  }
+
+  * = * "Intro TimedRoutine"
+  TimedRoutine: {
+      lda DelayCounter
+      beq DelayTriggered        // when counter is zero stop decrementing
+      dec DelayCounter      // decrement the counter
+      cmp #10
+      beq Delay10
+      cmp #20
+      beq Delay20
+      cmp #30
+      beq Delay30
+      cmp #40
+      beq Delay40
+
+      jmp Exit
+
+    Delay10:
+      jsr AnimateIntro1
+      jmp Exit
+
+    Delay20:
+      jsr AnimateIntro2
+      jmp Exit
+
+    Delay30:
+      jmp Exit
+
+    Delay40:
+      jsr AnimateIntro3
+      jmp Exit
+
+    DelayTriggered:
+      jsr AnimateIntro4
+
+      lda DelayRequested      // delay reached 0, reset it
+      sta DelayCounter
+
+    Waiting:
+
+      jmp Exit
+
+    NotWaiting:
+
+    Exit:
+      rts
+
+    DelayCounter:
+      .byte 50                  // Counter storage
+    DelayRequested:
+      .byte 50                  // 1 second delay
   }
 
 }
