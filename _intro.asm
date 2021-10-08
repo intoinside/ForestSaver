@@ -262,8 +262,9 @@ Intro: {
 
   // "HI-SCORE: 0000"
   HiScoreLabel: .byte $09, $0a, $27, $14, $04, $10, $13, $06, $34, $00
-                .byte $2a, $2a, $2a, $2a
+                .byte ZeroChar, ZeroChar, ZeroChar, ZeroChar
 
+  .label ZeroChar = $2a
 }
 
 #import "_label.asm"

@@ -25,6 +25,36 @@
   jsr Hud.AddScore
 }
 
+.macro CompareAndUpdateHiScore() {
+  lda Intro.HiScoreLabel + $0a
+  cmp Hud.ScoreLabel + $07
+  bcc UpdateHiScore1
+  lda Intro.HiScoreLabel + $0b
+  cmp Hud.ScoreLabel + $08
+  bcc UpdateHiScore2
+  lda Intro.HiScoreLabel + $0c
+  cmp Hud.ScoreLabel + $09
+  bcc UpdateHiScore3
+  lda Intro.HiScoreLabel + $0d
+  cmp Hud.ScoreLabel + $0a
+  bcc UpdateHiScore4
+  jmp !+
+
+UpdateHiScore1:
+  lda Hud.ScoreLabel + $07
+  sta Intro.HiScoreLabel + $0a
+UpdateHiScore2:
+  lda Hud.ScoreLabel + $08
+  sta Intro.HiScoreLabel + $0b
+UpdateHiScore3:
+  lda Hud.ScoreLabel + $09
+  sta Intro.HiScoreLabel + $0c
+UpdateHiScore4:
+  lda Hud.ScoreLabel + $0a
+  sta Intro.HiScoreLabel + $0d
+!:
+}
+
 Hud: {
   * = * "Hud Init"
   Init: {
