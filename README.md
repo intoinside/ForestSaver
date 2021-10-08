@@ -26,6 +26,9 @@ These are used for CI/CD, not needed (but helpful) for development
 
 ## Build info
 
+### Download ForestSaver only for play
+Look into [Releases](https://github.com/intoinside/ForestSaver/releases) and take the last prg available.
+
 ### Download ForestSaver for develop
 
 * Clone repository on your folder
