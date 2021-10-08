@@ -34,19 +34,28 @@ Level1: {
       jsr Ranger.HandleRangerMove
       jsr HandleEnemyMove
 
-    CheckFirePressed:
+      lda GameEnded
+      bne CloseLevelAndGame
+
+      jmp EndLoop
+
+    CloseLevelAndGame:
       lda FirePressed
       bne LevelDone
 
+    EndLoop:
       jmp JoystickMovement
 
     LevelDone:
       jsr Finalize
+      rts
   }
 
   // Initialization of intro screen
   * = * "Level1 Init"
   Init: {
+      CopyScreenRam($4400, $5000)
+
 // Set background and border color to brown
       lda #$09
       sta VIC.BORDER_COLOR
@@ -127,14 +136,52 @@ Level1: {
 
   * = * "Level1 Finalize"
   Finalize: {
+      CopyScreenRam($5000, $4400)
+
       lda #$00
       sta VIC.SPRITE_ENABLE
+      sta AddEnemy.EnemyActive
+      sta Enemy2Manager.WoodCutterFined
+      sta Enemy2Manager.ComplaintShown
+      sta Enemy2Manager.CutCompleted
+      sta Enemy2Manager.WalkInCompleted
+      sta Enemy2Manager.HatchetShown
+      sta Enemy2Manager.TrackPointer
+
+      sta Enemy2Manager.TreeAlreadyCut
+      sta Enemy2Manager.TreeAlreadyCut + 1
+      sta Enemy2Manager.TreeAlreadyCut + 2
+
+      sta Enemy3Manager.WoodCutterFined
+      sta Enemy3Manager.ComplaintShown
+      sta Enemy3Manager.CutCompleted
+      sta Enemy3Manager.WalkInCompleted
+      sta Enemy3Manager.HatchetShown
+      sta Enemy3Manager.TrackPointer
+
+      sta Enemy3Manager.TreeAlreadyCut
+      sta Enemy3Manager.TreeAlreadyCut + 1
+      sta Enemy3Manager.TreeAlreadyCut + 2
+
+      sta Hud.ReduceDismissalCounter.DismissalCompleted
+
+      jsr Hud.ResetScore
+      jsr Hud.ResetDismissalCounter
+
+      EnableSprite(0, false)
+      EnableSprite(1, false)
+      EnableSprite(2, false)
+      EnableSprite(3, false)
+      EnableSprite(4, false)
 
       rts
   }
 
   * = * "Level1 AddEnemy"
   AddEnemy: {
+      lda GameEnded
+      bne Done
+
       GetRandomUpTo(6)
 
       cmp #$02
@@ -179,8 +226,6 @@ Level1: {
       sta SPRITES.EXTRA_BIT
 
       EnableSprite(4, true)
-
-      jmp Done
 
     Done:
       rts
@@ -375,8 +420,20 @@ Level1: {
       lda #$01
       sta TreeAlreadyCut, x
 
+      lda GameEnded
+      bne !+
+
       jsr Hud.ReduceDismissalCounter
 
+      lda Hud.ReduceDismissalCounter.DismissalCompleted
+      sta GameEnded
+      beq !+
+
+      lda #$44
+      sta ShowGameEndedMessage.StartAddress + 1
+      jsr ShowGameEndedMessage
+
+    !:
       jmp Done
 
     WalkOut:
@@ -788,8 +845,20 @@ Level1: {
       lda #$01
       sta TreeAlreadyCut, x
 
+      lda GameEnded
+      bne !+
+
       jsr Hud.ReduceDismissalCounter
 
+      lda Hud.ReduceDismissalCounter.DismissalCompleted
+      sta GameEnded
+      beq !+
+
+      lda #$44
+      sta ShowGameEndedMessage.StartAddress + 1
+      jsr ShowGameEndedMessage
+
+    !:
       jmp Done
 
     WalkOut:
@@ -1111,7 +1180,6 @@ Level1: {
 // Enemy sprite pointer
   .label SPRITE_2     = $47fa
   .label SPRITE_4     = $47fc
-
 }
 
 #import "_hud.asm"

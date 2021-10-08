@@ -72,6 +72,18 @@ Hud: {
     Points: .byte $00, $00, $00, $00
   }
 
+  * = * "Hud ResetScore"
+  ResetScore: {
+      ldx #04
+      lda #ZeroChar
+    !:
+      sta ScoreLabel + $06, x
+      dex
+      bne !-
+
+      rts
+  }
+
   * = * "Hud DrawScore"
   DrawScore: {
       ldx #$00
@@ -96,17 +108,22 @@ Hud: {
 
   * = * "Hud ReduceDismissalCounter"
   ReduceDismissalCounter: {
+      lda DismissalCompleted
+      bne Done
+
       ldx #$10
     !:
       lda DismissalLabel, x
       cmp #DismissalAliveChar
       beq Reduce
       dex
-      cpx #$09
+      cpx #$0b
       bne !-
 
-      // TODO(intoinside): Dismissal NOW!!!! (need gameplay end support)
     RangerDismissal:
+      lda #$00
+      sta DismissalLabel + $0b
+      inc DismissalCompleted
       jmp Done
 
     Reduce:
@@ -115,6 +132,20 @@ Hud: {
 
     Done:
       jsr DrawDismissal
+      rts
+
+    DismissalCompleted: .byte $00
+  }
+
+  * = * "Hud ResetDismissalCounter"
+  ResetDismissalCounter: {
+      ldx #05
+      lda #DismissalAliveChar
+    !:
+      sta DismissalLabel + $0a, x
+      dex
+      bne !-
+
       rts
   }
 
@@ -128,11 +159,11 @@ Hud: {
       inc SelfMod + 1
 
       inx
-      cpx #$11
+      cpx #$10
       bne LoopDismissal
 
       lda SelfMod + 1
-      sbc #$11
+      sbc #$10
       sta SelfMod + 1
 
       rts
@@ -142,14 +173,17 @@ Hud: {
 
   // "SCORE: 0000"
   ScoreLabel: .byte $14, $04, $10, $13, $06, $34, $00
-              .byte $2a, $2a, $2a, $2a
+              .byte ZeroChar, ZeroChar, ZeroChar, ZeroChar
 
-  // "DISMISSAL: ******"
+  .label ZeroChar = $2a
+
+
+  // "DISMISSAL: *****"
   DismissalLabel: .byte $05, $0a, $14, $0e, $0a, $14, $14, $02, $0d, $34, $00
                   .byte DismissalAliveChar, DismissalAliveChar, DismissalAliveChar
-                  .byte DismissalAliveChar, DismissalAliveChar, DismissalAliveChar
+                  .byte DismissalAliveChar, DismissalAliveChar
 
-  .label DismissalAliveChar = $a6
+  .label DismissalAliveChar = $a4
 
   ScreenMemoryAddress:
     .word $be00

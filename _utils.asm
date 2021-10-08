@@ -17,8 +17,6 @@ SpriteNumberMask:
 
 * = * "Utils RemoveTree"
 RemoveTree: {
-    .assert "RemoveTree.StartAddress not beef", StartAddress != $beef, true
-
 // Row #1
     lda StartAddress
     sta SelfMod1 + 1
@@ -168,6 +166,57 @@ RemoveTree: {
     StartAddress: .word $beef
 }
 
+ShowGameEndedMessage: {
+    c64lib_add16($014a, StartAddress)
+
+    lda StartAddress
+    sta SelfMod1 + 1
+    lda StartAddress + 1
+    sta SelfMod1 + 2
+
+    lda #$00
+    tax
+  SelfMod1:
+    sta $beef, x
+    inx
+    cpx #$14
+    bne SelfMod1
+
+    c64lib_add16($0028, StartAddress)
+
+    lda StartAddress
+    sta SelfMod2 + 1
+    lda StartAddress + 1
+    sta SelfMod2 + 2
+
+    lda #$00
+    tax
+  SelfMod2:
+    sta $beef, x
+    inx
+    cpx #$14
+    bne SelfMod3
+
+    c64lib_add16($0028, StartAddress)
+
+    lda StartAddress
+    sta SelfMod3 + 1
+    lda StartAddress + 1
+    sta SelfMod3 + 2
+
+    lda #$00
+    tax
+  SelfMod3:
+    sta $beef, x
+    inx
+    cpx #$14
+    bne SelfMod3
+
+    rts
+
+    StartAddress: .word $be00
+}
+
 // Fill screen with $20 char (preserve sprite pointer memory area)
 .macro ClearScreen(screenram) {
     lda #$20
@@ -178,6 +227,22 @@ RemoveTree: {
     sta screenram + 250, x
     sta screenram + 500, x
     sta screenram + 750, x
+    bne !-
+}
+
+.macro CopyScreenRam(StartAddress, EndAddress) {
+    ldx #250
+  !:
+    dex
+    lda StartAddress, x
+    sta EndAddress, x
+    lda StartAddress + 250, x
+    sta EndAddress + 250, x
+    lda StartAddress + 500, x
+    sta EndAddress + 500, x
+    lda StartAddress + 750, x
+    sta EndAddress + 750, x
+    cpx #$0
     bne !-
 }
 
@@ -413,7 +478,7 @@ HandleWoodCutterFined: {
 
     rts
 
-  ComplainChars:  .byte $a0, $a1, $a2, $a3, $a4, $a5
+  ComplainChars:  .byte $9e, $9f, $a0, $a1, $a2, $a3
   AddOrSub:       .byte $00   // $00 means add, otherwise sub
   Offset:         .byte $00   // Offset (to add or sub) from the tree position
   MapComplain:    .word $4569

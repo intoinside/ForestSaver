@@ -17,6 +17,7 @@ Intro: {
   Manager: {
       jsr Init
       jsr AddColorToMap
+      jsr StupidWaitRoutine
 
     CheckFire:
       jsr WaitRoutine
@@ -72,23 +73,23 @@ Intro: {
   * = * "Intro AnimateIntro1"
   AnimateIntro1: {
       lda $4093
-      cmp #$5f
+      cmp #$5e
       beq !+
-      ldx #$5f
+      ldx #$5e
       jmp !Set+
     !:
-      ldx #$65
+      ldx #$64
 
     !Set:
       stx $4093
 
       lda $40ba
-      cmp #$66
+      cmp #$65
       beq !+
-      ldx #$66
+      ldx #$65
       jmp !Set+
     !:
-      ldx #$62
+      ldx #$61
 
     !Set:
       stx $40ba
@@ -98,23 +99,23 @@ Intro: {
   * = * "Intro AnimateIntro2"
   AnimateIntro2: {
       lda $420c
+      cmp #$61
+      beq !+
+      ldx #$61
+      jmp !Set+
+    !:
+      ldx #$65
+
+    !Set:
+      stx $420c
+
+      lda $420d
       cmp #$62
       beq !+
       ldx #$62
       jmp !Set+
     !:
       ldx #$66
-
-    !Set:
-      stx $420c
-
-      lda $420d
-      cmp #$63
-      beq !+
-      ldx #$63
-      jmp !Set+
-    !:
-      ldx #$67
 
     !Set:
       stx $420d
@@ -125,23 +126,23 @@ Intro: {
   * = * "Intro AnimateIntro3"
   AnimateIntro3: {
       lda $432d
-      cmp #$63
+      cmp #$62
       beq !+
-      ldx #$63
+      ldx #$62
       jmp !Set+
     !:
-      ldx #$67
+      ldx #$66
 
     !Set:
       stx $432d
 
       lda $4305
-      cmp #$5f
+      cmp #$5e
       beq !+
-      ldx #$5f
+      ldx #$5e
       jmp !Set+
     !:
-      ldx #$65
+      ldx #$64
 
     !Set:
       stx $4305
@@ -152,23 +153,23 @@ Intro: {
   * = * "Intro AnimateIntro4"
   AnimateIntro4: {
       lda $431b
+      cmp #$61
+      beq !+
+      ldx #$61
+      jmp !Set+
+    !:
+      ldx #$65
+
+    !Set:
+      stx $431b
+
+      lda $431c
       cmp #$62
       beq !+
       ldx #$62
       jmp !Set+
     !:
       ldx #$66
-
-    !Set:
-      stx $431b
-
-      lda $431c
-      cmp #$63
-      beq !+
-      ldx #$63
-      jmp !Set+
-    !:
-      ldx #$67
 
     !Set:
       stx $431c
