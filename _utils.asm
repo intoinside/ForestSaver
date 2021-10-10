@@ -269,21 +269,21 @@ DisableAllSprites: {
 }
 
 .macro bpl16(value, low) {
-  lda value + 1
-  cmp low + 1
-  bpl end     // branch to end if value is bigger
-  lda value
-  cmp low
-end:
+    lda value + 1
+    cmp low + 1
+    bpl end     // branch to end if value is bigger
+    lda value
+    cmp low
+  end:
 }
 
 .macro bmi16(value, low) {
-  lda value + 1
-  cmp low + 1
-  bmi end     // branch to end if value is smaller
-  lda value
-  cmp low
-end:
+    lda value + 1
+    cmp low + 1
+    bmi end     // branch to end if value is smaller
+    lda value
+    cmp low
+  end:
 }
 
 * = * "Utils SpriteCollision"
@@ -360,43 +360,43 @@ SpriteCollision: {
 }
 
 .macro add16(value, dest) {
-  clc
-  lda dest
-  adc value
-  sta dest
-  lda dest + 1
-  adc value + 1
-  sta dest + 1
+    clc
+    lda dest
+    adc value
+    sta dest
+    lda dest + 1
+    adc value + 1
+    sta dest + 1
 }
 
 .macro add16byte(value, dest) {
-  clc
-  lda dest
-  adc value
-  sta dest
-  bcc !+
-  inc dest + 1
-!:
+    clc
+    lda dest
+    adc value
+    sta dest
+    bcc !+
+    inc dest + 1
+  !:
 }
 
 .macro add16value(value, dest) {
-  clc
-  lda dest
-  adc #<value
-  sta dest
-  lda dest + 1
-  adc #>value
-  sta dest + 1
+    clc
+    lda dest
+    adc #<value
+    sta dest
+    lda dest + 1
+    adc #>value
+    sta dest + 1
 }
 
 .macro sub16byte(value, low) {
-  sec
-  lda low
-  sbc value
-  sta low
-  lda low + 1
-  sbc #$00
-  sta low + 1
+    sec
+    lda low
+    sbc value
+    sta low
+    lda low + 1
+    sbc #$00
+    sta low + 1
 }
 
 * = * "Utils HandleWoodCutterFined"

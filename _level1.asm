@@ -165,7 +165,7 @@ Level1: {
 
       sta Hud.ReduceDismissalCounter.DismissalCompleted
 
-      CompareAndUpdateHiScore()
+      jsr CompareAndUpdateHiScore
 
       jsr Hud.ResetScore
       jsr Hud.ResetDismissalCounter
