@@ -246,6 +246,13 @@ ShowGameEndedMessage: {
     bne !-
 }
 
+DisableAllSprites: {
+    lda #$00
+    sta VIC.SPRITE_ENABLE
+
+    rts
+}
+
 .macro EnableSprite(bSprite, bEnable) {
     ldy #bSprite
     lda SpriteNumberMask, y

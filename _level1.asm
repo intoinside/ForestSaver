@@ -170,11 +170,7 @@ Level1: {
       jsr Hud.ResetScore
       jsr Hud.ResetDismissalCounter
 
-      EnableSprite(0, false)
-      EnableSprite(1, false)
-      EnableSprite(2, false)
-      EnableSprite(3, false)
-      EnableSprite(4, false)
+      jsr DisableAllSprites
 
       rts
   }
