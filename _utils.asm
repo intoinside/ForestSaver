@@ -166,55 +166,60 @@ RemoveTree: {
     StartAddress: .word $beef
 }
 
+* = * "Utils ShowGameEndedMessage"
 ShowGameEndedMessage: {
     c64lib_add16($014a, StartAddress)
+
+    lda #FrameChar
+    ldy #$00
+  MainLoop:
+    cpy #$01
+    beq DrawMessage
 
     lda StartAddress
     sta SelfMod1 + 1
     lda StartAddress + 1
     sta SelfMod1 + 2
 
-    lda #$00
-    tax
+    lda #FrameChar
+
+  RowLoop:
+    ldx #$14
   SelfMod1:
     sta $beef, x
-    inx
-    cpx #$14
+    dex
     bne SelfMod1
+    jmp SetNextCicle
 
-    c64lib_add16($0028, StartAddress)
-
+  DrawMessage:
     lda StartAddress
-    sta SelfMod2 + 1
+    sta SelfModLabel + 1
     lda StartAddress + 1
-    sta SelfMod2 + 2
+    sta SelfModLabel + 2
 
-    lda #$00
-    tax
-  SelfMod2:
+    ldx #GameOverLabelLen
+  LabelLoop:
+    lda GameOverLabel, x
+  SelfModLabel:
     sta $beef, x
-    inx
-    cpx #$14
-    bne SelfMod3
+    dex
+    bne LabelLoop
 
+  SetNextCicle:
     c64lib_add16($0028, StartAddress)
+    iny
 
-    lda StartAddress
-    sta SelfMod3 + 1
-    lda StartAddress + 1
-    sta SelfMod3 + 2
+    cpy #$03
+    bne MainLoop
 
-    lda #$00
-    tax
-  SelfMod3:
-    sta $beef, x
-    inx
-    cpx #$14
-    bne SelfMod3
+    jsr SetColorToChars
 
     rts
 
+    .label FrameChar = $a4
     StartAddress: .word $be00
+    .label GameOverLabelLen = $0a
+    GameOverLabel: .byte $00, $08, $02, $0e, $06, $00, $10, $17, $06, $13
 }
 
 // Fill screen with $20 char (preserve sprite pointer memory area)
