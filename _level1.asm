@@ -1119,7 +1119,7 @@ Level1: {
       jmp Exit
 
     DelayTriggered:
-      inc $4410
+      // inc $4410
 
       lda DelayRequested      // delay reached 0, reset it
       sta DelayCounter
@@ -1148,7 +1148,7 @@ Level1: {
       jmp Exit
 
     DelayTriggered:
-      inc $4411
+      // inc $4411
 
       lda DelayRequested      // delay reached 0, reset it
       sta DelayCounter

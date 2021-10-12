@@ -51,10 +51,6 @@ Intro: {
       lda #%00001110
       sta VIC.MEMORY_SETUP
 
-      lda #$43
-      sta DrawHiScore.SelfMod + 2
-      lda #$9a
-      sta DrawHiScore.SelfMod + 1
       jsr DrawHiScore
 
       jsr Instruction
@@ -177,42 +173,36 @@ Intro: {
       rts
   }
 
-  * = * "Intro DrawScore"
+  * = * "Intro DrawHiScore"
   DrawHiScore: {
       ldx #$00
     LoopScore:
       lda HiScoreLabel, x
-    SelfMod:
-      sta ScorePtr
-      inc SelfMod + 1
-
+      sta ScorePtr, x
       inx
       cpx #$0e
       bne LoopScore
 
-      lda SelfMod + 1
-      sbc #$0e
-      sta SelfMod + 1
-
       rts
 
-      .label ScorePtr = $beef
+      .label ScorePtr = $439a
   }
 
   * = * "Intro Instruction"
   Instruction: {
-      ldx #HiScoreLabelLen
+      ldx #InstructionLabelLen
     LabelLoop:
-      lda HiScoreLabel, x
+      lda InstructionLabel, x
       sta $43ae, x
       dex
       bne LabelLoop
 
       rts
 
-    .label HiScoreLabelLen = $0f
-    HiScoreLabel: .byte $00, $0b, $10, $1a, $14, $15, $0a, $04, $0c, $00
-                  .byte $11, $10, $13, $15, $00, $2c
+  // "JOYSTICK PORT 2"
+    .label InstructionLabelLen = $0f
+    InstructionLabel: .byte $00, $0b, $10, $1a, $14, $15, $0a, $04, $0c, $00
+                      .byte $11, $10, $13, $15, $00, $2c
   }
 
   AddColorToMap: {
