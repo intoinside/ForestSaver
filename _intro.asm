@@ -53,11 +53,11 @@ Intro: {
 
       lda #$43
       sta DrawHiScore.SelfMod + 2
-
       lda #$9a
       sta DrawHiScore.SelfMod + 1
-
       jsr DrawHiScore
+
+      jsr Instruction
 
       rts
   }
@@ -197,6 +197,22 @@ Intro: {
       rts
 
       .label ScorePtr = $beef
+  }
+
+  * = * "Intro Instruction"
+  Instruction: {
+      ldx #HiScoreLabelLen
+    LabelLoop:
+      lda HiScoreLabel, x
+      sta $43ae, x
+      dex
+      bne LabelLoop
+
+      rts
+
+    .label HiScoreLabelLen = $0f
+    HiScoreLabel: .byte $00, $0b, $10, $1a, $14, $15, $0a, $04, $0c, $00
+                  .byte $11, $10, $13, $15, $00, $2c
   }
 
   AddColorToMap: {
