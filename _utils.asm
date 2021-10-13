@@ -168,8 +168,12 @@ RemoveTree: {
 
 * = * "Utils ShowGameEndedMessage"
 ShowGameEndedMessage: {
+    lda #$00
+    sta StartAddress
+
     c64lib_add16($014a, StartAddress)
 
+// First and third row (border)
     lda #FrameChar
     ldy #$00
   MainLoop:
@@ -183,6 +187,7 @@ ShowGameEndedMessage: {
 
     lda #FrameChar
 
+// Second row (message)
   RowLoop:
     ldx #$14
   SelfMod1:
@@ -217,7 +222,7 @@ ShowGameEndedMessage: {
     rts
 
     .label FrameChar = $a4
-    StartAddress: .word $be00
+    StartAddress: .word $beef
     .label GameOverLabelLen = $0a
     GameOverLabel: .byte $00, $08, $02, $0e, $06, $00, $10, $17, $06, $13
 }
