@@ -40,6 +40,7 @@ Level1: {
       jmp EndLoop
 
     CloseLevelAndGame:
+      SetSpriteToBackground()
       lda FirePressed
       bne LevelDone
 
@@ -56,6 +57,7 @@ Level1: {
   Init: {
       CopyScreenRam($4400, $5000)
 
+      SetSpriteToForeground()
 // Set background and border color to brown
       lda #$09
       sta VIC.BORDER_COLOR

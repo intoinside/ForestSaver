@@ -258,6 +258,16 @@ DisableAllSprites: {
     rts
 }
 
+.macro SetSpriteToBackground() {
+    lda #$ff
+    sta SPRITES.PRIORITY
+}
+
+.macro SetSpriteToForeground() {
+    lda #$00
+    sta SPRITES.PRIORITY
+}
+
 .macro EnableSprite(bSprite, bEnable) {
     ldy #bSprite
     lda SpriteNumberMask, y

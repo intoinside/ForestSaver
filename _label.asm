@@ -53,6 +53,8 @@ SPRITES: {
 
   .label EXTRA_BIT          = $d010
 
+  .label PRIORITY           = $d01b
+
   .label COLLISION_REGISTER = $d01e
 
   .label RANGER_STANDING    = $50
