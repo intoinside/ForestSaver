@@ -10,7 +10,17 @@
 
 #importonce
 
-BasicUpstart2(Entry)
+#import "_allimport.asm"
+
+.file [name="./main.prg", segments="Code, Charsets, CharsetsColors, MapData, Sprites", modify="BasicUpstart", _start=$0810]
+.file [name="./ForestSaver.prg", segments="Code, Charsets, CharsetsColors, MapData, Sprites", modify="BasicUpstart", _start=$0810]
+.disk [filename="./ForestSaver.d64", name="FORESTSAVER", id="C2021"] {
+  [name="----------------", type="rel"],
+  [name="FORESTSAVER", type="prg", segments="Code, Charsets, CharsetsColors, MapData, Sprites", modify="BasicUpstart", _start=$0810],
+  [name="----------------", type="rel"]
+}
+
+.segment Code
 
 * = * "Entry"
 Entry: {
@@ -59,6 +69,4 @@ MainGameSettings: {
 
 #import "_intro.asm"
 #import "_level1.asm"
-// #import "_level2.asm"
-#import "_allimport.asm"
 #import "_label.asm"

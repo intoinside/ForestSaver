@@ -10,7 +10,13 @@
 
 #importonce
 
-// Screen map memory definition
+.segmentdef Code [start=$0810]
+.segmentdef Charsets [start=$7800]
+.segmentdef CharsetsColors [start=$c000]
+.segmentdef Sprites [start=$5400]
+.segmentdef MapData [start=$4000]
+
+.segment MapData
 * = $4000 "IntroMap"
   .import binary "./maps/intro.bin"
 * = $4400 "Level1"
@@ -24,15 +30,14 @@
   .import binary "./maps/map2.bin"
 */
 
-// Sprite area definition
-* = $5400 "Sprites"
+.segment Sprites
   .import binary "./sprites/sprites.bin"
 
-// Charset and char color
-* = $7800 "Charset"
+.segment Charsets
 Charset:
   .import binary "./maps/charset.bin"
-* = $c000 "CharColors"
+
+.segment CharsetsColors
 CharColors:
   .import binary "./maps/charcolors.bin"
 

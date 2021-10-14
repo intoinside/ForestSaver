@@ -7,5 +7,6 @@ maps/*.bin
 .gradle/*
 *.dmp
 *.prg
+*.d64
 *.tmp
 *.sublime-*
