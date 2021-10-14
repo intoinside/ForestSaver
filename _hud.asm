@@ -85,31 +85,36 @@ Hud: {
 
   * = * "Hud AddScore"
   AddScore: {
-      ldx #$07
-      ldy #$00
+      ldx #$03
       clc
     !:
-      lda ScoreLabel, x
-      adc Points, y
-      sta ScoreLabel, x
-      inx
-      iny
-      cpy #$04
+      lda CurrentScore, x
+      adc Points, x
+      cmp #10
+      bcc SaveDigit
+      sbc #10
+      sec
+
+    SaveDigit:
+      sta CurrentScore, x
+      dex
       bne !-
 
     Done:
       jsr DrawScore
       rts
 
+    CurrentScore: .byte $00, $00, $00, $00
+
     Points: .byte $00, $00, $00, $00
   }
 
   * = * "Hud ResetScore"
   ResetScore: {
-      ldx #04
-      lda #ZeroChar
+      ldx #$04
+      lda #$00
     !:
-      sta ScoreLabel + $06, x
+      sta AddScore.CurrentScore, x
       dex
       bne !-
 
@@ -118,6 +123,15 @@ Hud: {
 
   * = * "Hud DrawScore"
   DrawScore: {
+      ldx #$00
+    !:
+      lda AddScore.CurrentScore, x
+      adc #ZeroChar
+      sta ScoreLabel + $07, x
+      inx
+      cpx #$04
+      bne !-
+
       ldx #$00
     LoopScore:
       lda ScoreLabel, x
