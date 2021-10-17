@@ -55,6 +55,9 @@ Intro: {
 
       jsr Instruction
 
+      // jsr Copyright
+      // jsr Copyright2
+
       rts
   }
 
@@ -121,7 +124,7 @@ Intro: {
 
   * = * "Intro AnimateIntro3"
   AnimateIntro3: {
-      lda $432d
+      lda $432a
       cmp #$62
       beq !+
       ldx #$62
@@ -130,9 +133,9 @@ Intro: {
       ldx #$66
 
     !Set:
-      stx $432d
+      stx $432a
 
-      lda $4305
+      lda $4302
       cmp #$5e
       beq !+
       ldx #$5e
@@ -141,7 +144,7 @@ Intro: {
       ldx #$64
 
     !Set:
-      stx $4305
+      stx $4302
 
       rts
   }
@@ -185,7 +188,7 @@ Intro: {
 
       rts
 
-      .label ScorePtr = $439a
+      .label ScorePtr = $4372
   }
 
   * = * "Intro Instruction"
@@ -193,7 +196,7 @@ Intro: {
       ldx #InstructionLabelLen
     LabelLoop:
       lda InstructionLabel, x
-      sta $43ae, x
+      sta $4387, x
       dex
       bne LabelLoop
 
@@ -205,6 +208,42 @@ Intro: {
                       .byte $11, $10, $13, $15, $00, $2c
   }
 
+/*
+  * = * "Intro Copyright"
+  Copyright: {
+      ldx #CopyrightLabelLen
+    LabelLoop:
+      lda CopyrightLabel, x
+      sta $439e, x
+      dex
+      bne LabelLoop
+
+      rts
+
+  // "RAFFAELE.INTORCIA@GMAIL.COM"
+    .label CopyrightLabelLen = $1B
+    CopyrightLabel: .byte $00, $13, $02, $07, $07, $02, $06, $0D, $06, $28
+                    .byte $0a, $0f, $15, $10, $13, $04, $0a, $02, $01
+                    .byte $08, $0e, $02, $0a, $0d, $28, $04, $10, $0e
+  }
+
+  * = * "Intro Copyright2"
+  Copyright2: {
+      ldx #CopyrightLabelLen
+    LabelLoop:
+      lda CopyrightLabel, x
+      sta $43cc, x
+      dex
+      bne LabelLoop
+
+      rts
+
+  // "INTOINSIDE (c)"
+    .label CopyrightLabelLen = $0e
+    CopyrightLabel: .byte $00, $0a, $0f, $15, $10, $0a, $0f, $14, $0a, $05
+                    .byte $06, $00, $22, $04, $23
+  }
+*/
   AddColorToMap: {
       lda #$40
       sta SetColorToChars.ScreenMemoryAddress
