@@ -6,28 +6,30 @@ A ranger has to do a lot of work to preserve the forest. He must be careful of t
 
 ## Tools needed
 
-### For development
+### Play
+* A real Commodore 64
+* Vice emulator https://vice-emu.sourceforge.io/
+* FrodoC64 for Android&trade; https://play.google.com/store/apps/details?id=org.ab.c64
+
+### Development
 * Sublime Text https://www.sublimetext.com/3 with Kick Assembler http://theweb.dk/KickAssembler/
 * CharPad https://subchristsoftware.itch.io/charpad-free-edition
 * SpritePad https://www.subchristsoftware.com/spritepadfree/
 * Vice emulator https://vice-emu.sourceforge.io/
 * C64 debugger Gui https://magoarcade.org/wp/c64debuggui/
 * Java JDK (at least v11) https://www.oracle.com/java/technologies/downloads/
-* Gradle build tool https://gradle.org/
 * c64lib https://github.com/c64lib
-* c64lib.retro-assembler https://github.com/c64lib/gradle-retro-assembler-plugin
 
 These are used for CI/CD, not needed (but helpful) for development
+* Gradle build tool https://gradle.org/
+* c64lib.retro-assembler https://github.com/c64lib/gradle-retro-assembler-plugin
 * Circle.ci https://circleci.com/
 * GitHub https://github.com/intoinside/ForestSaver
-
-### For play
-* Vice emulator https://vice-emu.sourceforge.io/ or a real Commodore 64
 
 ## Build info
 
 ### Download ForestSaver only for play
-Look into [Releases](https://github.com/intoinside/ForestSaver/releases) and take the last prg available.
+Look into [Releases](https://github.com/intoinside/ForestSaver/releases) and check for the latest prg/d64 available.
 
 ### Download ForestSaver for develop
 
