@@ -166,9 +166,9 @@ WoodCutter: {
 
 // Update woodcutter frame
 .macro CallUpdateWoodCutterFrame(directionX, directionY, woodCutterFrame) {
-  lda directionX, x
+  lda directionX
   sta WoodCutter.UpdateWoodCutterFrame.DirectionX
-  lda directionY, x
+  lda directionY
   sta WoodCutter.UpdateWoodCutterFrame.DirectionY
 
   lda woodCutterFrame
@@ -182,11 +182,11 @@ WoodCutter: {
 
 // Update woodcutter frame with reverse hatchet
 .macro CallUpdateWoodCutterFrameReverse(directionX, directionY, woodCutterFrame) {
-  lda directionX, x
+  lda directionX
   sec
   sbc #2
   sta WoodCutter.UpdateWoodCutterFrame.DirectionX
-  lda directionY, x
+  lda directionY
   sta WoodCutter.UpdateWoodCutterFrame.DirectionY
 
   lda woodCutterFrame
@@ -200,9 +200,9 @@ WoodCutter: {
 
 // Set woodcutter position
 .macro CallSetPosition(trackX, trackY, xBit, spriteXLow, spriteYLow) {
-  lda trackX, x
+  lda trackX
   sta WoodCutter.SetPosition.NewX
-  lda trackY, x
+  lda trackY
   sta WoodCutter.SetPosition.NewY
   lda #spriteXLow
   sta WoodCutter.SetPosition.SpriteXLow
