@@ -11,10 +11,11 @@
 #importonce
 
 .segmentdef Code [start=$0810]
+.segmentdef MapData [start=$4000]
+.segmentdef MapDummyArea [start=$5000]
+.segmentdef Sprites [start=$5400]
 .segmentdef Charsets [start=$7800]
 .segmentdef CharsetsColors [start=$c000]
-.segmentdef Sprites [start=$5400]
-.segmentdef MapData [start=$4000]
 
 .segment MapData
 * = $4000 "IntroMap"
@@ -29,6 +30,11 @@
 * = $5000 "Map4"
   .import binary "./maps/map2.bin"
 */
+
+
+.segment MapDummyArea
+* = $5000 "MapDummyArea"
+MapDummyArea:
 
 .segment Sprites
   .import binary "./sprites/sprites.bin"

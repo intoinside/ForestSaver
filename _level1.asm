@@ -55,7 +55,7 @@ Level1: {
   // Initialization of intro screen
   * = * "Level1 Init"
   Init: {
-      CopyScreenRam($4400, $5000)
+      CopyScreenRam($4400, MapDummyArea)
 
       SetSpriteToForeground()
 // Set background and border color to brown
@@ -138,7 +138,7 @@ Level1: {
 
   * = * "Level1 Finalize"
   Finalize: {
-      CopyScreenRam($5000, $4400)
+      CopyScreenRam(MapDummyArea, $4400)
 
       lda #$00
       sta VIC.SPRITE_ENABLE
