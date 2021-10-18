@@ -14,7 +14,8 @@
 
 .file [name="./main.prg", segments="Code, Charsets, CharsetsColors, MapData, Sprites", modify="BasicUpstart", _start=$0810]
 .file [name="./ForestSaver.prg", segments="Code, Charsets, CharsetsColors, MapData, Sprites", modify="BasicUpstart", _start=$0810]
-.disk [filename="./ForestSaver.d64", name="FORESTSAVER", id="C2021"] {
+.disk [filename="./ForestSaver.d64", name="FORESTSAVER", id="C2021", showInfo]
+{
   [name="----------------", type="rel"],
   [name="FORESTSAVER", type="prg", segments="Code, Charsets, CharsetsColors, MapData, Sprites", modify="BasicUpstart", _start=$0810],
   [name="----------------", type="rel"]
