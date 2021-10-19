@@ -309,7 +309,7 @@ DisableAllSprites: {
 * = * "Utils SpriteCollision"
 SpriteCollision: {
     lda #%00000001
-    and SPRITES.COLLISION_REGISTER
+    and SPRITES.COLLISION_TO_SPRITE
     bne CollisionHappened
     jmp NoCollisionDetected
 
@@ -375,6 +375,24 @@ SpriteCollision: {
 // Other sprite initial coordinate
   I1: .word $0000
   J1: .word $0000
+
+  Collision: .byte $00
+}
+
+* = * "Utils BackgroundCollision"
+BackgroundCollision: {
+    lda #%00000001
+    and SPRITES.COLLISION_TO_BKG
+    bne CollisionHappened
+    lda #$00
+    jmp Done
+
+  CollisionHappened:
+    lda #$01
+
+  Done:
+    sta Collision
+    rts
 
   Collision: .byte $00
 }

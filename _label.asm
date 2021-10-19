@@ -55,7 +55,8 @@ SPRITES: {
 
   .label PRIORITY           = $d01b
 
-  .label COLLISION_REGISTER = $d01e
+  .label COLLISION_TO_SPRITE = $d01e
+  .label COLLISION_TO_BKG    = $d01f
 
   .label RANGER_STANDING    = $50
 
