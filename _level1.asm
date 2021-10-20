@@ -494,7 +494,8 @@ Level1: {
 
     TreeAlreadyCut: .byte $00, $00, $00
 
-    .label HatchetStrokesMax = $0c
+    // Number of strokes to cut tree
+    .label HatchetStrokesMax = 18
     HatchetStrokes: .byte HatchetStrokesMax
 
     HatchetFrame:
@@ -611,7 +612,7 @@ Level1: {
 
 // First woodcutter track data
     .label TrackWalk1XStart = 0
-    .label TrackWalk1XEnd   = 114
+    .label TrackWalk1XEnd   = 108
     .label TrackWalk1Y      = 79
     .label DirectionX1      = 1
     .label DirectionY1      = 0
@@ -620,7 +621,7 @@ Level1: {
 
 // Second woodcutter track data
     .label TrackWalk2XStart = 0
-    .label TrackWalk2XEnd   = 45
+    .label TrackWalk2XEnd   = 39
     .label TrackWalk2Y      = 136
     .label DirectionX2      = 1
     .label DirectionY2      = 0
@@ -629,7 +630,7 @@ Level1: {
 
 // Third woodcutter track data
     .label TrackWalk3XStart = 0
-    .label TrackWalk3XEnd   = 180
+    .label TrackWalk3XEnd   = 174
     .label TrackWalk3Y      = 167
     .label DirectionX3      = 1
     .label DirectionY3      = 0
@@ -914,7 +915,8 @@ Level1: {
 
     TreeAlreadyCut: .byte $00, $00, $00
 
-    .label HatchetStrokesMax = $0c
+    // Number of strokes to cut tree
+    .label HatchetStrokesMax = 18
     HatchetStrokes:
       .byte HatchetStrokesMax
 
@@ -1040,7 +1042,7 @@ Level1: {
 
 // First woodcutter track data
     .label TrackWalk1XStart = 70
-    .label TrackWalk1XEnd   = 210
+    .label TrackWalk1XEnd   = 216
     .label X1BitStart       = 1
     .label TrackWalk1Y      = 87
     .label DirectionX1      = 255
@@ -1050,7 +1052,7 @@ Level1: {
 
 // Second woodcutter track data
     .label TrackWalk2XStart = 70
-    .label TrackWalk2XEnd   = 40
+    .label TrackWalk2XEnd   = 46
     .label X2BitStart       = 1
     .label TrackWalk2Y      = 145
     .label DirectionX2      = 255
@@ -1060,7 +1062,7 @@ Level1: {
 
 // Third woodcutter track data
     .label TrackWalk3XStart = 70
-    .label TrackWalk3XEnd   = 10
+    .label TrackWalk3XEnd   = 16
     .label X3BitStart       = 1
     .label TrackWalk3Y      = 199
     .label DirectionX3      = 255

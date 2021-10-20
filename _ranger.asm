@@ -39,6 +39,27 @@ Ranger: {
 
   * = * "Ranger HandleRangerMove"
   HandleRangerMove: {
+      jsr BackgroundCollision
+      lda BackgroundCollision.Collision
+      beq NoCollision
+
+      // If there is collision, revert ranger position
+      lda OLDX0
+      sta SPRITES.X0
+      lda OLDXBIT
+      sta SPRITES.EXTRA_BIT
+      lda OLDY0
+      sta SPRITES.Y0
+
+    NoCollision:
+      // If there is no collision, save position
+      lda SPRITES.X0
+      sta OLDX0
+      lda SPRITES.EXTRA_BIT
+      sta OLDXBIT
+      lda SPRITES.Y0
+      sta OLDY0
+
       lda Direction
       beq CheckDirectionY
 
@@ -113,6 +134,10 @@ Ranger: {
 
     Done:
       rts
+
+    OLDX0:    .byte $00
+    OLDXBIT:  .byte $00
+    OLDY0:    .byte $00
   }
 
   * = * "Ranger UpdateRangerFrame"
