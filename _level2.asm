@@ -17,22 +17,39 @@ Level2: {
   Manager: {
       jsr Init
       jsr AddColorToMap
+      jsr StupidWaitRoutine
 
-    CheckFirePressed:
-      jsr GetOnlyFirePress
-      lda #$ff
-      cmp FirePressed
-      bne CheckFirePressed
-      inc FirePressed
+    JoystickMovement:
+      jsr WaitRoutine
+      jsr TimedRoutine
+      jsr GetJoystickMove
 
+      jsr Ranger.HandleRangerMove
+
+      lda GameEnded
+      bne CloseLevelAndGame
+
+      jmp EndLoop
+
+    CloseLevelAndGame:
+      SetSpriteToBackground()
+      lda FirePressed
+      bne LevelDone
+
+    EndLoop:
+      jmp JoystickMovement
+
+    LevelDone:
       jsr Finalize
-
       rts
   }
 
   // Initialization of intro screen
   * = * "Level2 Init"
   Init: {
+      CopyScreenRam($4800, MapDummyArea)
+
+      SetSpriteToForeground()
 
 // Set background and border color to brown
       lda #$08
@@ -67,9 +84,8 @@ Level2: {
       lda #$07
       sta SPRITES.COLOR0
 
-// Enable the first sprite (just for test)
-      lda #$01
-      sta VIC.SPRITE_MULTICOLOR
+// Enable the first sprite (ranger)
+      lda #%00000001
       sta VIC.SPRITE_ENABLE
 
       rts
@@ -77,8 +93,73 @@ Level2: {
 
   * = * "Level2 Finalize"
   Finalize: {
+      CopyScreenRam(MapDummyArea, $4800)
+
+      lda #$00
+      sta VIC.SPRITE_ENABLE
+
+      jsr CompareAndUpdateHiScore
+
+      jsr Hud.ResetScore
+      jsr Hud.ResetDismissalCounter
+
+      jsr DisableAllSprites
 
       rts
+  }
+
+  * = * "Level1 TimedRoutine"
+  TimedRoutine: {
+      jsr TimedRoutine10th
+
+      lda DelayCounter
+      beq DelayTriggered        // when counter is zero stop decrementing
+      dec DelayCounter      // decrement the counter
+
+      jmp Exit
+
+    DelayTriggered:
+      // inc $4410
+
+      lda DelayRequested      // delay reached 0, reset it
+      sta DelayCounter
+
+    Waiting:
+      // jsr AddEnemy
+
+      jmp Exit
+
+    NotWaiting:
+
+    Exit:
+      rts
+
+    DelayCounter:
+      .byte 50                  // Counter storage
+    DelayRequested:
+      .byte 50                  // 1 second delay
+  }
+
+  TimedRoutine10th: {
+      lda DelayCounter
+      beq DelayTriggered        // when counter is zero stop decrementing
+      dec DelayCounter        // decrement the counter
+
+      jmp Exit
+
+    DelayTriggered:
+      // inc $4411
+
+      lda DelayRequested      // delay reached 0, reset it
+      sta DelayCounter
+
+    Exit:
+      rts
+
+    DelayCounter:
+      .byte 8                  // Counter storage
+    DelayRequested:
+      .byte 8                  // 8/50 second delay
   }
 
   AddColorToMap: {

@@ -36,12 +36,16 @@ GameEnded:          // $00 - Game in progress
 GamePlay: {
     jsr Intro.Manager
 
+/*
     jsr Level1.Manager
 
     lda GameEnded
     bne GamePlay
+*/
+    jsr Level2.Manager
 
-    //jsr Level2.Manager
+    lda GameEnded
+    bne GamePlay
 
     jmp GamePlay
 }
@@ -70,4 +74,5 @@ MainGameSettings: {
 
 #import "_intro.asm"
 #import "_level1.asm"
+#import "_level2.asm"
 #import "_label.asm"

@@ -22,9 +22,9 @@
   .import binary "./maps/intro.bin"
 * = $4400 "Level1"
   .import binary "./maps/level1.bin"
-/*
 * = $4800 "Level2"
   .import binary "./maps/level2.bin"
+/*
 * = $4c00 "Map3"
   .import binary "./maps/map2.bin"
 * = $5000 "Map4"
