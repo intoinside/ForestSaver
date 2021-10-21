@@ -532,8 +532,6 @@ Level1: {
 
   * = * "Level1 SetWoodCutter2Track"
   SetWoodCutter2Track: {
-      ldx #0
-
       lda Enemy2Manager.CurrentWoodCutter
       cmp #$02
       beq FixForWoodCutter3
@@ -602,7 +600,6 @@ Level1: {
       sta Enemy2Manager.TreeStartAddress + 1
 
     Done:
-
       lda Enemy2Manager.TrackWalkXStart
       sta SPRITES.X1
       lda Enemy2Manager.TrackWalkY
@@ -955,8 +952,6 @@ Level1: {
 
     * = * "Level1 SetWoodCutter3Track"
   SetWoodCutter3Track: {
-      ldx #0
-
       lda Enemy3Manager.CurrentWoodCutter
       cmp #$01
       beq FixForWoodCutter2
