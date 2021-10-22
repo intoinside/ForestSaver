@@ -119,9 +119,9 @@ Level2: {
       sta VIC.SPRITE_ENABLE
 
       GetRandomUpTo(2)
-      sta Enemy2Manager.CurrentWoodCutter
+      sta WoodCutterFromLeft.CurrentWoodCutter
       GetRandomUpTo(2)
-      sta Enemy3Manager.CurrentWoodCutter
+      sta WoodCutterFromRight.CurrentWoodCutter
 
       jsr SetWoodCutter2Track
       jsr SetWoodCutter3Track
@@ -136,23 +136,23 @@ Level2: {
       lda #$00
       sta VIC.SPRITE_ENABLE
       sta AddEnemy.EnemyActive
-      sta Enemy2Manager.WoodCutterFined
-      sta Enemy2Manager.ComplaintShown
-      sta Enemy2Manager.CutCompleted
-      sta Enemy2Manager.WalkInCompleted
-      sta Enemy2Manager.HatchetShown
+      sta WoodCutterFromLeft.WoodCutterFined
+      sta WoodCutterFromLeft.ComplaintShown
+      sta WoodCutterFromLeft.CutCompleted
+      sta WoodCutterFromLeft.WalkInCompleted
+      sta WoodCutterFromLeft.HatchetShown
 
-      sta Enemy2Manager.TreeAlreadyCut
-      sta Enemy2Manager.TreeAlreadyCut + 1
+      sta WoodCutterFromLeft.TreeAlreadyCut
+      sta WoodCutterFromLeft.TreeAlreadyCut + 1
 
-      sta Enemy3Manager.WoodCutterFined
-      sta Enemy3Manager.ComplaintShown
-      sta Enemy3Manager.CutCompleted
-      sta Enemy3Manager.WalkInCompleted
-      sta Enemy3Manager.HatchetShown
+      sta WoodCutterFromRight.WoodCutterFined
+      sta WoodCutterFromRight.ComplaintShown
+      sta WoodCutterFromRight.CutCompleted
+      sta WoodCutterFromRight.WalkInCompleted
+      sta WoodCutterFromRight.HatchetShown
 
-      sta Enemy3Manager.TreeAlreadyCut
-      sta Enemy3Manager.TreeAlreadyCut + 1
+      sta WoodCutterFromRight.TreeAlreadyCut
+      sta WoodCutterFromRight.TreeAlreadyCut + 1
 
       sta Hud.ReduceDismissalCounter.DismissalCompleted
 
@@ -174,14 +174,14 @@ Level2: {
       GetRandomUpTo(6)
 
       cmp #$02
-      beq StartEnemy2
+      beq StartWoodCutterFromLeft
 
       cmp #$03
-      beq StartEnemy3
+      beq StartWoodCutterFromRight
 
       jmp Done
 
-    StartEnemy2:
+    StartWoodCutterFromLeft:
       lda EnemyActive
       and #%00000100
       bne Done
@@ -198,7 +198,7 @@ Level2: {
 
       jmp Done
 
-    StartEnemy3:
+    StartWoodCutterFromRight:
       lda EnemyActive
       and #%00001000
       bne Done
@@ -226,21 +226,21 @@ Level2: {
   HandleEnemyMove: {
       lda AddEnemy.EnemyActive
       and #%00000100
-      beq IsEnemyNo3Alive
-      jsr Enemy2Manager
+      beq IsEnemyFromRight3Alive
+      jsr WoodCutterFromLeft
 
-    IsEnemyNo3Alive:
+    IsEnemyFromRight3Alive:
       lda AddEnemy.EnemyActive
       and #%00001000
       beq Done
-      jsr Enemy3Manager
+      jsr WoodCutterFromRight
 
     Done:
       rts
   }
 
-  * = * "Level2 Enemy2Manager"
-  Enemy2Manager: {
+  * = * "Level2 WoodCutterFromLeft"
+  WoodCutterFromLeft: {
       lda WoodCutterFined
       beq CutCompletedCheck
       lda ComplaintShown
@@ -523,54 +523,54 @@ Level2: {
 
   * = * "Level2 SetWoodCutter2Track"
   SetWoodCutter2Track: {
-      lda Enemy2Manager.CurrentWoodCutter
+      lda WoodCutterFromLeft.CurrentWoodCutter
       cmp #$01
       beq FixForWoodCutter2
 
     FixForWoodCutter1:
       lda #TrackWalk1XStart
-      sta Enemy2Manager.TrackWalkXStart
+      sta WoodCutterFromLeft.TrackWalkXStart
       lda #TrackWalk1XEnd
-      sta Enemy2Manager.TrackWalkXEnd
+      sta WoodCutterFromLeft.TrackWalkXEnd
 
       lda #TrackWalk1Y
-      sta Enemy2Manager.TrackWalkY
+      sta WoodCutterFromLeft.TrackWalkY
 
       lda #DirectionX1
-      sta Enemy2Manager.DirectionX
+      sta WoodCutterFromLeft.DirectionX
       lda #DirectionY1
-      sta Enemy2Manager.DirectionY
+      sta WoodCutterFromLeft.DirectionY
 
       lda TreeStartAddress1
-      sta Enemy2Manager.TreeStartAddress
+      sta WoodCutterFromLeft.TreeStartAddress
       lda TreeStartAddress1 + 1
-      sta Enemy2Manager.TreeStartAddress + 1
+      sta WoodCutterFromLeft.TreeStartAddress + 1
 
       jmp Done
 
     FixForWoodCutter2:
       lda #TrackWalk2XStart
-      sta Enemy2Manager.TrackWalkXStart
+      sta WoodCutterFromLeft.TrackWalkXStart
       lda #TrackWalk2XEnd
-      sta Enemy2Manager.TrackWalkXEnd
+      sta WoodCutterFromLeft.TrackWalkXEnd
 
       lda #TrackWalk2Y
-      sta Enemy2Manager.TrackWalkY
+      sta WoodCutterFromLeft.TrackWalkY
 
       lda #DirectionX2
-      sta Enemy2Manager.DirectionX
+      sta WoodCutterFromLeft.DirectionX
       lda #DirectionY2
-      sta Enemy2Manager.DirectionY
+      sta WoodCutterFromLeft.DirectionY
 
       lda TreeStartAddress2
-      sta Enemy2Manager.TreeStartAddress
+      sta WoodCutterFromLeft.TreeStartAddress
       lda TreeStartAddress2 + 1
-      sta Enemy2Manager.TreeStartAddress + 1
+      sta WoodCutterFromLeft.TreeStartAddress + 1
 
     Done:
-      lda Enemy2Manager.TrackWalkXStart
+      lda WoodCutterFromLeft.TrackWalkXStart
       sta SPRITES.X1
-      lda Enemy2Manager.TrackWalkY
+      lda WoodCutterFromLeft.TrackWalkY
       sta SPRITES.Y1
 
       rts
@@ -594,8 +594,8 @@ Level2: {
     TreeStartAddress2: .word $4a89
   }
 
-  * = * "Level2 Enemy3Manager"
-  Enemy3Manager: {
+  * = * "Level2 WoodCutterFromRight"
+  WoodCutterFromRight: {
       lda WoodCutterFined
       beq CutCompletedCheck
       lda ComplaintShown
@@ -911,60 +911,60 @@ Level2: {
 
     * = * "Level2 SetWoodCutter3Track"
   SetWoodCutter3Track: {
-      lda Enemy3Manager.CurrentWoodCutter
+      lda WoodCutterFromRight.CurrentWoodCutter
       cmp #$01
       beq FixForWoodCutter2
 
     FixForWoodCutter1:
       lda #TrackWalk1XStart
-      sta Enemy3Manager.TrackWalkXStart
+      sta WoodCutterFromRight.TrackWalkXStart
       lda #TrackWalk1XEnd
-      sta Enemy3Manager.TrackWalkXEnd
+      sta WoodCutterFromRight.TrackWalkXEnd
 
       lda #X1BitStart
-      sta Enemy3Manager.XBit
+      sta WoodCutterFromRight.XBit
 
       lda #TrackWalk1Y
-      sta Enemy3Manager.TrackWalkY
+      sta WoodCutterFromRight.TrackWalkY
 
       lda #DirectionX1
-      sta Enemy3Manager.DirectionX
+      sta WoodCutterFromRight.DirectionX
       lda #DirectionY1
-      sta Enemy3Manager.DirectionY
+      sta WoodCutterFromRight.DirectionY
 
       lda TreeStartAddress1
-      sta Enemy3Manager.TreeStartAddress
+      sta WoodCutterFromRight.TreeStartAddress
       lda TreeStartAddress1 + 1
-      sta Enemy3Manager.TreeStartAddress + 1
+      sta WoodCutterFromRight.TreeStartAddress + 1
       jmp Done
 
     FixForWoodCutter2:
       lda #TrackWalk2XStart
-      sta Enemy3Manager.TrackWalkXStart
+      sta WoodCutterFromRight.TrackWalkXStart
       lda #TrackWalk2XEnd
-      sta Enemy3Manager.TrackWalkXEnd
+      sta WoodCutterFromRight.TrackWalkXEnd
 
       lda #X2BitStart
-      sta Enemy3Manager.XBit
+      sta WoodCutterFromRight.XBit
 
       lda #TrackWalk2Y
-      sta Enemy3Manager.TrackWalkY
+      sta WoodCutterFromRight.TrackWalkY
 
       lda #DirectionX2
-      sta Enemy3Manager.DirectionX
+      sta WoodCutterFromRight.DirectionX
       lda #DirectionY2
-      sta Enemy3Manager.DirectionY
+      sta WoodCutterFromRight.DirectionY
 
       lda TreeStartAddress2
-      sta Enemy3Manager.TreeStartAddress
+      sta WoodCutterFromRight.TreeStartAddress
       lda TreeStartAddress2 + 1
-      sta Enemy3Manager.TreeStartAddress + 1
+      sta WoodCutterFromRight.TreeStartAddress + 1
 
     Done:
 
-      lda Enemy3Manager.TrackWalkXStart
+      lda WoodCutterFromRight.TrackWalkXStart
       sta SPRITES.X3
-      lda Enemy3Manager.TrackWalkY
+      lda WoodCutterFromRight.TrackWalkY
       sta SPRITES.Y3
 
       rts
