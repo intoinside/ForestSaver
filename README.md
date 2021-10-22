@@ -1,3 +1,7 @@
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+[![Gitter](https://badges.gitter.im/intoinside/community.svg)](https://gitter.im/intoinside/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 [![CircleCI](https://circleci.com/gh/intoinside/ForestSaver/tree/main.svg?style=svg)](https://circleci.com/gh/intoinside/ForestSaver/tree/main)
 
 # ForestSaver
