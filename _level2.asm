@@ -971,7 +971,7 @@ Level2: {
 
 // First woodcutter track data
     .label TrackWalk1XStart = 70
-    .label TrackWalk1XEnd   = 10
+    .label TrackWalk1XEnd   = 12
     .label X1BitStart       = 1
     .label TrackWalk1Y      = 71
     .label DirectionX1      = 255
@@ -981,7 +981,7 @@ Level2: {
 
 // Second woodcutter track data
     .label TrackWalk2XStart = 70
-    .label TrackWalk2XEnd   = 228
+    .label TrackWalk2XEnd   = 230
     .label X2BitStart       = 1
     .label TrackWalk2Y      = 158
     .label DirectionX2      = 255
