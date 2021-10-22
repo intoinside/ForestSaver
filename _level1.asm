@@ -130,8 +130,8 @@ Level1: {
       GetRandomUpTo(3)
       sta WoodCutterFromRight.CurrentWoodCutter
 
-      jsr SetWoodCutter2Track
-      jsr SetWoodCutter3Track
+      jsr SetLeftWoodCutterTrack
+      jsr SetRightWoodCutterTrack
 
       rts
   }
@@ -472,7 +472,7 @@ Level1: {
       lda TreeAlreadyCut, x
       bne CheckNextWoodCutter
       stx CurrentWoodCutter
-      jsr SetWoodCutter2Track
+      jsr SetLeftWoodCutterTrack
 
       // Clear sprite
       lda AddEnemy.EnemyActive
@@ -530,8 +530,8 @@ Level1: {
     TreeStartAddress: .word $beef
   }
 
-  * = * "Level1 SetWoodCutter2Track"
-  SetWoodCutter2Track: {
+  * = * "Level1 SetLeftWoodCutterTrack"
+  SetLeftWoodCutterTrack: {
       lda WoodCutterFromLeft.CurrentWoodCutter
       cmp #$02
       beq FixForWoodCutter3
@@ -890,7 +890,7 @@ Level1: {
       lda TreeAlreadyCut, x
       bne CheckNextWoodCutter
       stx CurrentWoodCutter
-      jsr SetWoodCutter3Track
+      jsr SetRightWoodCutterTrack
 
       // Clear sprite
       lda AddEnemy.EnemyActive
@@ -950,8 +950,8 @@ Level1: {
     TreeStartAddress: .word $beef
   }
 
-    * = * "Level1 SetWoodCutter3Track"
-  SetWoodCutter3Track: {
+    * = * "Level1 SetRightWoodCutterTrack"
+  SetRightWoodCutterTrack: {
       lda WoodCutterFromRight.CurrentWoodCutter
       cmp #$01
       beq FixForWoodCutter2
