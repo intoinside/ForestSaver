@@ -990,6 +990,67 @@ Level2: {
     TreeStartAddress2: .word $49f7
   }
 
+  TankTruckManager: {
+
+
+      rts
+
+    .label TankXStart = 70
+    .label TankXEnd   = 12
+    .label TankX1BitStart = 1
+    .label TankY      = 71
+
+    LakeStartAddress: .word $4844
+  }
+
+  SetTankTruckTrack: {
+
+    SetLeftTank:
+      lda #TankLeftXStart
+      sta TankTruckManager.TankXStart
+      lda #TankLeftXEnd
+      sta TankTruckManager.TankXEnd
+
+      lda #TankLeftX1BitStart
+      sta TankTruckManager.TankX1BitStart
+
+      lda #TankLeftY
+      sta TankTruckManager.TankY
+
+      jmp Done
+
+    SetRightTank:
+      lda #TankRightXStart
+      sta TankTruckManager.TankXStart
+      lda #TankRightXEnd
+      sta TankTruckManager.TankXEnd
+
+      lda #TankRightX1BitStart
+      sta TankTruckManager.TankX1BitStart
+
+      lda #TankRightY
+      sta TankTruckManager.TankY
+
+    Done:
+      rts
+
+// Tank from left
+    .label TankLeftXStart = 0
+    .label TankLeftXEnd   = 70
+    .label TankLeftX1BitStart = 0
+    .label TankLeftY      = 90
+    .label TankLeftBodySpriteNum = $67
+    .label TankLeftTailSpriteNum = $66
+
+// Tank from right
+    .label TankRightXStart = 70
+    .label TankRightXEnd   = 24
+    .label TankRightX1BitStart = 1
+    .label TankRightY      = 80
+    .label TankRightBodySpriteNum = $68
+    .label TankRightTailSpriteNum = $69
+  }
+
   * = * "Level2 TimedRoutine"
   TimedRoutine: {
       jsr TimedRoutine10th
