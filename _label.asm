@@ -39,6 +39,7 @@ SPRITES: {
   .label COLOR4             = $d02b
   .label COLOR5             = $d02c
   .label COLOR6             = $d02d
+  .label COLOR7             = $d02e
 
   .label X0                 = $d000
   .label Y0                 = $d001
@@ -50,6 +51,12 @@ SPRITES: {
   .label Y3                 = $d007
   .label X4                 = $d008
   .label Y4                 = $d009
+  .label X5                 = $d00a
+  .label Y5                 = $d00b
+  .label X6                 = $d00c
+  .label Y6                 = $d00d
+  .label X7                 = $d00e
+  .label Y7                 = $d00f
 
   .label EXTRA_BIT          = $d010
 
@@ -58,21 +65,29 @@ SPRITES: {
   .label COLLISION_TO_SPRITE = $d01e
   .label COLLISION_TO_BKG   = $d01f
 
+// Level x ranger
   .label RANGER_STANDING    = $50
 
+// Level 1 woodcutter and hatchet
   .label ENEMY_STANDING     = $59
-
   .label HATCHET            = $62
   .label HATCHET_REV        = $64
 
+// Level 2 tank, pipe
+  .label TANK_TAIL          = $66
+  .label TANK_BODY          = $67
+  .label TANK_TAIL_REV      = $69
+  .label TANK_BODY_REV      = $68
+  .label PIPE_1             = $6a
+  .label PIPE_2             = $6b
+  .label PIPE_3             = $6c
+  .label PIPE_4             = $6d
+
+// Level 3
+// TBD
+
   // These label will be modified with self-modification code
   .label SPRITE_0           = $bef8
-  .label SPRITE_1           = $bef9
-  .label SPRITE_2           = $befa
-  .label SPRITE_3           = $befb
-  .label SPRITE_4           = $befc
-  .label SPRITE_5           = $befd
-  .label SPRITE_6           = $befe
 }
 
 #import "main.asm"
