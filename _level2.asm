@@ -6,6 +6,16 @@
 //
 // Manager for level 2.
 //
+// Sprite pointer settings:
+// * Ranger       Sprite 0
+// * Hatchet 1    Sprite 1
+// * Woodcutter 1 Sprite 2
+// * Hatchet 2    Sprite 3
+// * Woodcutter 2 Sprite 4
+// * Tank tail    Sprite 5
+// * Tank body    Sprite 6
+// * Tank pipe    Sprite 7
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #importonce
@@ -26,6 +36,7 @@ Level2: {
 
       jsr Ranger.HandleRangerMove
       jsr HandleEnemyMove
+      jsr HandleTankTruckMove
 
       lda GameEnded
       bne CloseLevelAndGame
@@ -45,7 +56,7 @@ Level2: {
       rts
   }
 
-  // Initialization of intro screen
+  // Initialization of level 2
   * = * "Level2 Init"
   Init: {
       CopyScreenRam($4800, MapDummyArea)
@@ -113,6 +124,9 @@ Level2: {
       lda #$02
       sta SPRITES.COLOR2
       sta SPRITES.COLOR4
+      lda #$01
+      sta SPRITES.COLOR5
+      sta SPRITES.COLOR6
 
 // Enable the first sprite (ranger)
       lda #%00000001
@@ -125,6 +139,10 @@ Level2: {
 
       jsr SetLeftWoodCutterTrack
       jsr SetRightWoodCutterTrack
+
+      GetRandomUpTo(2)
+      sta TankTruckManager.CurrentTank
+      jsr SetTankTruckTrack
 
       rts
   }
@@ -990,10 +1008,98 @@ Level2: {
     TreeStartAddress2: .word $49f7
   }
 
+  AddTankTruck: {
+      lda GameEnded
+      bne Done
+
+      GetRandomUpTo(6)
+
+      cmp #$02
+      beq StartTankTruckFromLeft
+
+      cmp #$03
+      beq StartTankTruckFromRight
+
+      jmp Done
+
+    StartTankTruckFromLeft:
+      lda TruckActive
+      and #%00000100
+      bne Done
+      lda TruckActive
+      ora #%00000100
+      sta TruckActive
+
+/*
+      lda #$0
+      sta SPRITES.X2
+      lda #$45
+      sta SPRITES.Y2
+*/
+
+      EnableSprite(5, true)
+      EnableSprite(6, true)
+
+      jmp Done
+
+    StartTankTruckFromRight:
+      lda TruckActive
+      and #%00001000
+      bne Done
+      lda TruckActive
+      ora #%00001000
+      sta TruckActive
+
+/*
+      lda #$10
+      sta SPRITES.X4
+      lda #$cf
+      sta SPRITES.Y4
+*/
+      lda SPRITES.EXTRA_BIT
+      ora #%01100000
+      sta SPRITES.EXTRA_BIT
+
+      EnableSprite(5, true)
+      EnableSprite(6, true)
+
+    Done:
+      rts
+
+    TruckActive:      .byte $00
+  }
+
+  * = * "Level2 HandleTankTruckMove"
+  HandleTankTruckMove: {
+      lda AddTankTruck.TruckActive
+      and #%00000100
+      beq IsTruckFromRightAlive
+      jsr TankTruckFromLeft
+
+    IsTruckFromRightAlive:
+      lda AddTankTruck.TruckActive
+      and #%00001000
+      beq Done
+      jsr TankTruckFromRight
+
+    Done:
+      rts
+  }
+
+  TankTruckFromLeft: {
+      rts
+  }
+
+  TankTruckFromRight: {
+      rts
+  }
+
   TankTruckManager: {
 
 
       rts
+
+    CurrentTank: .byte $00
 
     .label TankXStart = 70
     .label TankXEnd   = 12
@@ -1004,6 +1110,9 @@ Level2: {
   }
 
   SetTankTruckTrack: {
+      lda TankTruckManager.CurrentTank
+      cmp #$01
+      beq SetRightTank
 
     SetLeftTank:
       lda #TankLeftXStart
@@ -1121,6 +1230,10 @@ Level2: {
 // Enemy sprite pointer
   .label SPRITE_2     = $4bfa
   .label SPRITE_4     = $4bfc
+
+// Tank tail and body sprite pointer
+  .label SPRITE_5     = $4bfd
+  .label SPRITE_6     = $4bfe
 
 }
 
