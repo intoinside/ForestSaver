@@ -1,8 +1,4 @@
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-
-[![Gitter](https://badges.gitter.im/intoinside/community.svg)](https://gitter.im/intoinside/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-
-[![CircleCI](https://circleci.com/gh/intoinside/ForestSaver/tree/main.svg?style=svg)](https://circleci.com/gh/intoinside/ForestSaver/tree/main)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Gitter](https://badges.gitter.im/intoinside/community.svg)](https://gitter.im/intoinside/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![CircleCI](https://circleci.com/gh/intoinside/ForestSaver/tree/main.svg?style=svg)](https://circleci.com/gh/intoinside/ForestSaver/tree/main)
 
 # ForestSaver
 
@@ -14,6 +10,7 @@ A ranger has to do a lot of work to preserve the forest. He must be careful of t
 * A real Commodore 64
 * Vice emulator https://vice-emu.sourceforge.io/
 * FrodoC64 for Android&trade; https://play.google.com/store/apps/details?id=org.ab.c64
+* Don't know if there's an emulator for Iphone
 
 ### Development
 * Sublime Text https://www.sublimetext.com/3 with Kick Assembler http://theweb.dk/KickAssembler/
