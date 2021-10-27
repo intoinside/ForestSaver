@@ -141,8 +141,8 @@ Level2: {
       jsr SetRightWoodCutterTrack
 
       GetRandomUpTo(2)
-      sta TankTruckManager.CurrentTank
-      jsr SetTankTruckTrack
+      sta HandleTankTruckMove.CurrentTank
+//      jsr SetTankTruckTrack
 
       rts
   }
@@ -1008,18 +1008,24 @@ Level2: {
     TreeStartAddress2: .word $49f7
   }
 
+  * = * "Level2 AddTankTruck"
   AddTankTruck: {
       lda GameEnded
-      bne Done
+      beq !+
+      jmp Done
 
+    !:
+      /*
       GetRandomUpTo(6)
 
       cmp #$02
       beq StartTankTruckFromLeft
-
+      */
+      jmp StartTankTruckFromLeft
+/*
       cmp #$03
       beq StartTankTruckFromRight
-
+*/
       jmp Done
 
     StartTankTruckFromLeft:
@@ -1030,12 +1036,16 @@ Level2: {
       ora #%00000100
       sta TruckActive
 
-/*
-      lda #$0
-      sta SPRITES.X2
-      lda #$45
-      sta SPRITES.Y2
-*/
+      lda #SPRITES.TANK_TAIL_LE
+      sta SPRITE_5
+      lda #SPRITES.TANK_BODY_LE
+      sta SPRITE_6
+
+      lda #TankTruckFromLeft.TankLeftXStart
+      sta SPRITES.X6
+      clc
+      adc #24
+      sta SPRITES.X5
 
       EnableSprite(5, true)
       EnableSprite(6, true)
@@ -1050,12 +1060,11 @@ Level2: {
       ora #%00001000
       sta TruckActive
 
-/*
-      lda #$10
-      sta SPRITES.X4
-      lda #$cf
-      sta SPRITES.Y4
-*/
+      lda #SPRITES.TANK_TAIL_RI
+      sta SPRITE_5
+      lda #SPRITES.TANK_BODY_RI
+      sta SPRITE_6
+
       lda SPRITES.EXTRA_BIT
       ora #%01100000
       sta SPRITES.EXTRA_BIT
@@ -1084,74 +1093,94 @@ Level2: {
 
     Done:
       rts
-  }
-
-  TankTruckFromLeft: {
-      rts
-  }
-
-  TankTruckFromRight: {
-      rts
-  }
-
-  TankTruckManager: {
-
-
-      rts
 
     CurrentTank: .byte $00
-
-    .label TankXStart = 70
-    .label TankXEnd   = 12
-    .label TankX1BitStart = 1
-    .label TankY      = 71
-
-    LakeStartAddress: .word $4844
   }
 
-  SetTankTruckTrack: {
-      lda TankTruckManager.CurrentTank
-      cmp #$01
-      beq SetRightTank
+  * = * "Level2 TankTruckFromLeft"
+  TankTruckFromLeft: {
+      lda Polluted
+      beq StillGoodLake
+      jmp Done
 
-    SetLeftTank:
-      lda #TankLeftXStart
-      sta TankTruckManager.TankXStart
-      lda #TankLeftXEnd
-      sta TankTruckManager.TankXEnd
+    StillGoodLake:
+      // Lake is not polluted, so a new tank can drive in
+      lda SPRITES.X5
+      cmp #TankLeftXEnd
+      beq DriveInDone
 
-      lda #TankLeftX1BitStart
-      sta TankTruckManager.TankX1BitStart
+      inc SPRITES.X5
+      inc SPRITES.X6
 
-      lda #TankLeftY
-      sta TankTruckManager.TankY
+      CallTankSetPosition(SPRITES.X5, TankLeftY, $0, $0a, $0b);
+      CallTankSetPosition(SPRITES.X6, TankLeftY, $0, $0c, $0d);
 
       jmp Done
 
-    SetRightTank:
-      lda #TankRightXStart
-      sta TankTruckManager.TankXStart
-      lda #TankRightXEnd
-      sta TankTruckManager.TankXEnd
+    DriveInDone:
+      // Walk is done, check if pollution is done, otherwise pollute it
+      lda PollutionCounter
+      cmp #PollutionCounterLimit
+      beq PollutionCompleted
 
-      lda #TankRightX1BitStart
-      sta TankTruckManager.TankX1BitStart
+      inc PollutionCounter
 
-      lda #TankRightY
-      sta TankTruckManager.TankY
+      jmp Done
+
+    PollutionCompleted:
+      // Lake pollution is completed, tank should go out
+      inc Polluted
+
+      lda SPRITES.X5
+      cmp #TankLeftXStart
+      beq DriveOutDone
+
+      dec SPRITES.X5
+      dec SPRITES.X6
+
+      CallTankSetPosition(SPRITES.X5, TankLeftY, $0, $0a, $0b);
+      CallTankSetPosition(SPRITES.X6, TankLeftY, $0, $0c, $0d);
+
+      jmp Done
+
+    DriveOutDone:
+      // Tank is out of screen
+      EnableSprite(5, false)
+      EnableSprite(6, false)
 
     Done:
       rts
 
-// Tank from left
+    Polluted: .byte $00
+
+    PollutionCounter: .byte $00
+
+    .label PollutionCounterLimit = 10
+
     .label TankLeftXStart = 0
-    .label TankLeftXEnd   = 70
+    .label TankLeftXEnd   = 40
     .label TankLeftX1BitStart = 0
-    .label TankLeftY      = 90
+    .label TankLeftY      = 120
     .label TankLeftBodySpriteNum = $67
     .label TankLeftTailSpriteNum = $66
+  }
 
-// Tank from right
+  * = * "Level2 TankTruckFromRight"
+  TankTruckFromRight: {
+      lda Polluted
+      bne Done
+
+/*
+      lda #$01
+      sta HandleTankTruckMove.CurrentTank
+*/
+    Done:
+      rts
+
+    Polluted: .byte $00
+
+    PollutionCounter: .byte $00
+
     .label TankRightXStart = 70
     .label TankRightXEnd   = 24
     .label TankRightX1BitStart = 1
@@ -1177,7 +1206,8 @@ Level2: {
       sta DelayCounter
 
     Waiting:
-      jsr AddEnemy
+      // jsr AddEnemy
+      jsr AddTankTruck
 
       jmp Exit
 
@@ -1238,3 +1268,5 @@ Level2: {
 }
 
 #import "main.asm"
+#import "_label.asm"
+#import "_tanktruck.asm"

@@ -74,10 +74,10 @@ SPRITES: {
   .label HATCHET_REV        = $64
 
 // Level 2 tank, pipe
-  .label TANK_TAIL          = $66
-  .label TANK_BODY          = $67
-  .label TANK_TAIL_REV      = $69
-  .label TANK_BODY_REV      = $68
+  .label TANK_BODY_LE       = $66
+  .label TANK_TAIL_LE       = $67
+  .label TANK_TAIL_RI       = $68
+  .label TANK_BODY_RI       = $69
   .label PIPE_1             = $6a
   .label PIPE_2             = $6b
   .label PIPE_3             = $6c
