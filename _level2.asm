@@ -1155,6 +1155,16 @@ Level2: {
       lda Polluted
       bne DriveOut
 
+      lda #$00
+      sta SpriteCollision.I1 + 1
+      lda SPRITES.X7
+      sta SpriteCollision.I1
+      lda SPRITES.Y7
+      sta SpriteCollision.J1
+      jsr SpriteCollision
+      lda SpriteCollision.Collision
+      bne RangerTankMet
+
       inc PollutionFrameWait
       lda PollutionFrameWait
       lsr
@@ -1190,6 +1200,9 @@ Level2: {
     !Done:
       jmp Done
 
+    RangerTankMet:
+      jmp Done
+
     DriveOut:
       lda TankOut
       bne DriveOutDone
@@ -1215,7 +1228,6 @@ Level2: {
     DriveOutDone:
       // Tank is out of screen
       EnableSprite(5, false)
-      EnableSprite(6, false)
 
     Done:
       rts

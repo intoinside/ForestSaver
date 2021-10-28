@@ -5,7 +5,11 @@ build/*
 maps/*.bin
 .ra/*
 .gradle/*
+.source.txt
 *.dmp
+*.dbg
+*.sym
+*.vs
 *.prg
 *.d64
 *.tmp
