@@ -1118,16 +1118,66 @@ Level2: {
       jmp Done
 
     DriveInDone:
-      // Walk is done, check if pollution is done, otherwise pollute it
+      // Tank is in position, showing pipe
+      lda PipeShown
+      bne Polluting
+
+      lda #SPRITES.PIPE_1
+      sta SPRITE_7
+      sta PollutionFrame
+
+      lda SPRITES.X5
+      clc
+      adc #22
+      sta SPRITES.X7
+
+      lda SPRITES.Y5
+      sta SPRITES.Y7
+
+      EnableSprite(7, true)
+
+      inc PipeShown
+
+      jmp Done
+
+  * = * "Level2 Polluting"
+    Polluting:
+      // Check if pollution is done, otherwise pollute it
+      inc PollutionFrameWait
+      lda PollutionFrameWait
+      lsr
+      lsr
+      lsr
+      lsr
+      lsr
+      bcc !+
+
+      lda #$00
+      sta PollutionFrameWait
+
       lda PollutionCounter
       cmp #PollutionCounterLimit
       beq PollutionCompleted
 
       inc PollutionCounter
 
+      inc PollutionFrame
+      lda PollutionFrame
+      sta SPRITE_7
+
+      cmp #SPRITES.PIPE_4
+      bne !+
+
+      lda #SPRITES.PIPE_1
+      sta PollutionFrame
+
+    !:
       jmp Done
 
     PollutionCompleted:
+      EnableSprite(7, false)
+
+      /*
       // Lake pollution is completed, tank should go out
       inc Polluted
 
@@ -1140,7 +1190,7 @@ Level2: {
 
       CallTankSetPosition(SPRITES.X5, TankLeftY, $0, $0a, $0b);
       CallTankSetPosition(SPRITES.X6, TankLeftY, $0, $0c, $0d);
-
+      */
       jmp Done
 
     DriveOutDone:
@@ -1151,14 +1201,17 @@ Level2: {
     Done:
       rts
 
+    PipeShown: .byte $00
     Polluted: .byte $00
 
     PollutionCounter: .byte $00
+    PollutionFrame: .byte $00
+    PollutionFrameWait: .byte $01
 
-    .label PollutionCounterLimit = 10
+    .label PollutionCounterLimit = 20
 
     .label TankLeftXStart = 0
-    .label TankLeftXEnd   = 40
+    .label TankLeftXEnd   = 42
     .label TankLeftX1BitStart = 0
     .label TankLeftY      = 120
     .label TankLeftBodySpriteNum = $67
@@ -1167,19 +1220,14 @@ Level2: {
 
   * = * "Level2 TankTruckFromRight"
   TankTruckFromRight: {
-      lda Polluted
-      bne Done
 
-/*
-      lda #$01
-      sta HandleTankTruckMove.CurrentTank
-*/
     Done:
       rts
 
+    PipeShown: .byte $00
     Polluted: .byte $00
 
-    PollutionCounter: .byte $00
+    PollutionCounter: .byte SPRITES.PIPE_1
 
     .label TankRightXStart = 70
     .label TankRightXEnd   = 24
@@ -1200,7 +1248,7 @@ Level2: {
       jmp Exit
 
     DelayTriggered:
-      // inc $4410
+      // inc $4810
 
       lda DelayRequested      // delay reached 0, reset it
       sta DelayCounter
@@ -1230,7 +1278,7 @@ Level2: {
       jmp Exit
 
     DelayTriggered:
-      // inc $4411
+      // inc $4811
 
       lda DelayRequested      // delay reached 0, reset it
       sta DelayCounter
@@ -1264,6 +1312,7 @@ Level2: {
 // Tank tail and body sprite pointer
   .label SPRITE_5     = $4bfd
   .label SPRITE_6     = $4bfe
+  .label SPRITE_7     = $4bff
 
 }
 
