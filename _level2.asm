@@ -1099,22 +1099,31 @@ Level2: {
 
   * = * "Level2 TankTruckFromLeft"
   TankTruckFromLeft: {
-      lda Polluted
-      beq StillGoodLake
+      lda LakeNotAvailable
+      beq LakeGood
       jmp Done
 
-    StillGoodLake:
+    LakeGood:
       // Lake is not polluted, so a new tank can drive in
+      lda TankIn
+      bne DriveInDone
+
       lda SPRITES.X5
       cmp #TankLeftXEnd
-      beq DriveInDone
+      bne !+
+      jmp !Update+
 
+    !:
       inc SPRITES.X5
       inc SPRITES.X6
 
       CallTankSetPosition(SPRITES.X5, TankLeftY, $0, $0a, $0b);
       CallTankSetPosition(SPRITES.X6, TankLeftY, $0, $0c, $0d);
+      jmp !End+
 
+    !Update:
+      inc TankIn
+    !End:
       jmp Done
 
     DriveInDone:
@@ -1143,6 +1152,9 @@ Level2: {
   * = * "Level2 Polluting"
     Polluting:
       // Check if pollution is done, otherwise pollute it
+      lda Polluted
+      bne DriveOut
+
       inc PollutionFrameWait
       lda PollutionFrameWait
       lsr
@@ -1150,15 +1162,19 @@ Level2: {
       lsr
       lsr
       lsr
-      bcc !+
+      bcc !Done+
 
       lda #$00
       sta PollutionFrameWait
 
       lda PollutionCounter
       cmp #PollutionCounterLimit
-      beq PollutionCompleted
+      bne !+
+      inc Polluted
+      EnableSprite(7, false)
+      jmp Done
 
+    !:
       inc PollutionCounter
 
       inc PollutionFrame
@@ -1166,31 +1182,34 @@ Level2: {
       sta SPRITE_7
 
       cmp #SPRITES.PIPE_4
-      bne !+
+      bne !Done+
 
       lda #SPRITES.PIPE_1
       sta PollutionFrame
 
-    !:
+    !Done:
       jmp Done
 
-    PollutionCompleted:
-      EnableSprite(7, false)
+    DriveOut:
+      lda TankOut
+      bne DriveOutDone
 
-      /*
       // Lake pollution is completed, tank should go out
-      inc Polluted
 
       lda SPRITES.X5
       cmp #TankLeftXStart
       beq DriveOutDone
 
-      dec SPRITES.X5
       dec SPRITES.X6
+      bne !DecOtherSprite+
+      EnableSprite(6, false)
+
+    !DecOtherSprite:
+      dec SPRITES.X5
 
       CallTankSetPosition(SPRITES.X5, TankLeftY, $0, $0a, $0b);
       CallTankSetPosition(SPRITES.X6, TankLeftY, $0, $0c, $0d);
-      */
+
       jmp Done
 
     DriveOutDone:
@@ -1201,7 +1220,10 @@ Level2: {
     Done:
       rts
 
+    LakeNotAvailable: .byte $00
     PipeShown: .byte $00
+    TankIn: .byte $00
+    TankOut: .byte $00
     Polluted: .byte $00
 
     PollutionCounter: .byte $00
