@@ -371,7 +371,6 @@ Level2: {
       lda SPRITES.Y1
       sta SpriteCollision.J1
       jsr SpriteCollision
-      lda SpriteCollision.Collision
       bne RangerWoodCutterMet
 
       lda #<SPRITE_1
@@ -740,7 +739,6 @@ Level2: {
       lda SPRITES.Y3
       sta SpriteCollision.J1
       jsr SpriteCollision
-      lda SpriteCollision.Collision
       bne RangerWoodCutterMet
 
       lda #<SPRITE_3
@@ -1153,8 +1151,15 @@ Level2: {
     Polluting:
       // Check if pollution is done, otherwise pollute it
       lda Polluted
-      bne DriveOut
+      bne !DriveOut+
+      lda TankFined
+      bne !DriveOut+
+      jmp !Proceed+
 
+    !DriveOut:
+      jmp DriveOut
+
+    !Proceed:
       lda #$00
       sta SpriteCollision.I1 + 1
       lda SPRITES.X7
@@ -1162,7 +1167,6 @@ Level2: {
       lda SPRITES.Y7
       sta SpriteCollision.J1
       jsr SpriteCollision
-      lda SpriteCollision.Collision
       bne RangerTankMet
 
       inc PollutionFrameWait
@@ -1181,7 +1185,10 @@ Level2: {
       cmp #PollutionCounterLimit
       bne !+
       inc Polluted
+
       EnableSprite(7, false)
+
+      jsr Hud.ReduceDismissalCounter
       jmp Done
 
     !:
@@ -1201,6 +1208,10 @@ Level2: {
       jmp Done
 
     RangerTankMet:
+      AddPoints(0, 0, 2, 0);
+
+      inc TankFined
+      EnableSprite(7, false)
       jmp Done
 
     DriveOut:
@@ -1208,7 +1219,6 @@ Level2: {
       bne DriveOutDone
 
       // Lake pollution is completed, tank should go out
-
       lda SPRITES.X5
       cmp #TankLeftXStart
       beq DriveOutDone
@@ -1236,6 +1246,7 @@ Level2: {
     PipeShown: .byte $00
     TankIn: .byte $00
     TankOut: .byte $00
+    TankFined: .byte $00
     Polluted: .byte $00
 
     PollutionCounter: .byte $00

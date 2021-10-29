@@ -363,7 +363,6 @@ SpriteCollision: {
     lda #$00
 
   Done:
-    sta Collision
     rts
 
 // Woodcutter square
@@ -375,8 +374,6 @@ SpriteCollision: {
 // Other sprite initial coordinate
   I1: .word $0000
   J1: .word $0000
-
-  Collision: .byte $00
 }
 
 * = * "Utils BackgroundCollision"

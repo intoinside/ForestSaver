@@ -362,7 +362,6 @@ Level1: {
       lda SPRITES.Y1
       sta SpriteCollision.J1
       jsr SpriteCollision
-      lda SpriteCollision.Collision
       bne RangerWoodCutterMet
 
       lda #<SPRITE_1
@@ -763,7 +762,6 @@ Level1: {
       lda SPRITES.Y3
       sta SpriteCollision.J1
       jsr SpriteCollision
-      lda SpriteCollision.Collision
       bne RangerWoodCutterMet
 
       lda #<SPRITE_3
