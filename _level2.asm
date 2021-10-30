@@ -1188,6 +1188,13 @@ Level2: {
 
       EnableSprite(7, false)
 
+      lda #$97
+      sta SetLakeToBlack.StartAddress
+      lda #$49
+      sta SetLakeToBlack.StartAddress + 1
+      jsr SetLakeToBlack
+      jsr AddColorToMap
+
       jsr Hud.ReduceDismissalCounter
       jmp Done
 

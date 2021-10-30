@@ -306,6 +306,44 @@ DisableAllSprites: {
   end:
 }
 
+* = * "Utils SetLakeToBlack"
+SetLakeToBlack: {
+    lda StartAddress
+    sta Loop1 + 1
+    lda StartAddress + 1
+    sta Loop1 + 2
+
+    ldx #$00
+    lda #$a5
+  Loop1:
+    sta StartAddress, x
+    clc
+    adc #$01
+    inx
+    cpx #$04
+    bne Loop1
+
+    c64lib_add16($0028, StartAddress)
+    lda StartAddress
+    sta Loop2 + 1
+    lda StartAddress + 1
+    sta Loop2 + 2
+
+    ldx #$00
+    lda #$a9
+  Loop2:
+    sta StartAddress, x
+    clc
+    adc #$01
+    inx
+    cpx #$04
+    bne Loop2
+
+    rts
+
+  StartAddress: .word $beef
+}
+
 * = * "Utils SpriteCollision"
 SpriteCollision: {
     lda #%00000001
