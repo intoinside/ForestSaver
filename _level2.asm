@@ -1034,6 +1034,9 @@ Level2: {
       ora #%00000100
       sta TruckActive
 
+      lda TankTruckFromLeft.LakeNotAvailable
+      bne Done
+
       lda #SPRITES.TANK_TAIL_LE
       sta SPRITE_5
       lda #SPRITES.TANK_BODY_LE
@@ -1044,9 +1047,6 @@ Level2: {
       clc
       adc #24
       sta SPRITES.X5
-
-      EnableSprite(5, true)
-      EnableSprite(6, true)
 
       jmp Done
 
@@ -1099,9 +1099,17 @@ Level2: {
   TankTruckFromLeft: {
       lda LakeNotAvailable
       beq LakeGood
-      jmp Done
+      jmp CleanForNextRun
 
     LakeGood:
+      // Setting up tank sprites
+      lda SpritesCreated
+      bne TankDrivingIn
+      inc SpritesCreated
+      EnableSprite(5, true)
+      EnableSprite(6, true)
+
+    TankDrivingIn:
       // Lake is not polluted, so a new tank can drive in
       lda TankIn
       bne DriveInDone
@@ -1246,11 +1254,38 @@ Level2: {
       // Tank is out of screen
       EnableSprite(5, false)
 
+    CleanForNextRun:
+      lda AddTankTruck.TruckActive
+      and #%11111011
+      sta AddTankTruck.TruckActive
+
+      lda Polluted
+      bne SetLakeNotAvailable
+
+      lda #$00
+      sta PollutionCounter
+      sta PollutionFrame
+      sta PipeShown
+      sta SpritesCreated
+      sta TankIn
+      sta TankOut
+      sta TankFined
+
+      lda #$01
+      sta PollutionFrameWait
+
+      jmp Done
+
+    SetLakeNotAvailable:
+      lda Polluted
+      sta LakeNotAvailable
+
     Done:
       rts
 
     LakeNotAvailable: .byte $00
     PipeShown: .byte $00
+    SpritesCreated: .byte $00
     TankIn: .byte $00
     TankOut: .byte $00
     TankFined: .byte $00
