@@ -925,7 +925,7 @@ Level2: {
     TreeStartAddress: .word $beef
   }
 
-    * = * "Level2 SetRightWoodCutterTrack"
+  * = * "Level2 SetRightWoodCutterTrack"
   SetRightWoodCutterTrack: {
       lda WoodCutterFromRight.CurrentWoodCutter
       cmp #$01
@@ -977,7 +977,6 @@ Level2: {
       sta WoodCutterFromRight.TreeStartAddress + 1
 
     Done:
-
       lda WoodCutterFromRight.TrackWalkXStart
       sta SPRITES.X3
       lda WoodCutterFromRight.TrackWalkY
@@ -1012,18 +1011,18 @@ Level2: {
       beq !+
       jmp Done
 
-    !:
-      /*
-      GetRandomUpTo(6)
+      lda TruckActive
+      bne Done
 
+    !:
+      GetRandomUpTo(6)
+/*
       cmp #$02
       beq StartTankTruckFromLeft
-      */
-      jmp StartTankTruckFromLeft
-/*
+*/
       cmp #$03
       beq StartTankTruckFromRight
-*/
+
       jmp Done
 
     StartTankTruckFromLeft:
@@ -1058,18 +1057,24 @@ Level2: {
       ora #%00001000
       sta TruckActive
 
+      lda TankTruckFromRight.LakeNotAvailable
+      bne Done
+
       lda #SPRITES.TANK_TAIL_RI
       sta SPRITE_5
       lda #SPRITES.TANK_BODY_RI
       sta SPRITE_6
 
+      lda #TankTruckFromRight.TankRightXStart
+      sta SPRITES.X6
+      clc
+      sbc #24
+      sta SPRITES.X5
+/*
       lda SPRITES.EXTRA_BIT
       ora #%01100000
       sta SPRITES.EXTRA_BIT
-
-      EnableSprite(5, true)
-      EnableSprite(6, true)
-
+*/
     Done:
       rts
 
@@ -1155,7 +1160,6 @@ Level2: {
 
       jmp Done
 
-  * = * "Level2 Polluting"
     Polluting:
       // Check if pollution is done, otherwise pollute it
       lda Polluted
@@ -1295,7 +1299,7 @@ Level2: {
     PollutionFrame: .byte $00
     PollutionFrameWait: .byte $01
 
-    .label PollutionCounterLimit = 20
+    .label PollutionCounterLimit = 10
 
     .label TankLeftXStart = 0
     .label TankLeftXEnd   = 42
@@ -1307,19 +1311,213 @@ Level2: {
 
   * = * "Level2 TankTruckFromRight"
   TankTruckFromRight: {
+      lda LakeNotAvailable
+      beq LakeGood
+      jmp CleanForNextRun
+
+    LakeGood:
+      // Setting up tank sprites
+      lda SpritesCreated
+      bne TankDrivingIn
+      inc SpritesCreated
+      EnableSprite(5, true)
+      EnableSprite(6, true)
+
+    TankDrivingIn:
+      // Lake is not polluted, so a new tank can drive in
+      lda TankIn
+      bne DriveInDone
+
+      lda SPRITES.X5
+      cmp #TankRightXEnd
+      bne !+
+      jmp !Update+
+
+    !:
+      dec SPRITES.X5
+      dec SPRITES.X6
+
+      CallTankSetPosition(SPRITES.X5, TankRightY, $1, $0a, $0b);
+      CallTankSetPosition(SPRITES.X6, TankRightY, $1, $0c, $0d);
+      jmp !End+
+
+    !Update:
+      inc TankIn
+    !End:
+      jmp Done
+
+    DriveInDone:
+      // Tank is in position, showing pipe
+      lda PipeShown
+      bne Polluting
+
+      lda #SPRITES.PIPE_1_R
+      sta SPRITE_7
+      sta PollutionFrame
+
+      lda SPRITES.X5
+      clc
+      sbc #22
+      sta SPRITES.X7
+
+      lda SPRITES.Y5
+      sta SPRITES.Y7
+
+      lda SPRITES.EXTRA_BIT
+      ora #%10000000
+      sta SPRITES.EXTRA_BIT
+
+      EnableSprite(7, true)
+
+      inc PipeShown
+
+      jmp Done
+
+    Polluting:
+      // Check if pollution is done, otherwise pollute it
+      lda Polluted
+      bne !DriveOut+
+      lda TankFined
+      bne !DriveOut+
+      jmp !Proceed+
+
+    !DriveOut:
+      jmp DriveOut
+
+    !Proceed:
+      lda #$00
+      sta SpriteCollision.I1 + 1
+      lda SPRITES.X7
+      sta SpriteCollision.I1
+      lda SPRITES.Y7
+      sta SpriteCollision.J1
+      jsr SpriteCollision
+      bne RangerTankMet
+
+      inc PollutionFrameWait
+      lda PollutionFrameWait
+      lsr
+      lsr
+      lsr
+      lsr
+      lsr
+      bcc !Done+
+
+      lda #$00
+      sta PollutionFrameWait
+
+      lda PollutionCounter
+      cmp #PollutionCounterLimit
+      bne !+
+      inc Polluted
+
+      EnableSprite(7, false)
+
+      lda #$84
+      sta SetLakeToBlack.StartAddress
+      lda #$49
+      sta SetLakeToBlack.StartAddress + 1
+      jsr SetLakeToBlack
+      jsr AddColorToMap
+
+      jsr Hud.ReduceDismissalCounter
+      jmp Done
+
+    !:
+      inc PollutionCounter
+
+      inc PollutionFrame
+      lda PollutionFrame
+      sta SPRITE_7
+
+      cmp #SPRITES.PIPE_4_R
+      bne !Done+
+
+      lda #SPRITES.PIPE_1_R
+      sta PollutionFrame
+
+    !Done:
+      jmp Done
+
+    RangerTankMet:
+      AddPoints(0, 0, 2, 0);
+
+      inc TankFined
+      EnableSprite(7, false)
+      jmp Done
+
+    DriveOut:
+      lda TankOut
+      bne DriveOutDone
+
+      // Lake pollution is completed, tank should go out
+      lda SPRITES.X5
+      cmp #TankRightXStart
+      beq DriveOutDone
+
+      inc SPRITES.X6
+      bne !DecOtherSprite+
+      EnableSprite(6, false)
+
+    !DecOtherSprite:
+      inc SPRITES.X5
+
+      CallTankSetPosition(SPRITES.X5, TankRightY, $1, $0a, $0b);
+      CallTankSetPosition(SPRITES.X6, TankRightY, $1, $0c, $0d);
+
+      jmp Done
+
+    DriveOutDone:
+      // Tank is out of screen
+      EnableSprite(5, false)
+
+    CleanForNextRun:
+      lda AddTankTruck.TruckActive
+      and #%11110111
+      sta AddTankTruck.TruckActive
+
+      lda Polluted
+      bne SetLakeNotAvailable
+
+      lda #$00
+      sta PollutionCounter
+      sta PollutionFrame
+      sta PipeShown
+      sta SpritesCreated
+      sta TankIn
+      sta TankOut
+      sta TankFined
+
+      lda #$01
+      sta PollutionFrameWait
+
+      jmp Done
+
+    SetLakeNotAvailable:
+      lda Polluted
+      sta LakeNotAvailable
 
     Done:
       rts
 
+    LakeNotAvailable: .byte $00
     PipeShown: .byte $00
+    SpritesCreated: .byte $00
+    TankIn: .byte $00
+    TankOut: .byte $00
+    TankFined: .byte $00
     Polluted: .byte $00
 
-    PollutionCounter: .byte SPRITES.PIPE_1
+    PollutionCounter: .byte $00
+    PollutionFrame: .byte $00
+    PollutionFrameWait: .byte $01
+
+    .label PollutionCounterLimit = 10
 
     .label TankRightXStart = 70
-    .label TankRightXEnd   = 24
+    .label TankRightXEnd   = 40
     .label TankRightX1BitStart = 1
-    .label TankRightY      = 80
+    .label TankRightY      = 110
     .label TankRightBodySpriteNum = $68
     .label TankRightTailSpriteNum = $69
   }

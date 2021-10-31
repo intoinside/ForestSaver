@@ -76,12 +76,16 @@ SPRITES: {
 // Level 2 tank, pipe
   .label TANK_BODY_LE       = $66
   .label TANK_TAIL_LE       = $67
-  .label TANK_TAIL_RI       = $68
-  .label TANK_BODY_RI       = $69
-  .label PIPE_1             = $6a
-  .label PIPE_2             = $6b
-  .label PIPE_3             = $6c
-  .label PIPE_4             = $6d
+  .label PIPE_1             = $68
+  .label PIPE_2             = $69
+  .label PIPE_3             = $6a
+  .label PIPE_4             = $6b
+  .label TANK_TAIL_RI       = $6c
+  .label TANK_BODY_RI       = $6d
+  .label PIPE_1_R           = $6e
+  .label PIPE_2_R           = $6f
+  .label PIPE_3_R           = $70
+  .label PIPE_4_R           = $71
 
 // Level 3
 // TBD
