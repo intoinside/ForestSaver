@@ -639,7 +639,7 @@ HandleWoodCutterFinedOut: {
   MapComplain:      .word $4569 //, $456a, $456b, $4591, $4592, $4593
 }
 
-* = * "SetColorToChars"
+* = * "Utils SetColorToChars"
 SetColorToChars: {
     lda ScreenMemoryAddress
     sta Dummy1 + 2
