@@ -127,10 +127,11 @@ Level2: {
       lda #$01
       sta SPRITES.COLOR5
       sta SPRITES.COLOR6
+      lda #$03
+      sta SPRITES.COLOR7
 
 // Enable the first sprite (ranger)
-      lda #%00000001
-      sta VIC.SPRITE_ENABLE
+      EnableSprite(0, true)
 
       GetRandomUpTo(2)
       sta WoodCutterFromLeft.CurrentWoodCutter
@@ -140,10 +141,6 @@ Level2: {
       jsr SetLeftWoodCutterTrack
       jsr SetRightWoodCutterTrack
 
-      GetRandomUpTo(2)
-      sta HandleTankTruckMove.CurrentTank
-//      jsr SetTankTruckTrack
-
       rts
   }
 
@@ -151,8 +148,9 @@ Level2: {
   Finalize: {
       CopyScreenRam(MapDummyArea, $4800)
 
+      jsr DisableAllSprites
+
       lda #$00
-      sta VIC.SPRITE_ENABLE
       sta AddEnemy.EnemyActive
       sta WoodCutterFromLeft.WoodCutterFined
       sta WoodCutterFromLeft.ComplaintShown
@@ -172,14 +170,23 @@ Level2: {
       sta WoodCutterFromRight.TreeAlreadyCut
       sta WoodCutterFromRight.TreeAlreadyCut + 1
 
+      sta AddTankTruck.TruckActive
+
+      sta TankTruckFromLeft.LakeNotAvailable
+      sta TankTruckFromLeft.Polluted
+
+      sta TankTruckFromRight.LakeNotAvailable
+      sta TankTruckFromRight.Polluted
+
       sta Hud.ReduceDismissalCounter.DismissalCompleted
+
+      jsr CleanTankLeft
+      jsr CleanTankRight
 
       jsr CompareAndUpdateHiScore
 
       jsr Hud.ResetScore
       jsr Hud.ResetDismissalCounter
-
-      jsr DisableAllSprites
 
       rts
   }
@@ -1011,30 +1018,27 @@ Level2: {
       beq !+
       jmp Done
 
+    !:
+// If there is already a truck active, no new truck is needed
       lda TruckActive
       bne Done
 
-    !:
       GetRandomUpTo(6)
-/*
-      cmp #$02
+
+      cmp #$01
       beq StartTankTruckFromLeft
-*/
-      cmp #$03
+
+      cmp #$02
       beq StartTankTruckFromRight
 
       jmp Done
 
     StartTankTruckFromLeft:
-      lda TruckActive
-      and #%00000100
-      bne Done
-      lda TruckActive
-      ora #%00000100
-      sta TruckActive
-
       lda TankTruckFromLeft.LakeNotAvailable
       bne Done
+
+      lda #$01
+      sta TruckActive
 
       lda #SPRITES.TANK_TAIL_LE
       sta SPRITE_5
@@ -1050,15 +1054,11 @@ Level2: {
       jmp Done
 
     StartTankTruckFromRight:
-      lda TruckActive
-      and #%00001000
-      bne Done
-      lda TruckActive
-      ora #%00001000
-      sta TruckActive
-
       lda TankTruckFromRight.LakeNotAvailable
       bne Done
+
+      lda #$02
+      sta TruckActive
 
       lda #SPRITES.TANK_TAIL_RI
       sta SPRITE_5
@@ -1070,11 +1070,7 @@ Level2: {
       clc
       sbc #24
       sta SPRITES.X5
-/*
-      lda SPRITES.EXTRA_BIT
-      ora #%01100000
-      sta SPRITES.EXTRA_BIT
-*/
+
     Done:
       rts
 
@@ -1084,20 +1080,19 @@ Level2: {
   * = * "Level2 HandleTankTruckMove"
   HandleTankTruckMove: {
       lda AddTankTruck.TruckActive
-      and #%00000100
-      beq IsTruckFromRightAlive
+      cmp #$01
+      bne IsTruckFromRightAlive
       jsr TankTruckFromLeft
+      jmp Done
 
     IsTruckFromRightAlive:
       lda AddTankTruck.TruckActive
-      and #%00001000
-      beq Done
+      cmp #$02
+      bne Done
       jsr TankTruckFromRight
 
     Done:
       rts
-
-    CurrentTank: .byte $00
   }
 
   * = * "Level2 TankTruckFromLeft"
@@ -1153,6 +1148,10 @@ Level2: {
 
       lda SPRITES.Y5
       sta SPRITES.Y7
+
+      lda SPRITES.EXTRA_BIT
+      and #%00011111
+      sta SPRITES.EXTRA_BIT
 
       EnableSprite(7, true)
 
@@ -1257,30 +1256,14 @@ Level2: {
     DriveOutDone:
       // Tank is out of screen
       EnableSprite(5, false)
+      inc TankOut
 
     CleanForNextRun:
-      lda AddTankTruck.TruckActive
-      and #%11111011
+      lda #$00
       sta AddTankTruck.TruckActive
 
-      lda Polluted
-      bne SetLakeNotAvailable
+      jsr CleanTankLeft
 
-      lda #$00
-      sta PollutionCounter
-      sta PollutionFrame
-      sta PipeShown
-      sta SpritesCreated
-      sta TankIn
-      sta TankOut
-      sta TankFined
-
-      lda #$01
-      sta PollutionFrameWait
-
-      jmp Done
-
-    SetLakeNotAvailable:
       lda Polluted
       sta LakeNotAvailable
 
@@ -1307,6 +1290,24 @@ Level2: {
     .label TankLeftY      = 120
     .label TankLeftBodySpriteNum = $67
     .label TankLeftTailSpriteNum = $66
+  }
+
+  * = * "Level2 CleanTankLeft"
+  CleanTankLeft: {
+      lda #$00
+      sta TankTruckFromLeft.PipeShown
+      sta TankTruckFromLeft.SpritesCreated
+      sta TankTruckFromLeft.TankIn
+      sta TankTruckFromLeft.TankOut
+      sta TankTruckFromLeft.TankFined
+
+      sta TankTruckFromLeft.PollutionCounter
+      sta TankTruckFromLeft.PollutionFrame
+
+      lda #$01
+      sta TankTruckFromLeft.PollutionFrameWait
+
+      rts
   }
 
   * = * "Level2 TankTruckFromRight"
@@ -1364,7 +1365,7 @@ Level2: {
       sta SPRITES.Y7
 
       lda SPRITES.EXTRA_BIT
-      ora #%10000000
+      ora #%11100000
       sta SPRITES.EXTRA_BIT
 
       EnableSprite(7, true)
@@ -1450,36 +1451,32 @@ Level2: {
       lda TankOut
       bne DriveOutDone
 
-      // Lake pollution is completed, tank should go out
-      lda SPRITES.X5
-      cmp #TankRightXStart
-      beq DriveOutDone
-
       inc SPRITES.X6
+      CallTankSetPosition(SPRITES.X6, TankRightY, $1, $0c, $0d);
+      lda SPRITES.X6
+      cmp #TankRightXStart
       bne !DecOtherSprite+
       EnableSprite(6, false)
 
     !DecOtherSprite:
       inc SPRITES.X5
-
       CallTankSetPosition(SPRITES.X5, TankRightY, $1, $0a, $0b);
-      CallTankSetPosition(SPRITES.X6, TankRightY, $1, $0c, $0d);
-
+      lda SPRITES.X5
+      cmp #TankRightXStart
+      beq DriveOutDone
       jmp Done
 
     DriveOutDone:
-      // Tank is out of screen
       EnableSprite(5, false)
+      inc TankOut
+      jmp Done
 
     CleanForNextRun:
-      lda AddTankTruck.TruckActive
-      and #%11110111
+      lda #$00
       sta AddTankTruck.TruckActive
 
-      lda Polluted
-      bne SetLakeNotAvailable
+      jsr CleanTankRight
 
-      lda #$00
       sta PollutionCounter
       sta PollutionFrame
       sta PipeShown
@@ -1491,9 +1488,6 @@ Level2: {
       lda #$01
       sta PollutionFrameWait
 
-      jmp Done
-
-    SetLakeNotAvailable:
       lda Polluted
       sta LakeNotAvailable
 
@@ -1522,6 +1516,24 @@ Level2: {
     .label TankRightTailSpriteNum = $69
   }
 
+  * = * "Level2 CleanTankRight"
+  CleanTankRight: {
+      lda #$00
+      sta TankTruckFromRight.PipeShown
+      sta TankTruckFromRight.SpritesCreated
+      sta TankTruckFromRight.TankIn
+      sta TankTruckFromRight.TankOut
+      sta TankTruckFromRight.TankFined
+
+      sta TankTruckFromRight.PollutionCounter
+      sta TankTruckFromRight.PollutionFrame
+
+      lda #$01
+      sta TankTruckFromRight.PollutionFrameWait
+
+      rts
+  }
+
   * = * "Level2 TimedRoutine"
   TimedRoutine: {
       jsr TimedRoutine10th
@@ -1539,7 +1551,7 @@ Level2: {
       sta DelayCounter
 
     Waiting:
-      // jsr AddEnemy
+      jsr AddEnemy
       jsr AddTankTruck
 
       jmp Exit

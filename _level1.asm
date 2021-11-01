@@ -122,8 +122,7 @@ Level1: {
       sta SPRITES.COLOR4
 
 // Enable the first sprite (ranger)
-      lda #%00000001
-      sta VIC.SPRITE_ENABLE
+      EnableSprite(0, true)
 
       GetRandomUpTo(3)
       sta WoodCutterFromLeft.CurrentWoodCutter
@@ -140,8 +139,9 @@ Level1: {
   Finalize: {
       CopyScreenRam(MapDummyArea, $4400)
 
+      jsr DisableAllSprites
+
       lda #$00
-      sta VIC.SPRITE_ENABLE
       sta AddEnemy.EnemyActive
       sta WoodCutterFromLeft.WoodCutterFined
       sta WoodCutterFromLeft.ComplaintShown
@@ -169,8 +169,6 @@ Level1: {
 
       jsr Hud.ResetScore
       jsr Hud.ResetDismissalCounter
-
-      jsr DisableAllSprites
 
       rts
   }
