@@ -104,8 +104,6 @@ Hud: {
       jsr DrawScore
       rts
 
-    CurrentScore: .byte $00, $00, $00, $00
-
     Points: .byte $00, $00, $00, $00
   }
 
@@ -114,7 +112,7 @@ Hud: {
       ldx #$04
       lda #$00
     !:
-      sta AddScore.CurrentScore, x
+      sta CurrentScore, x
       dex
       bne !-
 
@@ -125,7 +123,7 @@ Hud: {
   DrawScore: {
       ldx #$00
     !:
-      lda AddScore.CurrentScore, x
+      lda CurrentScore, x
       adc #ZeroChar
       sta ScoreLabel + $07, x
       inx
@@ -216,6 +214,8 @@ Hud: {
 
       .label DismissalPtr = $beef
   }
+
+  CurrentScore: .byte $00, $00, $00, $00
 
   // "SCORE: 0000"
   ScoreLabel: .byte $14, $04, $10, $13, $06, $34, $00
