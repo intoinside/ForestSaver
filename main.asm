@@ -36,17 +36,17 @@ GameEnded:          // $00 - Game in progress
 GamePlay: {
     jsr Intro.Manager
 
-/*
+// Play on level 1
     jsr Level1.Manager
-
     lda GameEnded
     bne GamePlay
-*/
+
+// Play on level 2
     jsr Level2.Manager
-
+    /*
     lda GameEnded
     bne GamePlay
-
+    */
     jmp GamePlay
 }
 

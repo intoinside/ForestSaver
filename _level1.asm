@@ -34,9 +34,18 @@ Level1: {
       jsr Ranger.HandleRangerMove
       jsr HandleEnemyMove
 
+      jsr CheckLevelCompleted
+      bne CloseLevelAndGotoNext
+
       lda GameEnded
       bne CloseLevelAndGame
 
+      jmp EndLoop
+
+    CloseLevelAndGotoNext:
+      SetSpriteToBackground()
+      lda FirePressed
+      bne LevelDone
       jmp EndLoop
 
     CloseLevelAndGame:
@@ -56,6 +65,9 @@ Level1: {
   * = * "Level1 Init"
   Init: {
       CopyScreenRam($4400, MapDummyArea)
+
+      lda #$44
+      sta ShowGameNextLevelMessage.StartAddress + 1
 
       SetSpriteToForeground()
 // Set background and border color to brown
@@ -142,6 +154,7 @@ Level1: {
       jsr DisableAllSprites
 
       lda #$00
+      sta LevelCompleted
       sta AddEnemy.EnemyActive
       sta WoodCutterFromLeft.WoodCutterFined
       sta WoodCutterFromLeft.ComplaintShown
@@ -165,11 +178,28 @@ Level1: {
 
       sta Hud.ReduceDismissalCounter.DismissalCompleted
 
+      sta ShowGameNextLevelMessage.IsShown
+
       jsr CompareAndUpdateHiScore
 
       jsr Hud.ResetScore
       jsr Hud.ResetDismissalCounter
 
+      rts
+  }
+
+  * = * "Level1 CheckLevelCompleted"
+  CheckLevelCompleted: {
+      lda Hud.CurrentScore + 2  // THIS SHOULD BE lda Hud.CurrentScore + 1
+      beq Done
+      lda ShowGameNextLevelMessage.IsShown
+      bne Done
+
+      inc LevelCompleted
+
+      jsr ShowGameNextLevelMessage
+
+    Done:
       rts
   }
 
@@ -266,8 +296,12 @@ Level1: {
       jsr HandleWoodCutterFined
       inc ComplaintShown
 
+      lda LevelCompleted
+      bne !+
+
       AddPoints(0, 0, 1, 0);
 
+    !:
       jmp Done
 
     CutCompletedCheck:
@@ -404,6 +438,9 @@ Level1: {
       ldx CurrentWoodCutter
       lda #$01
       sta TreeAlreadyCut, x
+
+      lda LevelCompleted
+      bne !+
 
       lda GameEnded
       bne !+
@@ -652,8 +689,12 @@ Level1: {
       jsr HandleWoodCutterFined
       inc ComplaintShown
 
+      lda LevelCompleted
+      bne !+
+
       AddPoints(0, 0, 1, 0);
 
+    !:
       jmp Done
 
     CutCompletedCheck:
@@ -804,6 +845,9 @@ Level1: {
       ldx CurrentWoodCutter
       lda #$01
       sta TreeAlreadyCut, x
+
+      lda LevelCompleted
+      bne !+
 
       lda GameEnded
       bne !+
@@ -1124,6 +1168,8 @@ Level1: {
 
       rts
   }
+
+  LevelCompleted: .byte $00
 
 // Hatchet sprite pointer
   .label SPRITE_1     = $47f9
