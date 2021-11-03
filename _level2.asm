@@ -509,7 +509,7 @@ Level2: {
     TreeAlreadyCut: .byte $00, $00
 
     // Number of strokes to cut tree
-    .label HatchetStrokesMax = 18
+    .label HatchetStrokesMax = 20
     HatchetStrokes: .byte HatchetStrokesMax
 
     HatchetFrame:
@@ -896,7 +896,7 @@ Level2: {
     TreeAlreadyCut: .byte $00, $00
 
     // Number of strokes to cut tree
-    .label HatchetStrokesMax = 18
+    .label HatchetStrokesMax = 20
     HatchetStrokes:
       .byte HatchetStrokesMax
 
@@ -1283,7 +1283,7 @@ Level2: {
     PollutionFrame: .byte $00
     PollutionFrameWait: .byte $01
 
-    .label PollutionCounterLimit = 10
+    .label PollutionCounterLimit = 20
 
     .label TankLeftXStart = 0
     .label TankLeftXEnd   = 42
@@ -1507,7 +1507,7 @@ Level2: {
     PollutionFrame: .byte $00
     PollutionFrameWait: .byte $01
 
-    .label PollutionCounterLimit = 10
+    .label PollutionCounterLimit = 20
 
     .label TankRightXStart = 70
     .label TankRightXEnd   = 40

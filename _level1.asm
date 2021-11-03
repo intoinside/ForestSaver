@@ -189,7 +189,7 @@ Level1: {
 
   * = * "Level1 CheckLevelCompleted"
   CheckLevelCompleted: {
-      lda Hud.CurrentScore + 2  // THIS SHOULD BE lda Hud.CurrentScore + 1
+      lda Hud.CurrentScore + 1
       beq Done
       lda ShowGameNextLevelMessage.IsShown
       bne Done
@@ -531,7 +531,7 @@ Level1: {
     TreeAlreadyCut: .byte $00, $00, $00
 
     // Number of strokes to cut tree
-    .label HatchetStrokesMax = 18
+    .label HatchetStrokesMax = 20
     HatchetStrokes: .byte HatchetStrokesMax
 
     HatchetFrame:
@@ -955,7 +955,7 @@ Level1: {
     TreeAlreadyCut: .byte $00, $00, $00
 
     // Number of strokes to cut tree
-    .label HatchetStrokesMax = 18
+    .label HatchetStrokesMax = 20
     HatchetStrokes:
       .byte HatchetStrokesMax
 
