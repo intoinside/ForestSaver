@@ -109,7 +109,7 @@ Hud: {
 
   * = * "Hud ResetScore"
   ResetScore: {
-      ldx #$04
+      ldx #$03
       lda #$00
     !:
       sta CurrentScore, x
@@ -121,6 +121,7 @@ Hud: {
 
   * = * "Hud DrawScore"
   DrawScore: {
+    // Append current score on score label
       ldx #$00
     !:
       lda CurrentScore, x
@@ -130,6 +131,7 @@ Hud: {
       cpx #$04
       bne !-
 
+    // Draws score label
       ldx #$00
     LoopScore:
       lda ScoreLabel, x
@@ -147,7 +149,7 @@ Hud: {
 
       rts
 
-      .label ScorePtr = $beef
+    .label ScorePtr = $beef
   }
 
   * = * "Hud ReduceDismissalCounter"

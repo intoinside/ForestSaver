@@ -51,6 +51,8 @@ Intro: {
       lda #%00001110
       sta VIC.MEMORY_SETUP
 
+      jsr Hud.ResetScore
+
       jsr DrawHiScore
 
       jsr Instruction

@@ -182,7 +182,6 @@ Level1: {
 
       jsr CompareAndUpdateHiScore
 
-      jsr Hud.ResetScore
       jsr Hud.ResetDismissalCounter
 
       rts

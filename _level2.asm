@@ -185,7 +185,6 @@ Level2: {
 
       jsr CompareAndUpdateHiScore
 
-      jsr Hud.ResetScore
       jsr Hud.ResetDismissalCounter
 
       rts
@@ -800,8 +799,10 @@ Level2: {
       sta GameEnded
       beq !+
 
+// Optimize this assignation
       lda #$48
       sta ShowGameEndedMessage.StartAddress + 1
+// END Optimize request
       jsr ShowGameEndedMessage
 
     !:
