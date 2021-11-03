@@ -431,7 +431,7 @@ SpriteCollision: {
     lda SPRITES.X0
     sta X1
     clc
-    adc #$08
+    adc #$0b
     sta X2
     bcc !+
     lda #$01
@@ -444,7 +444,7 @@ SpriteCollision: {
     lda SPRITES.Y0
     sta Y1
     clc
-    adc #$08
+    adc #$0b
     sta Y2
 
 // REMIND: BMI means jump if a is lower than b
