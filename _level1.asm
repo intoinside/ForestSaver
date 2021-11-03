@@ -208,6 +208,9 @@ Level1: {
       lda GameEnded
       bne Done
 
+      lda LevelCompleted
+      bne Done
+
       GetRandomUpTo(6)
 
       cmp #$02
