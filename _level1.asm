@@ -298,6 +298,9 @@ Level1: {
       jsr HandleWoodCutterFined
       inc ComplaintShown
 
+      lda #$ff
+      sta Ranger.IsFining
+
       lda LevelCompleted
       bne !+
 

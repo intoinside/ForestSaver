@@ -28,6 +28,7 @@ Ranger: {
       sta UpdateRangerFrame.StoreSprite2 + 2
       sta UpdateRangerFrame.StoreSprite3 + 2
       sta UpdateRangerFrame.StoreSprite4 + 2
+      sta FiningInAction.FiningSprite + 2
 
 // No need to update lobyte because ranger is always sprite 0
       lda #SPRITES.RANGER_STANDING
@@ -43,6 +44,12 @@ Ranger: {
       lda BackgroundCollision.Collision
       beq NoCollision
 
+      lda IsFining
+      beq !+
+      jsr FiningInAction
+      jmp Done
+
+    !:
       // If there is collision, revert ranger position
       lda OLDX0
       sta SPRITES.X0
@@ -140,6 +147,16 @@ Ranger: {
     OLDY0:    .byte $00
   }
 
+  * = * "Ranger FiningInAction"
+  FiningInAction: {
+      lda #SPRITES.RANGER_FINING
+    FiningSprite:
+      sta SPRITES.SPRITE_0
+      dec IsFining
+
+      rts
+  }
+
   * = * "Ranger UpdateRangerFrame"
   UpdateRangerFrame: {
       inc RangerFrame
@@ -223,6 +240,10 @@ Ranger: {
     RangerFrame:
       .byte $ff
   }
+
+  // If > 0 indicates that fining is in progress (remaining time)
+  // If == 0 indicates fining is done or never happened
+  IsFining: .byte $00
 
   .label LIMIT_UP     = $32
   .label LIMIT_DOWN   = $e0
