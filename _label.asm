@@ -69,23 +69,23 @@ SPRITES: {
   .label RANGER_STANDING    = $50
 
 // Level 1 woodcutter and hatchet
-  .label ENEMY_STANDING     = $59
-  .label HATCHET            = $62
-  .label HATCHET_REV        = $64
+  .label ENEMY_STANDING     = $5a
+  .label HATCHET            = $63
+  .label HATCHET_REV        = $65
 
 // Level 2 tank, pipe
-  .label TANK_BODY_LE       = $66
-  .label TANK_TAIL_LE       = $67
-  .label PIPE_1             = $68
-  .label PIPE_2             = $69
-  .label PIPE_3             = $6a
-  .label PIPE_4             = $6b
-  .label TANK_TAIL_RI       = $6c
-  .label TANK_BODY_RI       = $6d
-  .label PIPE_1_R           = $6e
-  .label PIPE_2_R           = $6f
-  .label PIPE_3_R           = $70
-  .label PIPE_4_R           = $71
+  .label TANK_BODY_LE       = $67
+  .label TANK_TAIL_LE       = $68
+  .label PIPE_1             = $69
+  .label PIPE_2             = $6a
+  .label PIPE_3             = $6b
+  .label PIPE_4             = $6c
+  .label TANK_TAIL_RI       = $6d
+  .label TANK_BODY_RI       = $6e
+  .label PIPE_1_R           = $6f
+  .label PIPE_2_R           = $70
+  .label PIPE_3_R           = $71
+  .label PIPE_4_R           = $72
 
 // Level 3
 // TBD
