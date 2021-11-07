@@ -283,6 +283,9 @@ Level2: {
       jsr HandleWoodCutterFined
       inc ComplaintShown
 
+      lda #$2f
+      sta Ranger.IsFining
+
       AddPoints(0, 0, 1, 0);
 
       jmp Done
@@ -636,6 +639,9 @@ Level2: {
       sta HandleWoodCutterFined.Offset
       jsr HandleWoodCutterFined
       inc ComplaintShown
+
+      lda #$2f
+      sta Ranger.IsFining
 
       AddPoints(0, 0, 1, 0);
 

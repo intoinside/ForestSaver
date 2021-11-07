@@ -298,13 +298,13 @@ Level1: {
       jsr HandleWoodCutterFined
       inc ComplaintShown
 
-      lda #$ff
-      sta Ranger.IsFining
-
       lda LevelCompleted
       bne !+
 
       AddPoints(0, 0, 1, 0);
+
+      lda #$2f
+      sta Ranger.IsFining
 
     !:
       jmp Done
@@ -421,7 +421,6 @@ Level1: {
 
     RangerWoodCutterMet:
       inc WoodCutterFined
-      jmp Done
 
     DoneFar:
       jmp Done
@@ -699,6 +698,9 @@ Level1: {
 
       AddPoints(0, 0, 1, 0);
 
+      lda #$2f
+      sta Ranger.IsFining
+
     !:
       jmp Done
 
@@ -828,7 +830,6 @@ Level1: {
 
     RangerWoodCutterMet:
       inc WoodCutterFined
-      jmp Done
 
     DoneFar:
       jmp Done

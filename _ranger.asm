@@ -41,6 +41,13 @@ Ranger: {
   * = * "Ranger HandleRangerMove"
   HandleRangerMove: {
       jsr BackgroundCollision
+      lda FirePressed
+      cmp #$ff
+      bne !+
+      lda #$00
+      sta IsFining
+
+    !:
       lda BackgroundCollision.Collision
       beq NoCollision
 
@@ -149,10 +156,17 @@ Ranger: {
 
   * = * "Ranger FiningInAction"
   FiningInAction: {
+      dec IsFining
+      beq StopFining
+
       lda #SPRITES.RANGER_FINING
+      jmp FiningSprite
+
+    StopFining:
+      lda #SPRITES.RANGER_STANDING
+
     FiningSprite:
       sta SPRITES.SPRITE_0
-      dec IsFining
 
       rts
   }
