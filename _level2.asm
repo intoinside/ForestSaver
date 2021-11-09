@@ -1180,9 +1180,9 @@ Level2: {
     !Proceed:
       lda #$00
       sta SpriteCollision.I1 + 1
-      lda SPRITES.X5
+      lda SPRITES.X7
       sta SpriteCollision.I1
-      lda SPRITES.Y5
+      lda SPRITES.Y7
       sta SpriteCollision.J1
       jsr SpriteCollision
       bne RangerTankMet
@@ -1395,9 +1395,9 @@ Level2: {
     !Proceed:
       lda #$00
       sta SpriteCollision.I1 + 1
-      lda SPRITES.X5
+      lda SPRITES.X7
       sta SpriteCollision.I1
-      lda SPRITES.Y5
+      lda SPRITES.Y7
       sta SpriteCollision.J1
       jsr SpriteCollision
       bne RangerTankMet
