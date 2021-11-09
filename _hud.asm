@@ -25,6 +25,19 @@
     jsr Hud.AddScore
 }
 
+.macro SubPoints(digit4, digit3, digit2, digit1) {
+    lda #digit1
+    sta Hud.SubScore.Points + 3
+    lda #digit2
+    sta Hud.SubScore.Points + 2
+    lda #digit3
+    sta Hud.SubScore.Points + 1
+    lda #digit4
+    sta Hud.SubScore.Points
+
+    jsr Hud.SubScore
+}
+
 CompareAndUpdateHiScore: {
     lda Intro.HiScoreLabel + $0a
     cmp Hud.ScoreLabel + $07
@@ -107,6 +120,30 @@ Hud: {
     Points: .byte $00, $00, $00, $00
   }
 
+  * = * "Hud SubScore"
+  SubScore: {
+      ldx #$04
+      sec
+    !:
+      lda CurrentScore - 1, x
+
+      sbc Points - 1, x
+      bpl SaveDigit
+      adc #10
+      clc
+
+    SaveDigit:
+      sta CurrentScore - 1, x
+      dex
+      bne !-
+
+    Done:
+      jsr DrawScore
+      rts
+
+    Points: .byte $00, $00, $00, $00
+  }
+
   * = * "Hud ResetScore"
   ResetScore: {
       ldx #$03
@@ -123,6 +160,7 @@ Hud: {
   DrawScore: {
     // Append current score on score label
       ldx #$00
+      clc
     !:
       lda CurrentScore, x
       adc #ZeroChar
