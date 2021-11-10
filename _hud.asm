@@ -190,6 +190,26 @@ Hud: {
     .label ScorePtr = $beef
   }
 
+  * = * "Hud IsScoreBiggerThanZero"
+  IsScoreBiggerThanZero: {
+      ldx #$04
+      ldy #$00
+    !:
+      lda CurrentScore - 1, x
+      bne NonZero
+      dex
+      bne !-
+      jmp !+
+
+    NonZero:
+      iny
+    !:
+      sty BiggerThanZero
+      rts
+
+    BiggerThanZero: .byte $00
+  }
+
   * = * "Hud ReduceDismissalCounter"
   ReduceDismissalCounter: {
       lda DismissalCompleted

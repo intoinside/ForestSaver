@@ -483,16 +483,7 @@ SpriteCollision: {
 BackgroundCollision: {
     lda SPRITES.COLLISION_TO_BKG
     and #%00000001
-    /*
-    bne CollisionHappened
-    lda #$00
-    jmp Done
 
-  CollisionHappened:
-    lda #$01
-
-  Done:
-  */
     sta Collision
     rts
 

@@ -40,7 +40,7 @@ Ranger: {
 
   * = * "Ranger HandleRangerMove"
   HandleRangerMove: {
-      jsr BackgroundCollision
+      jsr GetOnlyFirePress
       lda FirePressed
       cmp #$ff
       bne !+
@@ -48,13 +48,25 @@ Ranger: {
       sta IsFining
 
     !:
-      lda BackgroundCollision.Collision
-      beq NoCollision
-
       lda IsFining
       beq !+
       jsr FiningInAction
       jmp Done
+
+    !:
+      jsr BackgroundCollision
+      lda BackgroundCollision.Collision
+      beq NoCollision
+
+      lda FirePressed
+      cmp #$ff
+      bne !+
+
+      jsr Hud.IsScoreBiggerThanZero
+      lda Hud.IsScoreBiggerThanZero.BiggerThanZero
+      beq !+
+      SubPoints(0, 0, 0, 1)
+      jmp NoCollision
 
     !:
       // If there is collision, revert ranger position
