@@ -301,7 +301,7 @@ Level1: {
       lda LevelCompleted
       bne !+
 
-      AddPoints(0, 0, 1, 0);
+      AddPoints(0, 0, 2, 0);
 
       lda #$2f
       sta Ranger.IsFining
@@ -696,7 +696,7 @@ Level1: {
       lda LevelCompleted
       bne !+
 
-      AddPoints(0, 0, 1, 0);
+      AddPoints(0, 0, 2, 0);
 
       lda #$2f
       sta Ranger.IsFining

@@ -286,7 +286,7 @@ Level2: {
       lda #$2f
       sta Ranger.IsFining
 
-      AddPoints(0, 0, 1, 0);
+      AddPoints(0, 0, 2, 0);
 
       jmp Done
 
@@ -643,7 +643,7 @@ Level2: {
       lda #$2f
       sta Ranger.IsFining
 
-      AddPoints(0, 0, 1, 0);
+      AddPoints(0, 0, 2, 0);
 
       jmp Done
 
@@ -1233,7 +1233,7 @@ Level2: {
       jmp Done
 
     RangerTankMet:
-      AddPoints(0, 0, 2, 0);
+      AddPoints(0, 0, 5, 0);
 
       inc TankFined
       EnableSprite(7, false)
@@ -1448,7 +1448,7 @@ Level2: {
       jmp Done
 
     RangerTankMet:
-      AddPoints(0, 0, 2, 0);
+      AddPoints(0, 0, 5, 0);
 
       inc TankFined
       EnableSprite(7, false)
