@@ -10,6 +10,20 @@
 
 #importonce
 
+// Switch char at CharPosition from CharFrame1 to CharFrame2 and back
+.macro AnimateIntro(CharPosition, CharFrame1, CharFrame2) {
+      lda CharPosition
+      cmp #CharFrame1
+      beq !+
+      ldx #CharFrame1
+      jmp Set
+    !:
+      ldx #CharFrame2
+
+    Set:
+      stx CharPosition
+}
+
 Intro: {
 
 // Manager of intro screen
@@ -69,125 +83,6 @@ Intro: {
       sta GameEnded
 
       rts
-  }
-
-  * = * "Intro AnimateIntro1"
-  AnimateIntro1: {
-      lda Char1
-      cmp #$5e
-      beq !+
-      ldx #$5e
-      jmp !Set+
-    !:
-      ldx #$64
-
-    !Set:
-      stx Char1
-
-      lda Char2
-      cmp #$65
-      beq !+
-      ldx #$65
-      jmp !Set+
-    !:
-      ldx #$61
-
-    !Set:
-      stx Char2
-      rts
-
-    .label Char1 = $4000 + (40 * 3 + 27)
-    .label Char2 = $4000 + (40 * 4 + 26)
-  }
-
-  * = * "Intro AnimateIntro2"
-  AnimateIntro2: {
-      lda Char1
-      cmp #$61
-      beq !+
-      ldx #$61
-      jmp !Set+
-    !:
-      ldx #$65
-
-    !Set:
-      stx Char1
-
-      lda Char2
-      cmp #$62
-      beq !+
-      ldx #$62
-      jmp !Set+
-    !:
-      ldx #$66
-
-    !Set:
-      stx Char2
-
-      rts
-
-    .label Char1 = $4000 + (40 * 13 + 4)
-    .label Char2 = $4000 + (40 * 13 + 5)
-  }
-
-  * = * "Intro AnimateIntro3"
-  AnimateIntro3: {
-      lda Char1
-      cmp #$62
-      beq !+
-      ldx #$62
-      jmp !Set+
-    !:
-      ldx #$66
-
-    !Set:
-      stx Char1
-
-      lda Char2
-      cmp #$5e
-      beq !+
-      ldx #$5e
-      jmp !Set+
-    !:
-      ldx #$64
-
-    !Set:
-      stx Char2
-
-      rts
-
-    .label Char1 = $4000 + (40 * 20 + 10)
-    .label Char2 = $4000 + (40 * 19 + 10)
-  }
-
-  * = * "Intro AnimateIntro4"
-  AnimateIntro4: {
-      lda Char1
-      cmp #$61
-      beq !+
-      ldx #$61
-      jmp !Set+
-    !:
-      ldx #$65
-
-    !Set:
-      stx Char1
-
-      lda Char2
-      cmp #$62
-      beq !+
-      ldx #$62
-      jmp !Set+
-    !:
-      ldx #$66
-
-    !Set:
-      stx Char2
-
-      rts
-
-    .label Char1 = $4000 + (40 * 19 + 35)
-    .label Char2 = $4000 + (40 * 19 + 36)
   }
 
   * = * "Intro DrawHiScore"
@@ -270,7 +165,7 @@ Intro: {
   * = * "Intro TimedRoutine"
   TimedRoutine: {
       lda DelayCounter
-      beq DelayTriggered        // when counter is zero stop decrementing
+      beq DelayTriggeredFar        // when counter is zero stop decrementing
       dec DelayCounter      // decrement the counter
       cmp #10
       beq Delay10
@@ -283,40 +178,52 @@ Intro: {
 
       jmp Exit
 
+    DelayTriggeredFar:
+      jmp DelayTriggered
+
     Delay10:
-      jsr AnimateIntro1
+      AnimateIntro(Char1, $5e, $64)
+      AnimateIntro(Char2, $65, $61)
       jmp Exit
 
     Delay20:
-      jsr AnimateIntro2
+      AnimateIntro(Char3, $61, $65)
+      AnimateIntro(Char4, $62, $66)
       jmp Exit
 
     Delay30:
       jmp Exit
 
     Delay40:
-      jsr AnimateIntro3
+      AnimateIntro(Char5, $62, $66)
+      AnimateIntro(Char6, $5e, $64)
       jmp Exit
 
     DelayTriggered:
-      jsr AnimateIntro4
+      AnimateIntro(Char7, $61, $65)
+      AnimateIntro(Char8, $62, $66)
 
       lda DelayRequested      // delay reached 0, reset it
       sta DelayCounter
 
-    Waiting:
-
-      jmp Exit
-
-    NotWaiting:
-
     Exit:
       rts
 
-    DelayCounter:
-      .byte 50                  // Counter storage
-    DelayRequested:
-      .byte 50                  // 1 second delay
+// Char position in screen ram
+    .label Char1 = $4000 + (40 * 3 + 27)
+    .label Char2 = $4000 + (40 * 4 + 26)
+
+    .label Char3 = $4000 + (40 * 13 + 4)
+    .label Char4 = $4000 + (40 * 13 + 5)
+
+    .label Char5 = $4000 + (40 * 20 + 10)
+    .label Char6 = $4000 + (40 * 19 + 10)
+
+    .label Char7 = $4000 + (40 * 19 + 35)
+    .label Char8 = $4000 + (40 * 19 + 36)
+
+    DelayCounter:   .byte 50    // Counter storage
+    DelayRequested: .byte 50    // 1 second delay
   }
 
   // "HI-SCORE: 0000"
