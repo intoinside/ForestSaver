@@ -73,7 +73,7 @@ Intro: {
 
   * = * "Intro AnimateIntro1"
   AnimateIntro1: {
-      lda $4093
+      lda Char1
       cmp #$5e
       beq !+
       ldx #$5e
@@ -82,9 +82,9 @@ Intro: {
       ldx #$64
 
     !Set:
-      stx $4093
+      stx Char1
 
-      lda $40ba
+      lda Char2
       cmp #$65
       beq !+
       ldx #$65
@@ -93,13 +93,16 @@ Intro: {
       ldx #$61
 
     !Set:
-      stx $40ba
+      stx Char2
       rts
+
+    .label Char1 = $4000 + (40 * 3 + 27)
+    .label Char2 = $4000 + (40 * 4 + 26)
   }
 
   * = * "Intro AnimateIntro2"
   AnimateIntro2: {
-      lda $420c
+      lda Char1
       cmp #$61
       beq !+
       ldx #$61
@@ -108,9 +111,9 @@ Intro: {
       ldx #$65
 
     !Set:
-      stx $420c
+      stx Char1
 
-      lda $420d
+      lda Char2
       cmp #$62
       beq !+
       ldx #$62
@@ -119,14 +122,17 @@ Intro: {
       ldx #$66
 
     !Set:
-      stx $420d
+      stx Char2
 
       rts
+
+    .label Char1 = $4000 + (40 * 13 + 4)
+    .label Char2 = $4000 + (40 * 13 + 5)
   }
 
   * = * "Intro AnimateIntro3"
   AnimateIntro3: {
-      lda $432a
+      lda Char1
       cmp #$62
       beq !+
       ldx #$62
@@ -135,9 +141,9 @@ Intro: {
       ldx #$66
 
     !Set:
-      stx $432a
+      stx Char1
 
-      lda $4302
+      lda Char2
       cmp #$5e
       beq !+
       ldx #$5e
@@ -146,14 +152,17 @@ Intro: {
       ldx #$64
 
     !Set:
-      stx $4302
+      stx Char2
 
       rts
+
+    .label Char1 = $4000 + (40 * 20 + 10)
+    .label Char2 = $4000 + (40 * 19 + 10)
   }
 
   * = * "Intro AnimateIntro4"
   AnimateIntro4: {
-      lda $431b
+      lda Char1
       cmp #$61
       beq !+
       ldx #$61
@@ -162,9 +171,9 @@ Intro: {
       ldx #$65
 
     !Set:
-      stx $431b
+      stx Char1
 
-      lda $431c
+      lda Char2
       cmp #$62
       beq !+
       ldx #$62
@@ -173,9 +182,12 @@ Intro: {
       ldx #$66
 
     !Set:
-      stx $431c
+      stx Char2
 
       rts
+
+    .label Char1 = $4000 + (40 * 19 + 35)
+    .label Char2 = $4000 + (40 * 19 + 36)
   }
 
   * = * "Intro DrawHiScore"
