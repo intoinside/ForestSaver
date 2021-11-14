@@ -15,6 +15,20 @@ SpriteNumberMask:
 
 #import "common/lib/math-global.asm"
 
+// Switch char at CharPosition from CharFrame1 to CharFrame2 and back
+.macro AnimateLake(CharPosition, CharFrame1, CharFrame2) {
+    lda CharPosition
+    cmp #CharFrame1
+    beq !+
+    ldx #CharFrame1
+    jmp Set
+  !:
+    ldx #CharFrame2
+
+  Set:
+    stx CharPosition
+}
+
 * = * "Utils RemoveTree"
 RemoveTree: {
 // Row #1

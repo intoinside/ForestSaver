@@ -1549,6 +1549,25 @@ Level2: {
       beq DelayTriggered        // when counter is zero stop decrementing
       dec DelayCounter      // decrement the counter
 
+      cmp #10
+      beq Delay10
+      cmp #20
+      beq Delay20
+
+      jmp Exit
+
+    Delay10:
+      lda TankTruckFromRight.Polluted
+      bne Exit
+      AnimateLake(Char1, $61, $65)
+      AnimateLake(Char2, $62, $66)
+      jmp Exit
+
+    Delay20:
+      lda TankTruckFromLeft.Polluted
+      bne Exit
+      AnimateLake(Char3, $61, $65)
+      AnimateLake(Char4, $62, $66)
       jmp Exit
 
     DelayTriggered:
@@ -1561,12 +1580,15 @@ Level2: {
       jsr AddEnemy
       jsr AddTankTruck
 
-      jmp Exit
-
-    NotWaiting:
-
     Exit:
       rts
+
+// Char position in screen ram
+    .label Char1 = $4800 + (40 * 10 + 29)
+    .label Char2 = $4800 + (40 * 10 + 30)
+
+    .label Char3 = $4800 + (40 * 11 + 8)
+    .label Char4 = $4800 + (40 * 11 + 9)
 
     DelayCounter:
       .byte 50                  // Counter storage

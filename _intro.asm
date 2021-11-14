@@ -10,20 +10,6 @@
 
 #importonce
 
-// Switch char at CharPosition from CharFrame1 to CharFrame2 and back
-.macro AnimateIntro(CharPosition, CharFrame1, CharFrame2) {
-      lda CharPosition
-      cmp #CharFrame1
-      beq !+
-      ldx #CharFrame1
-      jmp Set
-    !:
-      ldx #CharFrame2
-
-    Set:
-      stx CharPosition
-}
-
 Intro: {
 
 // Manager of intro screen
@@ -182,26 +168,26 @@ Intro: {
       jmp DelayTriggered
 
     Delay10:
-      AnimateIntro(Char1, $5e, $64)
-      AnimateIntro(Char2, $65, $61)
+      AnimateLake(Char1, $5e, $64)
+      AnimateLake(Char2, $65, $61)
       jmp Exit
 
     Delay20:
-      AnimateIntro(Char3, $61, $65)
-      AnimateIntro(Char4, $62, $66)
+      AnimateLake(Char3, $61, $65)
+      AnimateLake(Char4, $62, $66)
       jmp Exit
 
     Delay30:
       jmp Exit
 
     Delay40:
-      AnimateIntro(Char5, $62, $66)
-      AnimateIntro(Char6, $5e, $64)
+      AnimateLake(Char5, $62, $66)
+      AnimateLake(Char6, $5e, $64)
       jmp Exit
 
     DelayTriggered:
-      AnimateIntro(Char7, $61, $65)
-      AnimateIntro(Char8, $62, $66)
+      AnimateLake(Char7, $61, $65)
+      AnimateLake(Char8, $62, $66)
 
       lda DelayRequested      // delay reached 0, reset it
       sta DelayCounter
