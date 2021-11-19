@@ -35,6 +35,15 @@ Ranger: {
     LoadSprite1:
       sta SPRITES.SPRITE_0
 
+      lda SPRITES.X0
+      sta HandleRangerMove.OLDX0
+      lda SPRITES.Y0
+      sta HandleRangerMove.OLDY0
+
+      lda SPRITES.EXTRA_BIT
+      and #%00000001
+      sta HandleRangerMove.OLDXBIT
+
       rts
   }
 
