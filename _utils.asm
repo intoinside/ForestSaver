@@ -367,21 +367,21 @@ DisableAllSprites: {
     sta VIC.SPRITE_ENABLE       // Set the new value into the sprite enable register
 }
 
-.macro bpl16(value, low) {
-    lda value + 1
-    cmp low + 1
-    bpl end     // branch to end if value is bigger
-    lda value
-    cmp low
+.macro bpl16(arg1, arg2) {
+    lda arg1 + 1
+    cmp arg2 + 1
+    bpl end     // branch to end if value is bigger or equal than low
+    lda arg1
+    cmp arg2
   end:
 }
 
-.macro bmi16(value, low) {
-    lda value + 1
-    cmp low + 1
-    bmi end     // branch to end if value is smaller
-    lda value
-    cmp low
+.macro bmi16(arg1, arg2) {
+    lda arg1 + 1
+    cmp arg2 + 1
+    bmi end     // branch to end if value is smaller than low
+    lda arg1
+    cmp arg2
   end:
 }
 
@@ -425,52 +425,75 @@ SetLakeToBlack: {
 
 * = * "Utils SpriteCollision"
 SpriteCollision: {
-    lda #%00000001
-    and SPRITES.COLLISION_TO_SPRITE
-    bne CollisionHappened
-    jmp NoCollisionDetected
+    c64lib_add16($000c, OtherX)
+    lda OtherY
+    clc
+    adc #10
+    sta OtherY
 
-// Sprite 0 collided with someone, detect sprite0 corner
-  CollisionHappened:
     lda SPRITES.EXTRA_BIT
-    cmp #%00000001
-    beq SetExtraBit
-    lda #$00
-    jmp NextArg
-  SetExtraBit:
-    lda #$01
-  NextArg:
-    sta X1 + 1
+    and #%00000001
+    sta RangerX1 + 1
+    sta RangerX2 + 1
 
     lda SPRITES.X0
-    sta X1
-    clc
-    adc #$0b
-    sta X2
-    bcc !+
-    lda #$01
-    jmp !Next+
-  !:
-    lda #$00
-  !Next:
-    sta X2 + 1
+    sta RangerX1
+    sta RangerX2
+    add16value($0018, RangerX2)
 
     lda SPRITES.Y0
-    sta Y1
+    sta RangerY1
     clc
-    adc #$0b
-    sta Y2
+    adc #21
+    sta RangerY2
 
-// REMIND: BMI means jump if a is lower than b
-    bmi16(I1, X1)
-    bmi NoCollisionDetected
-    bmi16(X2, I1)
+/*
+    lda RangerX1+1
+    DrawAccumulator($4806)
+    lda RangerX1
+    DrawAccumulator($4808)
+    lda RangerY1
+    DrawAccumulator($480b)
+
+    lda RangerX2+1
+    DrawAccumulator($482e)
+    lda RangerX2
+    DrawAccumulator($4830)
+    lda RangerY2
+    DrawAccumulator($4833)
+
+    lda OtherX+1
+    DrawAccumulator($4814)
+    lda OtherX
+    DrawAccumulator($4816)
+    lda OtherY
+    DrawAccumulator($4819)
+*/
+
+    // Collision happened if OtherSprite coordinates is inside Ranger
+    // square. This means that
+    // * RangerX1 < OtherX < RangerX2
+    // * RangerY1 < OtherY < RangerY2
+
+    // REMIND: BMI means jump if first value is lower than second value
+
+    // Is like if OtherX < RangerX1 then jump (no collision)
+    bmi16(OtherX, RangerX1)             // OtherSpriteX - Ranger Left
     bmi NoCollisionDetected
 
-    bmi16(J1, Y1)
+    // Is like if RangerX2 < OtherX then jump (no collision)
+    bmi16(RangerX2, OtherX)             // Ranger Right - OtherSpriteX
     bmi NoCollisionDetected
-    bmi16(Y2, J1)
-    bmi NoCollisionDetected
+
+    // Is like if OtherY < RangerY1 then jump (no collision)
+    lda OtherY
+    cmp RangerY1
+    bmi NoCollisionDetected     // branch to end if value is smaller than low
+
+    // Is like if RangerY2 < OtherY then jump (no collision)
+    lda RangerY2
+    cmp OtherY
+    bmi NoCollisionDetected     // branch to end if value is smaller than low
 
   CollisionDetected:
     lda #$01
@@ -482,15 +505,15 @@ SpriteCollision: {
   Done:
     rts
 
-// Woodcutter square
-  X1: .word $0000
-  X2: .word $0000
-  Y1: .word $0000
-  Y2: .word $0000
+// Ranger square
+  RangerX1: .word $0000
+  RangerX2: .word $0000
+  RangerY1: .byte $00
+  RangerY2: .byte $00
 
 // Other sprite initial coordinate
-  I1: .word $0000
-  J1: .word $0000
+  OtherX: .word $0000
+  OtherY: .byte $00
 }
 
 * = * "Utils BackgroundCollision"
@@ -798,6 +821,43 @@ StupidWaitRoutine: {
     dey
     bne LoopY
     rts
+}
+
+.macro DrawAccumulator(position) {
+    pha
+    and #$0f
+    cmp #$0a
+    bpl !bigger+
+    clc
+    adc #$2a
+    jmp !write+
+
+  !bigger:
+    sec
+    sbc #$08
+
+  !write:
+    sta position + 1
+
+    pla
+    and #$f0
+    clc
+    ror
+    ror
+    ror
+    ror
+    cmp #$0a
+    bpl !bigger+
+    clc
+    adc #$2a
+    jmp !write+
+
+  !bigger:
+    sec
+    sbc #$08
+
+  !write:
+    sta position
 }
 
 #import "_allimport.asm"

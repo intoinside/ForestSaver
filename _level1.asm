@@ -393,11 +393,11 @@ Level1: {
     SetExtraBit:
       lda #$01
     NextArg:
-      sta SpriteCollision.I1 + 1
+      sta SpriteCollision.OtherX + 1
       lda SPRITES.X1
-      sta SpriteCollision.I1
+      sta SpriteCollision.OtherX
       lda SPRITES.Y1
-      sta SpriteCollision.J1
+      sta SpriteCollision.OtherY
       jsr SpriteCollision
       bne RangerWoodCutterMet
 
@@ -802,11 +802,11 @@ Level1: {
     SetExtraBit:
       lda #$01
     NextArg:
-      sta SpriteCollision.I1 + 1
+      sta SpriteCollision.OtherX + 1
       lda SPRITES.X3
-      sta SpriteCollision.I1
+      sta SpriteCollision.OtherX
       lda SPRITES.Y3
-      sta SpriteCollision.J1
+      sta SpriteCollision.OtherY
       jsr SpriteCollision
       bne RangerWoodCutterMet
 

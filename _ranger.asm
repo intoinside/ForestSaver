@@ -81,7 +81,8 @@ Ranger: {
       // If there is collision, revert ranger position
       lda OLDX0
       sta SPRITES.X0
-      lda OLDXBIT
+      lda SPRITES.EXTRA_BIT
+      ora OLDXBIT
       sta SPRITES.EXTRA_BIT
       lda OLDY0
       sta SPRITES.Y0
@@ -91,6 +92,7 @@ Ranger: {
       lda SPRITES.X0
       sta OLDX0
       lda SPRITES.EXTRA_BIT
+      and #%00000001
       sta OLDXBIT
       lda SPRITES.Y0
       sta OLDY0

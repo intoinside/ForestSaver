@@ -367,18 +367,15 @@ Level2: {
 
     HatchetStrike:
       lda SPRITES.EXTRA_BIT
-      cmp #%00000010
-      beq SetExtraBit
-      lda #$00
-      jmp NextArg
-    SetExtraBit:
-      lda #$01
-    NextArg:
-      sta SpriteCollision.I1 + 1
+      and #%00000010
+      beq !+
+      lda #$1
+    !:
+      sta SpriteCollision.OtherX + 1
       lda SPRITES.X1
-      sta SpriteCollision.I1
+      sta SpriteCollision.OtherX
       lda SPRITES.Y1
-      sta SpriteCollision.J1
+      sta SpriteCollision.OtherY
       jsr SpriteCollision
       bne RangerWoodCutterMet
 
@@ -738,18 +735,15 @@ Level2: {
 
     HatchetStrike:
       lda SPRITES.EXTRA_BIT
-      cmp #%00001000
-      beq SetExtraBit
-      lda #$00
-      jmp NextArg
-    SetExtraBit:
+      and #%00001000
+      beq !+
       lda #$01
-    NextArg:
-      sta SpriteCollision.I1 + 1
+    !:
+      sta SpriteCollision.OtherX + 1
       lda SPRITES.X3
-      sta SpriteCollision.I1
+      sta SpriteCollision.OtherX
       lda SPRITES.Y3
-      sta SpriteCollision.J1
+      sta SpriteCollision.OtherY
       jsr SpriteCollision
       bne RangerWoodCutterMet
 
@@ -1177,13 +1171,18 @@ Level2: {
     !DriveOut:
       jmp DriveOut
 
-    !Proceed:
-      lda #$00
-      sta SpriteCollision.I1 + 1
+    !Proceed: // Tank from left
+      lda SPRITES.EXTRA_BIT
+      and #%10000000
+      beq !+
+      lda #$1
+    !:
+      sta SpriteCollision.OtherX + 1
+
       lda SPRITES.X7
-      sta SpriteCollision.I1
+      sta SpriteCollision.OtherX
       lda SPRITES.Y7
-      sta SpriteCollision.J1
+      sta SpriteCollision.OtherY
       jsr SpriteCollision
       bne RangerTankMet
 
@@ -1292,7 +1291,7 @@ Level2: {
     .label PollutionCounterLimit = 20
 
     .label TankLeftXStart = 0
-    .label TankLeftXEnd   = 42
+    .label TankLeftXEnd   = 40
     .label TankLeftX1BitStart = 0
     .label TankLeftY      = 120
     .label TankLeftBodySpriteNum = $67
@@ -1392,13 +1391,17 @@ Level2: {
     !DriveOut:
       jmp DriveOut
 
-    !Proceed:
-      lda #$00
-      sta SpriteCollision.I1 + 1
+    !Proceed:  // Tank from right
+      lda SPRITES.EXTRA_BIT
+      and #%10000000
+      beq !+
+      lda #$1
+    !:
+      sta SpriteCollision.OtherX + 1
       lda SPRITES.X7
-      sta SpriteCollision.I1
+      sta SpriteCollision.OtherX
       lda SPRITES.Y7
-      sta SpriteCollision.J1
+      sta SpriteCollision.OtherY
       jsr SpriteCollision
       bne RangerTankMet
 
@@ -1476,14 +1479,12 @@ Level2: {
     DriveOutDone:
       EnableSprite(5, false)
       inc TankOut
-      jmp Done
 
     CleanForNextRun:
       lda #$00
       sta AddTankTruck.TruckActive
 
       jsr CleanTankRight
-
 
       lda Polluted
       sta LakeNotAvailable
@@ -1506,7 +1507,7 @@ Level2: {
     .label PollutionCounterLimit = 20
 
     .label TankRightXStart = 70
-    .label TankRightXEnd   = 40
+    .label TankRightXEnd   = 44
     .label TankRightX1BitStart = 1
     .label TankRightY      = 110
     .label TankRightBodySpriteNum = $68
