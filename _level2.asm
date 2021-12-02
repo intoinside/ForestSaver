@@ -1484,16 +1484,6 @@ Level2: {
 
       jsr CleanTankRight
 
-      sta PollutionCounter
-      sta PollutionFrame
-      sta PipeShown
-      sta SpritesCreated
-      sta TankIn
-      sta TankOut
-      sta TankFined
-
-      lda #$01
-      sta PollutionFrameWait
 
       lda Polluted
       sta LakeNotAvailable
