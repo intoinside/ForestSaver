@@ -69,10 +69,13 @@ MainGameSettings: {
     lda #$ff
     sta VIC.SPRITE_MULTICOLOR
 
+    jsr Keyboard.Init
+
     rts
 }
 
 #import "_intro.asm"
 #import "_level1.asm"
 #import "_level2.asm"
+#import "_keyboard.asm"
 #import "_label.asm"

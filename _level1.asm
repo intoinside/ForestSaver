@@ -44,13 +44,13 @@ Level1: {
 
     CloseLevelAndGotoNext:
       SetSpriteToBackground()
-      lda FirePressed
+      jsr Keyboard.IsReturnPressed
       bne LevelDone
       jmp EndLoop
 
     CloseLevelAndGame:
       SetSpriteToBackground()
-      lda FirePressed
+      lda Keyboard.ReturnPressed
       bne LevelDone
 
     EndLoop:

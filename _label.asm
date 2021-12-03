@@ -29,6 +29,12 @@ CIA: {
   .label PORT_A             = $dd00
 }
 
+KEYB: {
+  .label CURRENT_PRESSED    = $00cb
+  .label BUFFER_LEN         = $0289
+  .label REPEAT_SWITCH      = $028a
+}
+
 SPRITES: {
   .label EXTRACOLOR1        = $d025
   .label EXTRACOLOR2        = $d026

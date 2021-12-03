@@ -45,7 +45,7 @@ Level2: {
 
     CloseLevelAndGame:
       SetSpriteToBackground()
-      lda FirePressed
+      jsr Keyboard.IsReturnPressed
       bne LevelDone
 
     EndLoop:

@@ -22,9 +22,7 @@ Intro: {
     CheckFire:
       jsr WaitRoutine
       jsr TimedRoutine
-      jsr GetJoystickMove
-
-      lda FirePressed
+      jsr Keyboard.IsReturnPressed
       beq CheckFire
 
     NoMovement:
