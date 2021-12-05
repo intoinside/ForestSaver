@@ -386,13 +386,10 @@ Level1: {
 
     HatchetStrike:
       lda SPRITES.EXTRA_BIT
-      cmp #%00000010
-      beq SetExtraBit
-      lda #$00
-      jmp NextArg
-    SetExtraBit:
-      lda #$01
-    NextArg:
+      and #%00000010
+      beq !+
+      lda #$1
+    !:
       sta SpriteCollision.OtherX + 1
       lda SPRITES.X1
       sta SpriteCollision.OtherX
@@ -795,13 +792,10 @@ Level1: {
 
     HatchetStrike:
       lda SPRITES.EXTRA_BIT
-      cmp #%00001000
-      beq SetExtraBit
-      lda #$00
-      jmp NextArg
-    SetExtraBit:
-      lda #$01
-    NextArg:
+      and #%00001000
+      beq !+
+      lda #$1
+    !:
       sta SpriteCollision.OtherX + 1
       lda SPRITES.X3
       sta SpriteCollision.OtherX
