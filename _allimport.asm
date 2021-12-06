@@ -24,12 +24,8 @@
   .import binary "./maps/level1.bin"
 * = $4800 "Level2"
   .import binary "./maps/level2.bin"
-/*
-* = $4c00 "Map3"
-  .import binary "./maps/map2.bin"
-* = $5000 "Map4"
-  .import binary "./maps/map2.bin"
-*/
+* = $4c00 "Level3"
+  .import binary "./maps/level3.bin"
 
 
 .segment MapDummyArea

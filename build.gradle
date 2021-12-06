@@ -71,6 +71,17 @@ preprocess {
                 interleaver {
                 }
             }
+            map {
+                left = 120
+                top = 0
+                right = 160
+                bottom = 22
+                interleaver {
+                    output = file("maps/level3.bin")
+                }
+                interleaver {
+                }
+            }
         }
     }
 }

@@ -43,10 +43,14 @@ GamePlay: {
 
 // Play on level 2
     jsr Level2.Manager
-    /*
     lda GameEnded
     bne GamePlay
-    */
+
+// Play on level 3
+    jsr Level3.Manager
+    lda GameEnded
+    bne GamePlay
+
     jmp GamePlay
 }
 
@@ -77,5 +81,6 @@ MainGameSettings: {
 #import "_intro.asm"
 #import "_level1.asm"
 #import "_level2.asm"
+#import "_level3.asm"
 #import "_keyboard.asm"
 #import "_label.asm"
