@@ -18,15 +18,58 @@ Keyboard: {
       sta KEYB.REPEAT_SWITCH  // disable key repeat
   }
 
+  * = * "Keyboard IsReturnPressed"
   IsReturnPressed: {
-      lda KEYB.CURRENT_PRESSED
-      and #$01
+      sei
+      lda #%11111111
+      sta $dc02
+      lda #%00000000
+      sta $dc03
+
+      lda #%11111110
+      sta $dc00
+      lda $dc01
+      and #%00000010
+      beq Pressed
+      lda #$00
+      jmp !+
+    Pressed:
+      lda #$01
+
+    !:
       sta ReturnPressed
 
+      cli
+      rts
+  }
+
+  * = * "Keyboard IsIKeyPressed"
+  IsIKeyPressed: {
+      sei
+      lda #%11111111
+      sta $dc02
+      lda #%00000000
+      sta $dc03
+
+      lda #%11101111
+      sta $dc00
+      lda $dc01
+      and #%00000010
+      beq Pressed
+      lda #$00
+      jmp !+
+    Pressed:
+      lda #$01
+
+    !:
+      sta IKeyPressed
+
+      cli
       rts
   }
 
   ReturnPressed:  .byte $00
+  IKeyPressed:    .byte $00
 }
 
 #import "_label.asm"
