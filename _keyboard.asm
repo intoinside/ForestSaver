@@ -10,62 +10,55 @@
 
 #importonce
 
+.macro IsReturnPressed() {
+  lda #%11111110
+  sta Keyboard.DetectKeyPressed.MaskOnPortA
+  lda #%00000010
+  sta Keyboard.DetectKeyPressed.MaskOnPortB
+  jsr Keyboard.DetectKeyPressed
+  sta Keyboard.ReturnPressed
+}
+
+.macro IsIKeyPressed() {
+  lda #%11101111
+  sta Keyboard.DetectKeyPressed.MaskOnPortA
+  lda #%00000010
+  sta Keyboard.DetectKeyPressed.MaskOnPortB
+  jsr Keyboard.DetectKeyPressed
+  sta Keyboard.IKeyPressed
+}
+
 Keyboard: {
   Init: {
       lda #1
-      sta KEYB.BUFFER_LEN     //  disable keyboard buffer
+      sta KEYB.BUFFER_LEN     // disable keyboard buffer
       lda #127
       sta KEYB.REPEAT_SWITCH  // disable key repeat
   }
 
-  * = * "Keyboard IsReturnPressed"
-  IsReturnPressed: {
+  * = * "Keyboard DetectKeyPressed"
+  DetectKeyPressed: {
       sei
       lda #%11111111
       sta $dc02
       lda #%00000000
       sta $dc03
 
-      lda #%11111110
+      lda MaskOnPortA
       sta $dc00
       lda $dc01
-      and #%00000010
+      and MaskOnPortB
       beq Pressed
       lda #$00
       jmp !+
     Pressed:
       lda #$01
-
     !:
-      sta ReturnPressed
-
       cli
       rts
-  }
 
-  * = * "Keyboard IsIKeyPressed"
-  IsIKeyPressed: {
-      sei
-      lda #%11111111
-      sta $dc02
-      lda #%00000000
-      sta $dc03
-
-      lda #%11101111
-      sta $dc00
-      lda $dc01
-      and #%00000010
-      beq Pressed
-      lda #$00
-      jmp !+
-    Pressed:
-      lda #$01
-
-    !:
-      sta IKeyPressed
-
-      cli
-      rts
+    MaskOnPortA:  .byte $00
+    MaskOnPortB:  .byte $00
   }
 
   ReturnPressed:  .byte $00

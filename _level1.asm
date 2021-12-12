@@ -44,7 +44,7 @@ Level1: {
 
     CloseLevelAndGotoNext:
       SetSpriteToBackground()
-      jsr Keyboard.IsReturnPressed
+      IsReturnPressed()
       bne LevelDone
       jmp EndLoop
 

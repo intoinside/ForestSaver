@@ -19,11 +19,17 @@ Intro: {
       jsr AddColorToMap
       jsr StupidWaitRoutine
 
-    CheckFire:
+    CheckReturn:
       jsr WaitRoutine
       jsr TimedRoutine
-      jsr Keyboard.IsReturnPressed
-      beq CheckFire
+
+      IsIKeyPressed()
+      beq !+
+      jsr InfoScreen.Handler
+
+    !:
+      IsReturnPressed()
+      beq CheckReturn
 
     NoMovement:
       jsr Finalize
@@ -34,7 +40,7 @@ Intro: {
   // Initialization of intro screen
   * = * "Intro Init"
   Init: {
-  // Set background and border color to black
+  // Set background and border color
       lda #$08
       sta VIC.BORDER_COLOR
       sta VIC.BACKGROUND_COLOR
@@ -43,6 +49,11 @@ Intro: {
       sta VIC.EXTRA_BACKGROUND1
       lda #$01
       sta VIC.EXTRA_BACKGROUND2
+
+      lda #$0a
+      sta SPRITES.EXTRACOLOR1
+      lda #$00
+      sta SPRITES.EXTRACOLOR2
 
 // Set pointer to char memory to $7800-$7fff (xxxx111x)
 // and pointer to screen memory to $4000-$43ff (0000xxxx)
@@ -218,5 +229,7 @@ Intro: {
 }
 
 #import "_label.asm"
+#import "_infoscreen.asm"
+#import "_keyboard.asm"
 #import "_joystick.asm"
 #import "main.asm"
