@@ -61,14 +61,12 @@ InfoScreen: {
 
       EnableMultiSprite(%01111111, true)
     !:
-      IsReturnPressed()
+      IsBackArrowPressed()
       beq !-
 
       jsr DisableAllSprites
 
-      lda #$09
-      sta VIC.BORDER_COLOR
-      sta VIC.BACKGROUND_COLOR
+      jsr Intro.Init
 
       CopyScreenRam(MapDummyArea, $4000)
 

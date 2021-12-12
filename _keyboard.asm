@@ -28,6 +28,15 @@
   sta Keyboard.IKeyPressed
 }
 
+.macro IsBackArrowPressed() {
+  lda #%01111111
+  sta Keyboard.DetectKeyPressed.MaskOnPortA
+  lda #%00000010
+  sta Keyboard.DetectKeyPressed.MaskOnPortB
+  jsr Keyboard.DetectKeyPressed
+  sta Keyboard.BackArrowPressed
+}
+
 Keyboard: {
   Init: {
       lda #1
@@ -40,13 +49,13 @@ Keyboard: {
   DetectKeyPressed: {
       sei
       lda #%11111111
-      sta $dc02
+      sta CIA1.PORT_A_DIRECTION
       lda #%00000000
-      sta $dc03
+      sta CIA1.PORT_B_DIRECTION
 
       lda MaskOnPortA
-      sta $dc00
-      lda $dc01
+      sta CIA1.PORT_A
+      lda CIA1.PORT_B
       and MaskOnPortB
       beq Pressed
       lda #$00
@@ -57,12 +66,13 @@ Keyboard: {
       cli
       rts
 
-    MaskOnPortA:  .byte $00
-    MaskOnPortB:  .byte $00
+    MaskOnPortA:    .byte $00
+    MaskOnPortB:    .byte $00
   }
 
-  ReturnPressed:  .byte $00
-  IKeyPressed:    .byte $00
+  ReturnPressed:    .byte $00
+  IKeyPressed:      .byte $00
+  BackArrowPressed: .byte $00
 }
 
 #import "_label.asm"

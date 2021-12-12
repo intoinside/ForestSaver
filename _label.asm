@@ -25,7 +25,14 @@ VIC: {
   .label SPRITE_MULTICOLOR  = $d01c
 }
 
-CIA: {
+CIA1: {
+  .label PORT_A             = $dc00
+  .label PORT_B             = $dc01
+  .label PORT_A_DIRECTION   = $dc02
+  .label PORT_B_DIRECTION   = $dc03
+}
+
+CIA2: {
   .label PORT_A             = $dd00
 }
 
