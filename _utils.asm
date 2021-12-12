@@ -306,9 +306,9 @@ ShowGameNextLevelMessage: {
   NextLevelLabel: .byte $00, $0f, $06, $19, $15, $00, $0d, $06, $17, $06, $0d
 }
 
-// Fill screen with $20 char (preserve sprite pointer memory area)
+// Fill screen with $00 char (preserve sprite pointer memory area)
 .macro ClearScreen(screenram) {
-    lda #$20
+    lda #$00
     ldx #250
   !:
     dex
@@ -355,6 +355,20 @@ DisableAllSprites: {
 .macro EnableSprite(bSprite, bEnable) {
     ldy #bSprite
     lda SpriteNumberMask, y
+    .if (bEnable)   // Build-time condition (not run-time)
+    {
+      ora VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
+    }
+    else
+    {
+      eor #$ff    // Get mask compliment
+      and VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
+    }
+    sta VIC.SPRITE_ENABLE       // Set the new value into the sprite enable register
+}
+
+.macro EnableMultiSprite(SpriteMask, bEnable) {
+    lda #SpriteMask
     .if (bEnable)   // Build-time condition (not run-time)
     {
       ora VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
