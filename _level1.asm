@@ -190,6 +190,7 @@ Level1: {
   * = * "Level1 CheckLevelCompleted"
   CheckLevelCompleted: {
       lda Hud.CurrentScore + 1
+      and #2
       beq Done
       lda ShowGameNextLevelMessage.IsShown
       bne Done
