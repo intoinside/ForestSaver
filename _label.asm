@@ -75,7 +75,7 @@ SPRITES: {
 
   .label PRIORITY           = $d01b
 
-  .label COLLISION_TO_SPRITE = $d01e
+  .label COLLISION_TO_SPRITE      = $d01e
   .label COLLISION_TO_BKG   = $d01f
 
 // Level x ranger
@@ -102,7 +102,13 @@ SPRITES: {
   .label PIPE_4_R           = $72
 
 // Level 3
-// TBD
+  .label FLAMETHROWER_STANDING    = $73
+  .label FLAMETHROWER_WALKING     = $74
+  .label FLAMETHROWER_STANDING_R  = $75
+  .label FLAMETHROWER_WALKING_R   = $76
+  .label FLAME_1            = $77
+  .label FLAME_2            = $78
+  .label FLAME_3            = $79
 
   // These label will be modified with self-modification code
   .label SPRITE_0           = $bef8
