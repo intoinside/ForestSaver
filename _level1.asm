@@ -98,6 +98,8 @@ Level1: {
       sta SPRITE_4
 
 // Ranger coordinates
+      lda #$0
+      sta SPRITES.EXTRA_BIT
       lda #$50
       sta SPRITES.X0
       lda #$40
