@@ -38,9 +38,18 @@ Level2: {
       jsr HandleEnemyMove
       jsr HandleTankTruckMove
 
+      jsr CheckLevelCompleted
+      bne CloseLevelAndGotoNext
+
       lda GameEnded
       bne CloseLevelAndGame
 
+      jmp EndLoop
+
+    CloseLevelAndGotoNext:
+      SetSpriteToBackground()
+      IsReturnPressed()
+      bne LevelDone
       jmp EndLoop
 
     CloseLevelAndGame:
@@ -90,6 +99,8 @@ Level2: {
       sta SPRITE_4
 
 // Ranger coordinates
+      lda #$0
+      sta SPRITES.EXTRA_BIT
       lda #$50
       sta SPRITES.X0
       lda #$40
@@ -151,6 +162,7 @@ Level2: {
       jsr DisableAllSprites
 
       lda #$00
+      sta LevelCompleted
       sta AddEnemy.EnemyActive
       sta WoodCutterFromLeft.WoodCutterFined
       sta WoodCutterFromLeft.ComplaintShown
@@ -190,9 +202,28 @@ Level2: {
       rts
   }
 
+  * = * "Level2 CheckLevelCompleted"
+  CheckLevelCompleted: {
+      lda Hud.CurrentScore + 1
+      and #6
+      beq Done
+      lda ShowGameNextLevelMessage.IsShown
+      bne Done
+
+      inc LevelCompleted
+
+      jsr ShowGameNextLevelMessage
+
+    Done:
+      rts
+  }
+
   * = * "Level2 AddEnemy"
   AddEnemy: {
       lda GameEnded
+      bne Done
+
+      lda LevelCompleted
       bne Done
 
       GetRandomUpTo(6)
@@ -283,11 +314,15 @@ Level2: {
       jsr HandleWoodCutterFined
       inc ComplaintShown
 
-      lda #$2f
-      sta Ranger.IsFining
+      lda LevelCompleted
+      bne !+
 
       AddPoints(0, 0, 2, 0);
 
+      lda #$2f
+      sta Ranger.IsFining
+
+    !:
       jmp Done
 
     CutCompletedCheck:
@@ -421,6 +456,9 @@ Level2: {
       ldx CurrentWoodCutter
       lda #$01
       sta TreeAlreadyCut, x
+
+      lda LevelCompleted
+      bne !+
 
       lda GameEnded
       bne !+
@@ -1630,6 +1668,8 @@ Level2: {
   .label SPRITE_5     = $4bfd
   .label SPRITE_6     = $4bfe
   .label SPRITE_7     = $4bff
+
+  LevelCompleted: .byte $00
 
 }
 
