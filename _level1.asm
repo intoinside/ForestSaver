@@ -1164,7 +1164,7 @@ Level1: {
   }
 
   AddColorToMap: {
-      lda #$44
+      lda #>ScreenMemoryBaseAddress
       sta SetColorToChars.ScreenMemoryAddress
 
       jsr SetColorToChars
@@ -1174,13 +1174,15 @@ Level1: {
 
   LevelCompleted: .byte $00
 
+  .label ScreenMemoryBaseAddress = $4400
+
 // Hatchet sprite pointer
-  .label SPRITE_1     = $47f9
-  .label SPRITE_3     = $47fb
+  .label SPRITE_1     = ScreenMemoryBaseAddress + $3f9
+  .label SPRITE_3     = ScreenMemoryBaseAddress + $3fb
 
 // Enemy sprite pointer
-  .label SPRITE_2     = $47fa
-  .label SPRITE_4     = $47fc
+  .label SPRITE_2     = ScreenMemoryBaseAddress + $3fa
+  .label SPRITE_4     = ScreenMemoryBaseAddress + $3fc
 }
 
 #import "_hud.asm"

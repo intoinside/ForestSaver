@@ -1648,7 +1648,7 @@ Level2: {
   }
 
   AddColorToMap: {
-      lda #$48
+      lda #>ScreenMemoryBaseAddress
       sta SetColorToChars.ScreenMemoryAddress
 
       jsr SetColorToChars
@@ -1656,21 +1656,22 @@ Level2: {
       rts
   }
 
-// Hatchet sprite pointer
-  .label SPRITE_1     = $4bf9
-  .label SPRITE_3     = $4bfb
-
-// Enemy sprite pointer
-  .label SPRITE_2     = $4bfa
-  .label SPRITE_4     = $4bfc
-
-// Tank tail and body sprite pointer
-  .label SPRITE_5     = $4bfd
-  .label SPRITE_6     = $4bfe
-  .label SPRITE_7     = $4bff
-
   LevelCompleted: .byte $00
 
+  .label ScreenMemoryBaseAddress = $4800
+
+// Hatchet sprite pointer
+  .label SPRITE_1     = ScreenMemoryBaseAddress + $3f9
+  .label SPRITE_3     = ScreenMemoryBaseAddress + $3fb
+
+// Enemy sprite pointer
+  .label SPRITE_2     = ScreenMemoryBaseAddress + $3fa
+  .label SPRITE_4     = ScreenMemoryBaseAddress + $3fc
+
+// Tank tail and body sprite pointer
+  .label SPRITE_5     = ScreenMemoryBaseAddress + $3fd
+  .label SPRITE_6     = ScreenMemoryBaseAddress + $3fe
+  .label SPRITE_7     = ScreenMemoryBaseAddress + $3ff
 }
 
 #import "main.asm"
