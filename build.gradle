@@ -17,7 +17,8 @@ retroProject {
     excludes = ["**/_*.asm", ".ra/**/*", "libs/*"]
 
     // dependencies
-    libFromGitHub "c64lib/common", "0.2.0"
+    libFromGitHub "c64lib/common", "0.3.0"
+    libFromGitHub "c64lib/chipset", "0.3.0"
 }
 
 preprocess {
