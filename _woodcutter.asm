@@ -18,7 +18,7 @@ WoodCutter: {
       adc #$03
       sta ScreenMemoryAddress
 
-// Self modify code to use current screen memotry address, update hibyte
+// Self modify code to use current screen memory address, update hibyte
       sta UpdateWoodCutterFrame.LoadSprite1 + 2
       sta UpdateWoodCutterFrame.LoadSprite2 + 2
       sta UpdateWoodCutterFrame.LoadSprite3 + 2

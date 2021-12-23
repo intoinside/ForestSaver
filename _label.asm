@@ -102,10 +102,10 @@ SPRITES: {
   .label PIPE_4_R           = $72
 
 // Level 3
-  .label FLAMETHROWER_STANDING    = $73
-  .label FLAMETHROWER_WALKING     = $74
-  .label FLAMETHROWER_STANDING_R  = $75
-  .label FLAMETHROWER_WALKING_R   = $76
+  .label ARSIONIST_STANDING    = $73
+  .label ARSIONIST_WALKING     = $74
+  .label ARSIONIST_STANDING_R  = $75
+  .label ARSIONIST_WALKING_R   = $76
   .label FLAME_1            = $77
   .label FLAME_2            = $78
   .label FLAME_3            = $79

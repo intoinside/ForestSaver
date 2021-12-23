@@ -20,6 +20,9 @@
 
 #importonce
 
+#import "chipset/lib/vic2.asm"
+#import "chipset/lib/vic2-global.asm"
+
 Level3: {
   * = * "Level3 Manager"
   Manager: {
@@ -34,6 +37,8 @@ Level3: {
 
       jsr Ranger.HandleRangerMove
       jsr HandleEnemyMove
+      jsr HandleTankTruckMove
+      jsr HandleArsionistMove
 
       //jsr CheckLevelCompleted
       //bne CloseLevelAndGotoNext
@@ -59,9 +64,9 @@ Level3: {
   // Initialization of level 3
   * = * "Level3 Init"
   Init: {
-      CopyScreenRam($4c00, MapDummyArea)
+      CopyScreenRam(ScreenMemoryBaseAddress, MapDummyArea)
 
-      lda #$4c
+      lda #<ScreenMemoryBaseAddress
       sta ShowGameNextLevelMessage.StartAddress + 1
 
       SetSpriteToForeground()
@@ -76,7 +81,7 @@ Level3: {
       sta VIC.EXTRA_BACKGROUND2
 
 // Set pointer to char memory to $7800-$7fff (xxxx111x)
-// and pointer to screen memory to $4400-$47ff (0001xxxx)
+// and pointer to screen memory to $4c00-$4fff (0011xxxx)
       lda #%00111110
       sta VIC.MEMORY_SETUP
 
@@ -91,27 +96,33 @@ Level3: {
       lda #$0
       sta SPRITES.EXTRA_BIT
       lda #$50
-      sta SPRITES.X0
+      sta c64lib.SPRITE_0_X
       lda #$40
-      sta SPRITES.Y0
+      sta c64lib.SPRITE_0_Y
 
 // Optimization may be done
 // Ranger module init
-      lda #$00
+      lda #<ScreenMemoryBaseAddress
       sta Ranger.ScreenMemoryAddress + 1
-      lda #$4c
+      lda #>ScreenMemoryBaseAddress
       sta Ranger.ScreenMemoryAddress
       jsr Ranger.Init
 
-      lda #$00
+      lda #<ScreenMemoryBaseAddress
       sta WoodCutter.ScreenMemoryAddress + 1
-      lda #$4c
+      lda #>ScreenMemoryBaseAddress
       sta WoodCutter.ScreenMemoryAddress
       jsr WoodCutter.Init
 
-      lda #$00
+      lda #<ScreenMemoryBaseAddress
+      sta Arsionist.ScreenMemoryAddress + 1
+      lda #>ScreenMemoryBaseAddress
+      sta Arsionist.ScreenMemoryAddress
+      jsr Arsionist.Init
+
+      lda #<ScreenMemoryBaseAddress
       sta Hud.ScreenMemoryAddress + 1
-      lda #$4c
+      lda #>ScreenMemoryBaseAddress
       sta Hud.ScreenMemoryAddress
       jsr Hud.Init
 
@@ -120,8 +131,15 @@ Level3: {
       sta SPRITES.COLOR0
       lda #$08
       sta SPRITES.COLOR1
+      sta SPRITES.COLOR3
       lda #$02
       sta SPRITES.COLOR2
+      sta SPRITES.COLOR4
+      lda #$01
+      sta SPRITES.COLOR5
+      sta SPRITES.COLOR6
+      lda #$03
+      sta SPRITES.COLOR7
 
 // Enable the first sprite (ranger)
       EnableSprite(0, true)
@@ -136,12 +154,32 @@ Level3: {
 
   * = * "Level3 Finalize"
   Finalize: {
-      CopyScreenRam(MapDummyArea, $4c00)
+      CopyScreenRam(MapDummyArea, ScreenMemoryBaseAddress)
 
       jsr DisableAllSprites
 
       lda #$00
       sta LevelCompleted
+      sta AddEnemy.EnemyActive
+      sta WoodCutterFromLeft.WoodCutterFined
+      sta WoodCutterFromLeft.ComplaintShown
+      sta WoodCutterFromLeft.CutCompleted
+      sta WoodCutterFromLeft.WalkInCompleted
+      sta WoodCutterFromLeft.HatchetShown
+
+      sta WoodCutterFromLeft.TreeAlreadyCut
+      sta WoodCutterFromLeft.TreeAlreadyCut + 1
+
+      sta AddTankTruck.TruckActive
+
+      sta TankTruckFromRight.LakeNotAvailable
+      sta TankTruckFromRight.Polluted
+
+      sta AddArsionist.ArsionistActive
+
+      sta Hud.ReduceDismissalCounter.DismissalCompleted
+
+      jsr CleanTankRight
 
       jsr CompareAndUpdateHiScore
 
@@ -377,7 +415,7 @@ Level3: {
       sta GameEnded
       beq !+
 
-      lda #$48
+      lda #<ScreenMemoryBaseAddress
       sta ShowGameEndedMessage.StartAddress + 1
       jsr ShowGameEndedMessage
 
@@ -574,7 +612,7 @@ Level3: {
     .label DirectionX1      = 1
     .label DirectionY1      = 0
 
-    TreeStartAddress1: .word $4c00 + (40 * 6) + 5
+    TreeStartAddress1: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(5, 6)
 
 // Second woodcutter track data
     .label TrackWalk2XStart = 0
@@ -583,7 +621,7 @@ Level3: {
     .label DirectionX2      = 1
     .label DirectionY2      = 0
 
-    TreeStartAddress2: .word $4c00 + (40 * 13) + 4
+    TreeStartAddress2: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(4, 13)
 
 // Third woodcutter track data
     .label TrackWalk3XStart = 0
@@ -592,7 +630,427 @@ Level3: {
     .label DirectionX3      = 1
     .label DirectionY3      = 0
 
-    TreeStartAddress3: .word $4c00 + (40 * 16) + 12
+    TreeStartAddress3: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(12, 16)
+  }
+
+  * = * "Level3 AddTankTruck"
+  AddTankTruck: {
+      lda GameEnded
+      beq !+
+      jmp Done
+
+    !:
+// If there is already a truck active, no new truck is needed
+      lda TruckActive
+      bne Done
+
+      GetRandomUpTo(6)
+
+      cmp #$02
+      beq StartTankTruckFromRight
+
+      jmp Done
+
+    StartTankTruckFromRight:
+      lda TankTruckFromRight.LakeNotAvailable
+      bne Done
+
+      lda #$02
+      sta TruckActive
+
+      lda #SPRITES.TANK_TAIL_RI
+      sta SPRITE_5
+      lda #SPRITES.TANK_BODY_RI
+      sta SPRITE_6
+
+      lda #TankTruckFromRight.TankRightXStart
+      sta SPRITES.X6
+      clc
+      sbc #24
+      sta SPRITES.X5
+
+    Done:
+      rts
+
+    TruckActive:      .byte $00
+  }
+
+  * = * "Level3 HandleTankTruckMove"
+  HandleTankTruckMove: {
+      lda AddTankTruck.TruckActive
+      cmp #$02
+      bne Done
+      jsr TankTruckFromRight
+
+    Done:
+      rts
+  }
+
+  * = * "Level3 TankTruckFromRight"
+  TankTruckFromRight: {
+      lda LakeNotAvailable
+      beq LakeGood
+      jmp CleanForNextRun
+
+    LakeGood:
+      // Setting up tank sprites
+      lda SpritesCreated
+      bne TankDrivingIn
+      inc SpritesCreated
+      EnableSprite(5, true)
+      EnableSprite(6, true)
+
+    TankDrivingIn:
+      // Lake is not polluted, so a new tank can drive in
+      lda TankIn
+      bne DriveInDone
+
+      lda SPRITES.X5
+      cmp #TankRightXEnd
+      bne !+
+      jmp !Update+
+
+    !:
+      dec SPRITES.X5
+      dec SPRITES.X6
+
+      CallTankSetPosition(SPRITES.X5, TankRightY, $1, $0a, $0b);
+      CallTankSetPosition(SPRITES.X6, TankRightY, $1, $0c, $0d);
+      jmp !End+
+
+    !Update:
+      inc TankIn
+    !End:
+      jmp Done
+
+    DriveInDone:
+      // Tank is in position, showing pipe
+      lda PipeShown
+      bne Polluting
+
+      lda #SPRITES.PIPE_1_R
+      sta SPRITE_7
+      sta PollutionFrame
+
+      lda SPRITES.X5
+      clc
+      sbc #22
+      sta SPRITES.X7
+
+      lda SPRITES.Y5
+      sta SPRITES.Y7
+
+      lda SPRITES.EXTRA_BIT
+      ora #%11100000
+      sta SPRITES.EXTRA_BIT
+
+      EnableSprite(7, true)
+
+      inc PipeShown
+
+      jmp Done
+
+    Polluting:
+      // Check if pollution is done, otherwise pollute it
+      lda Polluted
+      bne !DriveOut+
+      lda TankFined
+      bne !DriveOut+
+      jmp !Proceed+
+
+    !DriveOut:
+      jmp DriveOut
+
+    !Proceed:  // Tank from right
+      lda SPRITES.EXTRA_BIT
+      and #%10000000
+      beq !+
+      lda #$1
+    !:
+      sta SpriteCollision.OtherX + 1
+      lda SPRITES.X7
+      sta SpriteCollision.OtherX
+      lda SPRITES.Y7
+      sta SpriteCollision.OtherY
+      jsr SpriteCollision
+      bne RangerTankMet
+
+      inc PollutionFrameWait
+      lda PollutionFrameWait
+      lsr
+      lsr
+      lsr
+      lsr
+      lsr
+      bcc !Done+
+
+      lda #$00
+      sta PollutionFrameWait
+
+      lda PollutionCounter
+      cmp #PollutionCounterLimit
+      bne !+
+      inc Polluted
+
+      EnableSprite(7, false)
+
+      lda #<LakeCoordinates
+      sta SetLakeToBlack.StartAddress
+      lda #>(LakeCoordinates + 1)
+      sta SetLakeToBlack.StartAddress + 1
+      jsr SetLakeToBlack
+      jsr AddColorToMap
+
+      jsr Hud.ReduceDismissalCounter
+      jmp Done
+
+    !:
+      inc PollutionCounter
+
+      inc PollutionFrame
+      lda PollutionFrame
+      sta SPRITE_7
+
+      cmp #SPRITES.PIPE_4_R
+      bne !Done+
+
+      lda #SPRITES.PIPE_1_R
+      sta PollutionFrame
+
+    !Done:
+      jmp Done
+
+    RangerTankMet:
+      AddPoints(0, 0, 5, 0);
+
+      inc TankFined
+      EnableSprite(7, false)
+      jmp Done
+
+    DriveOut:
+      lda TankOut
+      bne DriveOutDone
+
+      inc SPRITES.X6
+      CallTankSetPosition(SPRITES.X6, TankRightY, $1, $0c, $0d);
+      lda SPRITES.X6
+      cmp #TankRightXStart
+      bne !DecOtherSprite+
+      EnableSprite(6, false)
+
+    !DecOtherSprite:
+      inc SPRITES.X5
+      CallTankSetPosition(SPRITES.X5, TankRightY, $1, $0a, $0b);
+      lda SPRITES.X5
+      cmp #TankRightXStart
+      beq DriveOutDone
+      jmp Done
+
+    DriveOutDone:
+      EnableSprite(5, false)
+      inc TankOut
+
+    CleanForNextRun:
+      lda #$00
+      sta AddTankTruck.TruckActive
+
+      jsr CleanTankRight
+
+      lda Polluted
+      sta LakeNotAvailable
+
+    Done:
+      rts
+
+    LakeNotAvailable: .byte $00
+    PipeShown: .byte $00
+    SpritesCreated: .byte $00
+    TankIn: .byte $00
+    TankOut: .byte $00
+    TankFined: .byte $00
+    Polluted: .byte $00
+
+    PollutionCounter: .byte $00
+    PollutionFrame: .byte $00
+    PollutionFrameWait: .byte $01
+
+    .label PollutionCounterLimit = 20
+
+    .label TankRightXStart = 92
+    .label TankRightXEnd   = 64
+    .label TankRightX1BitStart = 1
+    .label TankRightY      = 160
+    .label TankRightBodySpriteNum = $68
+    .label TankRightTailSpriteNum = $69
+
+    .label LakeCoordinates = ScreenMemoryBaseAddress + c64lib_getTextOffset(15, 31)
+  }
+
+  * = * "Level3 CleanTankRight"
+  CleanTankRight: {
+      lda #$00
+      sta TankTruckFromRight.PipeShown
+      sta TankTruckFromRight.SpritesCreated
+      sta TankTruckFromRight.TankIn
+      sta TankTruckFromRight.TankOut
+      sta TankTruckFromRight.TankFined
+
+      sta TankTruckFromRight.PollutionCounter
+      sta TankTruckFromRight.PollutionFrame
+
+      lda #$01
+      sta TankTruckFromRight.PollutionFrameWait
+
+      rts
+  }
+
+  * = * "Level3 AddArsionist"
+  AddArsionist: {
+      lda GameEnded
+      beq !+
+      jmp Done
+
+    !:
+// If there is already an arsionist on screen, no arsionist needed
+      lda ArsionistActive
+      bne Done
+
+      GetRandomUpTo(6)
+
+      cmp #$02
+      beq StartArsionistRight
+
+      jmp Done
+
+    StartArsionistRight:
+      lda ArsionistFromRight.BushNotAvailable
+      bne Done
+
+      lda #$01
+      sta ArsionistActive
+
+      lda #SPRITES.ARSIONIST_STANDING
+      sta SPRITE_3
+
+    Done:
+      rts
+
+    ArsionistActive: .byte $00
+  }
+
+  * = * "Level3 HandleArsionistMove"
+  HandleArsionistMove: {
+      lda AddArsionist.ArsionistActive
+      cmp #$01
+      bne Done
+      jsr ArsionistFromRight
+
+    Done:
+      rts
+  }
+
+  * = * "Level3 ArsionistFromRight"
+  ArsionistFromRight: {
+      lda BushNotAvailable
+      bne CleanForNextRun
+
+    BushNotBurned:
+      lda ArsionistReady
+      bne ArsionistReadyForWalkIn
+
+      // Code for arsionist sprite preparing
+      lda ArsionistStartX
+      sta c64lib.SPRITE_3_X
+      lda SPRITES.EXTRA_BIT
+      ora #%00011000
+      sta SPRITES.EXTRA_BIT
+
+      lda ArsionistStartY
+      sta c64lib.SPRITE_3_Y
+
+      EnableSprite(3, true)
+
+      inc ArsionistReady
+      jmp Done
+
+    ArsionistReadyForWalkIn:
+      lda ArsionistIn
+      bne ArsionistIsBurning
+
+      lda c64lib.SPRITE_3_X
+      cmp ArsionistEndX
+      bne !+
+
+      inc ArsionistIn
+      jmp ArsionistIsBurning
+
+    !:
+      // Code for arsionist walk in
+      dec c64lib.SPRITE_3_X
+
+      lda #<SPRITE_3
+      sta Arsionist.ScreenMemoryAddress + 1
+      lda #>SPRITE_3
+      sta Arsionist.ScreenMemoryAddress
+
+  * = * "Level3 CallUpdateArsionistFrame"
+      CallUpdateArsionistFrame(ArsionistFrame);
+
+    ArsionistIsBurning:
+      lda BushBurned
+      cmp #$08
+      bne ArsionistReadyForWalkOut
+
+      // Code for bush burning
+
+      jmp Done
+
+    ArsionistReadyForWalkOut:
+      lda ArsionistOut
+      bne ArsionistAlreadyOut
+
+      // Code for arsionist walk out
+
+    ArsionistAlreadyOut:
+      lda BushBurned
+      cmp #$08
+      bne Done
+
+    CleanForNextRun:
+      lda #$00
+      sta AddArsionist.ArsionistActive
+
+      jsr CleanArsionist
+
+      bne Done
+      sta BushNotAvailable
+
+    Done:
+      rts
+
+      ArsionistFrame: .byte $00
+
+      ArsionistStartX: .byte 90
+      ArsionistEndX: .byte 20
+      ArsionistStartY: .byte 100
+
+      BushNotAvailable: .byte $00
+      ArsionistReady: .byte $00
+      ArsionistIn: .byte $00
+      FlamingDone: .byte $00
+      ArsionistOut: .byte $00
+      BushBurned: .byte $00   // When is 8, bush is completely burnt
+  }
+
+  CleanArsionist: {
+      lda #$00
+      sta ArsionistFromRight.BushNotAvailable
+      sta ArsionistFromRight.ArsionistReady
+      sta ArsionistFromRight.ArsionistIn
+      sta ArsionistFromRight.FlamingDone
+      sta ArsionistFromRight.ArsionistOut
+
+      rts
   }
 
   * = * "Level3 TimedRoutine"
@@ -613,6 +1071,8 @@ Level3: {
 
     Waiting:
       jsr AddEnemy
+      jsr AddTankTruck
+      jsr AddArsionist
 
       jmp Exit
 
@@ -677,4 +1137,5 @@ Level3: {
   .label SPRITE_7     = ScreenMemoryBaseAddress + $3ff
 }
 
+#import "_arsionist.asm"
 #import "_utils.asm"

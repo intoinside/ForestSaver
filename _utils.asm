@@ -461,29 +461,6 @@ SpriteCollision: {
     adc #21
     sta RangerY2
 
-/*
-    lda RangerX1+1
-    DrawAccumulator($4806)
-    lda RangerX1
-    DrawAccumulator($4808)
-    lda RangerY1
-    DrawAccumulator($480b)
-
-    lda RangerX2+1
-    DrawAccumulator($482e)
-    lda RangerX2
-    DrawAccumulator($4830)
-    lda RangerY2
-    DrawAccumulator($4833)
-
-    lda OtherX+1
-    DrawAccumulator($4814)
-    lda OtherX
-    DrawAccumulator($4816)
-    lda OtherY
-    DrawAccumulator($4819)
-*/
-
     // Collision happened if OtherSprite coordinates is inside Ranger
     // square. This means that
     // * RangerX1 < OtherX < RangerX2
