@@ -461,7 +461,7 @@ Level3: {
       iny
     !Next:
       inx
-      cpx #$02
+      cpx #$03
       bne LookForTreeAvailable
       jmp Done
     CheckNextWoodCutter:
@@ -883,7 +883,7 @@ Level3: {
     .label TankRightBodySpriteNum = $68
     .label TankRightTailSpriteNum = $69
 
-    .label LakeCoordinates = ScreenMemoryBaseAddress + c64lib_getTextOffset(15, 31)
+    .label LakeCoordinates = ScreenMemoryBaseAddress + c64lib_getTextOffset(31, 15)
   }
 
   * = * "Level3 CleanTankRight"
