@@ -23,6 +23,8 @@ Arsionist: {
       sta UpdateFrame.LoadSprite2 + 2
       sta UpdateFrame.StoreSprite1 + 2
       sta UpdateFrame.StoreSprite2 + 2
+      sta UseTheFlame.LoadSprite1 + 2
+      sta UseTheFlame.StoreSprite1 + 2
 
       rts
   }
@@ -90,13 +92,12 @@ Arsionist: {
       .byte $00
   }
 
-  * = * "Arsionist UpdateFrame"
-  UpdateFlameFrame: {
-      lda ScreenMemoryAddress + 1
-      sta UpdateFrame.LoadSprite1 + 1
-      sta UpdateFrame.LoadSprite2 + 1
-      sta UpdateFrame.StoreSprite1 + 1
-      sta UpdateFrame.StoreSprite2 + 1
+  * = * "Arsionist UseTheFlame"
+  UseTheFlame: {
+      ldx ScreenMemoryAddress + 1
+      inx
+      stx UseTheFlame.LoadSprite1 + 1
+      stx UseTheFlame.StoreSprite1 + 1
 
       inc FlameFrame
       lda FlameFrame
@@ -104,7 +105,7 @@ Arsionist: {
       lsr
       lsr
       lsr
-      bcc NoMove
+      bcc NoChange
 
       lda #$00
       sta FlameFrame
@@ -112,21 +113,22 @@ Arsionist: {
       ldx #SPRITES.FLAME_1
     LoadSprite1:
       lda SPRITE_PTR
-      cmp #SPRITES.FLAME_1 + 2
+      cmp #SPRITES.FLAME_3
       beq RightUpdate
+      tax
       inx
 
     RightUpdate:
       // If right frame edit occours, no other frame switch will be performed
     StoreSprite1:
       stx SPRITE_PTR
-      jmp NoMove
 
-    NoMove:
+    NoChange:
       rts
 
-    FlameFrame:
-      .byte $00
+    FrameReference: .byte $00
+
+    FlameFrame: .byte $00
   }
 
   ScreenMemoryAddress:
@@ -159,4 +161,16 @@ Arsionist: {
 
   lda Arsionist.UpdateFrame.ArsionistFrame
   sta arsionistFrame
+}
+
+.macro CallUseTheFlameThrower(flameFrame, frameReference) {
+  lda flameFrame
+  sta Arsionist.UseTheFlame.FlameFrame
+  lda #frameReference
+  sta Arsionist.UseTheFlame.FrameReference
+
+  jsr Arsionist.UseTheFlame
+
+  lda Arsionist.UseTheFlame.FlameFrame
+  sta flameFrame
 }

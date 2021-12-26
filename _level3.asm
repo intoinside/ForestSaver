@@ -129,12 +129,12 @@ Level3: {
 // Sprite color setting
       lda #$07
       sta SPRITES.COLOR0
+      sta SPRITES.COLOR4
       lda #$08
       sta SPRITES.COLOR1
       sta SPRITES.COLOR3
       lda #$02
       sta SPRITES.COLOR2
-      sta SPRITES.COLOR4
       lda #$01
       sta SPRITES.COLOR5
       sta SPRITES.COLOR6
@@ -976,14 +976,14 @@ Level3: {
 
     ArsionistReadyForWalkIn:
       lda ArsionistIn
-      bne ArsionistIsBurning
+      bne ShowFlameThrower
 
       lda c64lib.SPRITE_3_X
       cmp ArsionistEndX
       bne !+
 
       inc ArsionistIn
-      jmp ArsionistIsBurning
+      jmp ShowFlameThrower
 
     !:
       // Code for arsionist walk in
@@ -997,12 +997,32 @@ Level3: {
       CallUpdateArsionistFrame(ArsionistFrame);
       jmp Done
 
+    ShowFlameThrower:
+      lda FlameThrowerShown
+      bne ArsionistIsBurning
+
+      lda #SPRITES.FLAME_1
+      sta SPRITE_4
+
+      lda SPRITES.X3
+      clc
+      sbc #18
+      sta SPRITES.X4
+      lda SPRITES.Y3
+      sta SPRITES.Y4
+
+      EnableSprite(4, true)
+      inc FlameThrowerShown
+
+      jmp Done
+
     ArsionistIsBurning:
       lda BushBurned
       cmp #$08
-      bne ArsionistReadyForWalkOut
+      beq ArsionistReadyForWalkOut
 
       // Code for bush burning
+      CallUseTheFlameThrower(FlameFrame, SPRITES.FLAME_3);
 
       jmp Done
 
@@ -1039,24 +1059,28 @@ Level3: {
       rts
 
       ArsionistFrame: .byte $00
+      FlameFrame: .byte $00
 
       ArsionistStartX: .byte 90
-      ArsionistEndX: .byte 20
-      ArsionistStartY: .byte 100
+      ArsionistEndX: .byte 28
+      ArsionistStartY: .byte 90
 
       BushNotAvailable: .byte $00
       ArsionistReady: .byte $00
       ArsionistIn: .byte $00
+      FlameThrowerShown: .byte $00
       FlamingDone: .byte $00
       ArsionistOut: .byte $00
       BushBurned: .byte $00   // When is 8, bush is completely burnt
   }
 
+  * = * "Level3 CleanArsionist"
   CleanArsionist: {
       lda #$00
       sta ArsionistFromRight.BushNotAvailable
       sta ArsionistFromRight.ArsionistReady
       sta ArsionistFromRight.ArsionistIn
+      sta ArsionistFromRight.FlameThrowerShown
       sta ArsionistFromRight.FlamingDone
       sta ArsionistFromRight.ArsionistOut
 
