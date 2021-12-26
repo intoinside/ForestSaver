@@ -19,7 +19,7 @@ A ranger has to do a lot of work to preserve the forest. He must be careful of t
 * Vice emulator https://vice-emu.sourceforge.io/
 * C64 debugger Gui https://magoarcade.org/wp/c64debuggui/
 * Java JDK (at least v11) https://www.oracle.com/java/technologies/downloads/
-* c64lib https://github.com/c64lib
+* c64lib https://github.com/c64lib (common, chipset)
 
 These are used for CI/CD, not needed (but helpful) for development
 * Gradle build tool https://gradle.org/
@@ -32,18 +32,9 @@ These are used for CI/CD, not needed (but helpful) for development
 ### Download ForestSaver only for play
 Look into [Releases](https://github.com/intoinside/ForestSaver/releases) and check for the latest prg/d64 available.
 
-### Download ForestSaver for develop
-
-* Clone repository on your folder
-`git clone https://github.com/intoinside/ForestSaver.git`
-* Switch to game folder
-`cd ForestSaver`
-* Clone libraries
-`git clone https://github.com/c64lib/common.git --branch 0.2.0`
-
 At this point you should be able to build project inside KickAssembler.
 
-### Download ForestSaver for build and play
+### Download ForestSaver for develop, build and play
 
 * Clone repository on your folder
 `git clone https://github.com/intoinside/ForestSaver.git`
