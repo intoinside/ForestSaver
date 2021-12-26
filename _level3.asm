@@ -952,7 +952,8 @@ Level3: {
   * = * "Level3 ArsionistFromRight"
   ArsionistFromRight: {
       lda BushNotAvailable
-      bne CleanForNextRun
+      beq BushNotBurned
+      jmp CleanForNextRun
 
     BushNotBurned:
       lda ArsionistReady
@@ -993,8 +994,8 @@ Level3: {
       lda #>SPRITE_3
       sta Arsionist.ScreenMemoryAddress
 
-  * = * "Level3 CallUpdateArsionistFrame"
       CallUpdateArsionistFrame(ArsionistFrame);
+      jmp Done
 
     ArsionistIsBurning:
       lda BushBurned
@@ -1010,6 +1011,15 @@ Level3: {
       bne ArsionistAlreadyOut
 
       // Code for arsionist walk out
+      inc c64lib.SPRITE_3_X
+
+      lda #<SPRITE_3
+      sta Arsionist.ScreenMemoryAddress + 1
+      lda #>SPRITE_3
+      sta Arsionist.ScreenMemoryAddress
+
+      CallUpdateArsionistFrameReverse(ArsionistFrame);
+      jmp Done
 
     ArsionistAlreadyOut:
       lda BushBurned

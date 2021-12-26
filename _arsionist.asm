@@ -90,6 +90,45 @@ Arsionist: {
       .byte $00
   }
 
+  * = * "Arsionist UpdateFrame"
+  UpdateFlameFrame: {
+      lda ScreenMemoryAddress + 1
+      sta UpdateFrame.LoadSprite1 + 1
+      sta UpdateFrame.LoadSprite2 + 1
+      sta UpdateFrame.StoreSprite1 + 1
+      sta UpdateFrame.StoreSprite2 + 1
+
+      inc FlameFrame
+      lda FlameFrame
+      lsr
+      lsr
+      lsr
+      lsr
+      bcc NoMove
+
+      lda #$00
+      sta FlameFrame
+
+      ldx #SPRITES.FLAME_1
+    LoadSprite1:
+      lda SPRITE_PTR
+      cmp #SPRITES.FLAME_1 + 2
+      beq RightUpdate
+      inx
+
+    RightUpdate:
+      // If right frame edit occours, no other frame switch will be performed
+    StoreSprite1:
+      stx SPRITE_PTR
+      jmp NoMove
+
+    NoMove:
+      rts
+
+    FlameFrame:
+      .byte $00
+  }
+
   ScreenMemoryAddress:
     .word $be00
 
