@@ -10,8 +10,7 @@
 
 #importonce
 
-FirePressed:
-  .byte $00
+FirePressed: .byte $00
 
 Direction:          // Player sprite direction
   .byte $01         // $00 - no move, $01 - right, $ff - left
@@ -78,5 +77,3 @@ GetOnlyFirePress: {
 
     rts
 }
-
-#import "main.asm"

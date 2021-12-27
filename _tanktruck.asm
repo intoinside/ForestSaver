@@ -21,7 +21,7 @@
   sta TankTruck.SetPosition.SpriteYLow
   jsr TankTruck.SetPosition
 
-  lda SPRITES.EXTRA_BIT
+  lda c64lib.SPRITE_MSB_X
   .if (xBit==0)
   {
     .if (spriteXLow == $00) and #%11111110
@@ -44,34 +44,36 @@
     .if (spriteXLow == $0c) ora #%01000000
     .if (spriteXLow == $0e) ora #%10000000
   }
-  sta SPRITES.EXTRA_BIT
+  sta c64lib.SPRITE_MSB_X
 }
 
-TankTruck: {
-  SetPosition: {
-      lda SpriteXLow
-      sta SetX + 1
-      lda SpriteYLow
-      sta SetY + 1
+.filenamespace TankTruck
 
-      lda NewX
-    SetX:
-      sta $d0ef
+SetPosition: {
+    lda SpriteXLow
+    sta SetX + 1
+    lda SpriteYLow
+    sta SetY + 1
 
-      lda NewY
-    SetY:
-      sta $d0ef
+    lda NewX
+  SetX:
+    sta $d0ef
 
-    Done:
-      rts
+    lda NewY
+  SetY:
+    sta $d0ef
 
-    NewX:
-      .byte $00
-    NewY:
-      .byte $00
-    SpriteXLow:
-      .byte $00
-    SpriteYLow:
-      .byte $00
-  }
+  Done:
+    rts
+
+  NewX:
+    .byte $00
+  NewY:
+    .byte $00
+  SpriteXLow:
+    .byte $00
+  SpriteYLow:
+    .byte $00
 }
+
+#import "chipset/lib/vic2.asm"

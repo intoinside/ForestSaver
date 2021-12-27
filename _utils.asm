@@ -13,8 +13,6 @@
 SpriteNumberMask:
     .byte %00000001, %00000010, %00000100, %00001000, %00010000, %00100000, %01000000, %10000000
 
-#import "common/lib/math-global.asm"
-
 // Switch char at CharPosition from CharFrame1 to CharFrame2 and back
 .macro AnimateLake(CharPosition, CharFrame1, CharFrame2) {
     lda CharPosition
@@ -335,21 +333,32 @@ ShowGameNextLevelMessage: {
     bne !-
 }
 
+.macro SetupColorMap(screenRamHiAddress) {
+    lda #screenRamHiAddress
+    sta SetColorToChars.ScreenMemoryAddress
+
+    jsr SetColorToChars
+}
+
 DisableAllSprites: {
     lda #$00
-    sta VIC.SPRITE_ENABLE
+    sta c64lib.SPRITE_ENABLE
 
     rts
 }
 
-.macro SetSpriteToBackground() {
+SetSpriteToBackground: {
     lda #$ff
-    sta SPRITES.PRIORITY
+    sta c64lib.SPRITE_PRIORITY
+
+    rts
 }
 
-.macro SetSpriteToForeground() {
+SetSpriteToForeground: {
     lda #$00
-    sta SPRITES.PRIORITY
+    sta c64lib.SPRITE_PRIORITY
+
+    rts
 }
 
 .macro EnableSprite(bSprite, bEnable) {
@@ -357,28 +366,28 @@ DisableAllSprites: {
     lda SpriteNumberMask, y
     .if (bEnable)   // Build-time condition (not run-time)
     {
-      ora VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
+      ora c64lib.SPRITE_ENABLE   // Merge with the current sprite enable register
     }
     else
     {
       eor #$ff    // Get mask compliment
-      and VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
+      and c64lib.SPRITE_ENABLE   // Merge with the current sprite enable register
     }
-    sta VIC.SPRITE_ENABLE       // Set the new value into the sprite enable register
+    sta c64lib.SPRITE_ENABLE       // Set the new value into the sprite enable register
 }
 
 .macro EnableMultiSprite(SpriteMask, bEnable) {
     lda #SpriteMask
     .if (bEnable)   // Build-time condition (not run-time)
     {
-      ora VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
+      ora c64lib.SPRITE_ENABLE   // Merge with the current sprite enable register
     }
     else
     {
       eor #$ff    // Get mask compliment
-      and VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
+      and c64lib.SPRITE_ENABLE   // Merge with the current sprite enable register
     }
-    sta VIC.SPRITE_ENABLE       // Set the new value into the sprite enable register
+    sta c64lib.SPRITE_ENABLE       // Set the new value into the sprite enable register
 }
 
 .macro bpl16(arg1, arg2) {
@@ -445,17 +454,17 @@ SpriteCollision: {
     adc #10
     sta OtherY
 
-    lda SPRITES.EXTRA_BIT
+    lda c64lib.SPRITE_MSB_X
     and #%00000001
     sta RangerX1 + 1
     sta RangerX2 + 1
 
-    lda SPRITES.X0
+    lda c64lib.SPRITE_0_X
     sta RangerX1
     sta RangerX2
     add16value($0018, RangerX2)
 
-    lda SPRITES.Y0
+    lda c64lib.SPRITE_0_Y
     sta RangerY1
     clc
     adc #21
@@ -509,7 +518,7 @@ SpriteCollision: {
 
 * = * "Utils BackgroundCollision"
 BackgroundCollision: {
-    lda SPRITES.COLLISION_TO_BKG
+    lda c64lib.SPRITE_2B_COLLISION
     and #%00000001
 
     sta Collision
@@ -763,8 +772,8 @@ SetColorToChars: {
   Done:
     rts
 
-  ScreenMemoryAddress:
-    .byte $be
+  ScreenMemoryAddress: .byte $be
+
   .label DummyScreenRam = $be00
 
   CleanLoop:
@@ -851,4 +860,5 @@ StupidWaitRoutine: {
     sta position
 }
 
-#import "_allimport.asm"
+#import "common/lib/math-global.asm"
+#import "chipset/lib/vic2.asm"
