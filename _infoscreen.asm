@@ -64,63 +64,63 @@ Handler: {
     ldx #Title1LabelLen
   !:
     lda Title1Label, x
-    sta $4000 + (40 * 1 + 2), x
+    sta ScreenMemoryBaseAddress + c64lib_getTextOffset(2, 1), x
     dex
     bne !-
 
     ldx #Title2LabelLen
   !:
     lda Title2Label, x
-    sta $4000 + (40 * 2 + 2), x
+    sta ScreenMemoryBaseAddress + c64lib_getTextOffset(2, 2), x
     dex
     bne !-
 
     ldx #Title3LabelLen
   !:
     lda Title3Label, x
-    sta $4000 + (40 * 3 + 2), x
+    sta ScreenMemoryBaseAddress + c64lib_getTextOffset(2, 3), x
     dex
     bne !-
 
     ldx #RangerLabelLen
   !:
     lda RangerLabel, x
-    sta $4000 + (40 * 6 + 10), x
+    sta ScreenMemoryBaseAddress + c64lib_getTextOffset(10, 6), x
     dex
     bne !-
 
     ldx #WoodcutterLabelLen
   !:
     lda WoodcutterLabel, x
-    sta $4000 + (40 * 9 + 10), x
+    sta ScreenMemoryBaseAddress + c64lib_getTextOffset(10, 9), x
     dex
     bne !-
 
     ldx #TankLabelLen
   !:
     lda TankLabel, x
-    sta $4000 + (40 * 12 + 10), x
+    sta ScreenMemoryBaseAddress + c64lib_getTextOffset(10, 12), x
     dex
     bne !-
 
     ldx #FireLabelLen
   !:
     lda FireLabel, x
-    sta $4000 + (40 * 20 + 2), x
+    sta ScreenMemoryBaseAddress + c64lib_getTextOffset(2, 20), x
     dex
     bne !-
 
     ldx #Fire2LabelLen
   !:
     lda Fire2Label, x
-    sta $4000 + (40 * 21 + 8), x
+    sta ScreenMemoryBaseAddress + c64lib_getTextOffset(8, 21), x
     dex
     bne !-
 
     ldx #Fire3LabelLen
   !:
     lda Fire3Label, x
-    sta $4000 + (40 * 23 + 2), x
+    sta ScreenMemoryBaseAddress + c64lib_getTextOffset(2, 23), x
     dex
     bne !-
 
@@ -132,7 +132,7 @@ Handler: {
 
     jsr DisableAllSprites
 
-    CopyScreenRam(MapDummyArea, $4000)
+    CopyScreenRam(MapDummyArea, ScreenMemoryBaseAddress)
 
     rts
 
@@ -181,15 +181,19 @@ Handler: {
   Fire3Label:       .byte $00, $1d, $00, $00, $00, $00, $00, $03, $02, $04
                     .byte $0c, $00, $15, $10, $00, $0a, $0f, $15, $13, $10
 
-  .label SPRITE_0     = $43f8
-  .label SPRITE_1     = $43f9
-  .label SPRITE_2     = $43fa
-  .label SPRITE_3     = $43fb
-  .label SPRITE_4     = $43fc
-  .label SPRITE_5     = $43fd
-  .label SPRITE_6     = $43fe
-  .label SPRITE_7     = $43ff
+  .label ScreenMemoryBaseAddress = $4000
+
+  .label SPRITE_0     = ScreenMemoryBaseAddress + $3f8
+  .label SPRITE_1     = ScreenMemoryBaseAddress + $3f9
+  .label SPRITE_2     = ScreenMemoryBaseAddress + $3fa
+  .label SPRITE_3     = ScreenMemoryBaseAddress + $3fb
+  .label SPRITE_4     = ScreenMemoryBaseAddress + $3fc
+  .label SPRITE_5     = ScreenMemoryBaseAddress + $3fd
+  .label SPRITE_6     = ScreenMemoryBaseAddress + $3fe
+  .label SPRITE_7     = ScreenMemoryBaseAddress + $3ff
 }
 
 #import "_utils.asm"
 #import "_label.asm"
+#import "_keyboard.asm"
+#import "chipset/lib/vic2-global.asm"
