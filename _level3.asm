@@ -1032,6 +1032,12 @@ ArsionistFromRight: {
     sta BurnStep
 
     inc BushBurned
+    lda BushBurned
+    sta RepaintBush.ColumnToRepaint
+    cmp #8
+    bne !+
+    EnableSprite(4, false)
+  !:
     jsr RepaintBush
   !BurnStepCompleted:
     inc BurnStep
@@ -1088,8 +1094,51 @@ ArsionistFromRight: {
 
 * = * "Level3 RepaintBush"
 RepaintBush: {
-  Done:
+    dec ColumnToRepaint
+
+    lda #<ScreenMemoryBaseAddress
+    sta Dummy
+    lda #>ScreenMemoryBaseAddress
+    sta Dummy + 1
+
+    c64lib_add16((4 * 40) + 26, Dummy)
+    lda ColumnToRepaint
+    beq !+
+
+    lda Dummy
+    clc
+    adc ColumnToRepaint
+    sta Dummy
+    bcc !+
+    inc Dummy + 1
+
+  !:
+    lda Dummy
+    sta ReadData + 1
+    sta SaveData + 1
+    lda Dummy + 1
+    sta ReadData + 2
+    sta SaveData + 2
+
+    ldx #0
+  Loop:
+    ldy Table, x
+  ReadData:
+    lda $beef, y
+    clc
+    adc #$46
+  SaveData:
+    sta $beef, y
+    inx
+    cpx #3
+    bne Loop
+
+    jsr AddColorToMap
     rts
+
+  Table: .byte 0, 40, 80
+  Dummy: .word $beef
+  ColumnToRepaint: .byte 0
 }
 
 * = * "Level3 CleanArsionist"
