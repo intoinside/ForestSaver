@@ -13,7 +13,11 @@ A ranger has to do a lot of work to preserve the forest. He must be careful of t
 * Don't know if there's an emulator for Iphone
 
 ### Development
+Install your preferred Ide:
 * Sublime Text https://www.sublimetext.com/3 with Kick Assembler http://theweb.dk/KickAssembler/
+* Visual Studio Code https://code.visualstudio.com/download with Kick Assembler (check Paul Hocker extension https://marketplace.visualstudio.com/items?itemName=paulhocker.kick-assembler-vscode-ext)
+
+Other useful tool are:
 * CharPad https://subchristsoftware.itch.io/charpad-free-edition
 * SpritePad https://www.subchristsoftware.com/spritepadfree/
 * Vice emulator https://vice-emu.sourceforge.io/
