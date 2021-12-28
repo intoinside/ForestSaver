@@ -1016,20 +1016,25 @@ ArsionistFromRight: {
 
   ArsionistIsBurning:
     lda BushBurned
-    cmp #64
+    cmp #8
     beq ArsionistReadyForWalkOut
 
-    lsr
-    lsr
-    lsr
-    bcc !+
-
-    jsr RepaintBush
-
-  !:
-    // Code for bush burning
     CallUseTheFlameThrower(FlameFrame, SPRITES.FLAME_3);
 
+    lda BurnStep
+    cmp #160
+    beq !NewBurnStep+
+
+    inc BurnStep
+    bcc !BurnStepCompleted+
+  !NewBurnStep:
+    lda #$ff
+    sta BurnStep
+
+    inc BushBurned
+    jsr RepaintBush
+  !BurnStepCompleted:
+    inc BurnStep
     jmp Done
 
   ArsionistReadyForWalkOut:
@@ -1066,6 +1071,7 @@ ArsionistFromRight: {
 
     ArsionistFrame: .byte $00
     FlameFrame: .byte $00
+    BurnStep: .byte $00
 
     ArsionistStartX: .byte 90
     ArsionistEndX: .byte 28
