@@ -1037,6 +1037,20 @@ ArsionistFromRight: {
     cmp #8
     bne !+
     EnableSprite(4, false)
+
+    lda GameEnded
+    bne !+
+
+    jsr Hud.ReduceDismissalCounter
+
+    lda Hud.ReduceDismissalCounter.DismissalCompleted
+    sta GameEnded
+    beq !+
+
+    lda #<ScreenMemoryBaseAddress
+    sta ShowGameEndedMessage.StartAddress + 1
+    jsr ShowGameEndedMessage
+
   !:
     jsr RepaintBush
   !BurnStepCompleted:
@@ -1056,6 +1070,15 @@ ArsionistFromRight: {
     sta Arsionist.ScreenMemoryAddress
 
     CallUpdateArsionistFrameReverse(ArsionistFrame);
+
+    lda c64lib.SPRITE_3_X
+    cmp ArsionistStartX
+    bne Done
+
+    inc ArsionistOut
+
+    EnableSprite(3, false)
+
     jmp Done
 
   ArsionistAlreadyOut:
@@ -1063,14 +1086,15 @@ ArsionistFromRight: {
     cmp #$08
     bne Done
 
+    inc BushNotAvailable
+
+    jmp Done
+
   CleanForNextRun:
     lda #$00
     sta AddArsionist.ArsionistActive
 
     jsr CleanArsionist
-
-    bne Done
-    sta BushNotAvailable
 
   Done:
     rts
@@ -1144,7 +1168,7 @@ RepaintBush: {
 * = * "Level3 CleanArsionist"
 CleanArsionist: {
     lda #$00
-    sta ArsionistFromRight.BushNotAvailable
+//    sta ArsionistFromRight.BushNotAvailable
     sta ArsionistFromRight.ArsionistReady
     sta ArsionistFromRight.ArsionistIn
     sta ArsionistFromRight.FlameThrowerShown
