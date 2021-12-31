@@ -125,18 +125,18 @@ Init: {
     jsr Hud.Init
 
 // Sprite color setting
-    lda #$07
+    lda #YELLOW
     sta c64lib.SPRITE_0_COLOR
     sta c64lib.SPRITE_4_COLOR
-    lda #$08
+    lda #ORANGE
     sta c64lib.SPRITE_1_COLOR
     sta c64lib.SPRITE_3_COLOR
-    lda #$02
+    lda #RED
     sta c64lib.SPRITE_2_COLOR
-    lda #$01
+    lda #WHITE
     sta c64lib.SPRITE_5_COLOR
     sta c64lib.SPRITE_6_COLOR
-    lda #$03
+    lda #CYAN
     sta c64lib.SPRITE_7_COLOR
 
 // Enable the first sprite (ranger)

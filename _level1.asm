@@ -64,9 +64,9 @@ Manager: {
 // Initialization of intro screen
 * = * "Level1 Init"
 Init: {
-    CopyScreenRam($4400, MapDummyArea)
+    CopyScreenRam(ScreenMemoryBaseAddress, MapDummyArea)
 
-    lda #$44
+    lda #<ScreenMemoryBaseAddress
     sta ShowGameNextLevelMessage.StartAddress + 1
 
     jsr SetSpriteToForeground
@@ -107,31 +107,31 @@ Init: {
 
 // Optimization may be done
 // Ranger module init
-    lda #$00
+    lda #<ScreenMemoryBaseAddress
     sta Ranger.ScreenMemoryAddress + 1
-    lda #$44
+    lda #>ScreenMemoryBaseAddress
     sta Ranger.ScreenMemoryAddress
     jsr Ranger.Init
 
-    lda #$00
+    lda #<ScreenMemoryBaseAddress
     sta WoodCutter.ScreenMemoryAddress + 1
-    lda #$44
+    lda #>ScreenMemoryBaseAddress
     sta WoodCutter.ScreenMemoryAddress
     jsr WoodCutter.Init
 
-    lda #$00
+    lda #<ScreenMemoryBaseAddress
     sta Hud.ScreenMemoryAddress + 1
-    lda #$44
+    lda #>ScreenMemoryBaseAddress
     sta Hud.ScreenMemoryAddress
     jsr Hud.Init
 
 // Sprite color setting
-    lda #$07
+    lda #YELLOW
     sta c64lib.SPRITE_0_COLOR
-    lda #$08
+    lda #ORANGE
     sta c64lib.SPRITE_1_COLOR
     sta c64lib.SPRITE_3_COLOR
-    lda #$02
+    lda #RED
     sta c64lib.SPRITE_2_COLOR
     sta c64lib.SPRITE_4_COLOR
 
@@ -151,7 +151,7 @@ Init: {
 
 * = * "Level1 Finalize"
 Finalize: {
-    CopyScreenRam(MapDummyArea, $4400)
+    CopyScreenRam(MapDummyArea, ScreenMemoryBaseAddress)
 
     jsr DisableAllSprites
 

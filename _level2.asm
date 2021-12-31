@@ -68,7 +68,7 @@ Manager: {
 // Initialization of level 2
 * = * "Level2 Init"
 Init: {
-    CopyScreenRam($4800, MapDummyArea)
+    CopyScreenRam(ScreenMemoryBaseAddress, MapDummyArea)
 
     jsr SetSpriteToForeground
 // Set background and border color to brown
@@ -108,37 +108,37 @@ Init: {
 
 // Optimization may be done
 // Ranger module init
-    lda #$00
+    lda #<ScreenMemoryBaseAddress
     sta Ranger.ScreenMemoryAddress + 1
-    lda #$48
+    lda #>ScreenMemoryBaseAddress
     sta Ranger.ScreenMemoryAddress
     jsr Ranger.Init
 
-    lda #$00
+    lda #<ScreenMemoryBaseAddress
     sta WoodCutter.ScreenMemoryAddress + 1
-    lda #$48
+    lda #>ScreenMemoryBaseAddress
     sta WoodCutter.ScreenMemoryAddress
     jsr WoodCutter.Init
 
-    lda #$00
+    lda #<ScreenMemoryBaseAddress
     sta Hud.ScreenMemoryAddress + 1
-    lda #$48
+    lda #>ScreenMemoryBaseAddress
     sta Hud.ScreenMemoryAddress
     jsr Hud.Init
 
 // Sprite color setting
-    lda #$07
+    lda #YELLOW
     sta c64lib.SPRITE_0_COLOR
-    lda #$08
+    lda #ORANGE
     sta c64lib.SPRITE_1_COLOR
     sta c64lib.SPRITE_3_COLOR
-    lda #$02
+    lda #RED
     sta c64lib.SPRITE_2_COLOR
     sta c64lib.SPRITE_4_COLOR
-    lda #$01
+    lda #WHITE
     sta c64lib.SPRITE_5_COLOR
     sta c64lib.SPRITE_6_COLOR
-    lda #$03
+    lda #CYAN
     sta c64lib.SPRITE_7_COLOR
 
 // Enable the first sprite (ranger)
@@ -157,7 +157,7 @@ Init: {
 
 * = * "Level2 Finalize"
 Finalize: {
-    CopyScreenRam(MapDummyArea, $4800)
+    CopyScreenRam(MapDummyArea, ScreenMemoryBaseAddress)
 
     jsr DisableAllSprites
 
@@ -1612,6 +1612,7 @@ TimedRoutine: {
   Exit:
     rts
 
+// TODO(): refactor
 // Char position in screen ram
   .label Char1 = $4800 + (40 * 10 + 29)
   .label Char2 = $4800 + (40 * 10 + 30)
