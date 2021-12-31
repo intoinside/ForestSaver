@@ -1619,10 +1619,8 @@ TimedRoutine: {
   .label Char3 = ScreenMemoryBaseAddress + c64lib_getTextOffset(8, 11)
   .label Char4 = ScreenMemoryBaseAddress + c64lib_getTextOffset(9, 11)
 
-  DelayCounter:
-    .byte 50                  // Counter storage
-  DelayRequested:
-    .byte 50                  // 1 second delay
+  DelayCounter: .byte 50    // Counter storage
+  DelayRequested: .byte 50  // 1 second delay
 }
 
 TimedRoutine10th: {

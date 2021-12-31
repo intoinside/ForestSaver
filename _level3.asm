@@ -170,6 +170,9 @@ Finalize: {
 
     sta AddTankTruck.TruckActive
 
+    sta TankTruckFromLeft.LakeNotAvailable
+    sta TankTruckFromLeft.Polluted
+
     sta TankTruckFromRight.LakeNotAvailable
     sta TankTruckFromRight.Polluted
 
@@ -177,6 +180,7 @@ Finalize: {
 
     sta Hud.ReduceDismissalCounter.DismissalCompleted
 
+    jsr CleanTankLeft
     jsr CleanTankRight
 
     jsr CompareAndUpdateHiScore
@@ -644,8 +648,31 @@ AddTankTruck: {
 
     GetRandomUpTo(6)
 
+    cmp #$01
+    beq StartTankTruckFromLeft
+
     cmp #$02
     beq StartTankTruckFromRight
+
+    jmp Done
+
+  StartTankTruckFromLeft:
+    lda TankTruckFromLeft.LakeNotAvailable
+    bne Done
+
+    lda #$01
+    sta TruckActive
+
+    lda #SPRITES.TANK_TAIL_LE
+    sta SPRITE_5
+    lda #SPRITES.TANK_BODY_LE
+    sta SPRITE_6
+
+    lda #TankTruckFromLeft.TankLeftXStart
+    sta c64lib.SPRITE_6_X
+    clc
+    adc #24
+    sta c64lib.SPRITE_5_X
 
     jmp Done
 
@@ -676,11 +703,239 @@ AddTankTruck: {
 * = * "Level3 HandleTankTruckMove"
 HandleTankTruckMove: {
     lda AddTankTruck.TruckActive
+    cmp #$01
+    bne IsTruckFromRightAlive
+    jsr TankTruckFromLeft
+    jmp Done
+
+  IsTruckFromRightAlive:
+    lda AddTankTruck.TruckActive
     cmp #$02
     bne Done
     jsr TankTruckFromRight
 
   Done:
+    rts
+}
+
+* = * "Level3 TankTruckFromLeft"
+TankTruckFromLeft: {
+    lda LakeNotAvailable
+    beq LakeGood
+    jmp CleanForNextRun
+
+  LakeGood:
+    // Setting up tank sprites
+    lda SpritesCreated
+    bne TankDrivingIn
+    inc SpritesCreated
+    EnableSprite(5, true)
+    EnableSprite(6, true)
+
+  TankDrivingIn:
+    // Lake is not polluted, so a new tank can drive in
+    lda TankIn
+    bne DriveInDone
+
+    lda c64lib.SPRITE_5_X
+    cmp #TankLeftXEnd
+    bne !+
+    jmp !Update+
+
+  !:
+    inc c64lib.SPRITE_5_X
+    inc c64lib.SPRITE_6_X
+
+    CallTankSetPosition(c64lib.SPRITE_5_X, TankLeftY, $0, $0a, $0b);
+    CallTankSetPosition(c64lib.SPRITE_6_X, TankLeftY, $0, $0c, $0d);
+    jmp !End+
+
+  !Update:
+    inc TankIn
+  !End:
+    jmp Done
+
+  DriveInDone:
+    // Tank is in position, showing pipe
+    lda PipeShown
+    bne Polluting
+
+    lda #SPRITES.PIPE_1
+    sta SPRITE_7
+    sta PollutionFrame
+
+    lda c64lib.SPRITE_5_X
+    clc
+    adc #22
+    sta c64lib.SPRITE_7_X
+
+    lda c64lib.SPRITE_5_Y
+    sta c64lib.SPRITE_7_Y
+
+    lda c64lib.SPRITE_MSB_X
+    and #%00011111
+    sta c64lib.SPRITE_MSB_X
+
+    EnableSprite(7, true)
+
+    inc PipeShown
+
+    jmp Done
+
+  Polluting:
+    // Check if pollution is done, otherwise pollute it
+    lda Polluted
+    bne !DriveOut+
+    lda TankFined
+    bne !DriveOut+
+    jmp !Proceed+
+
+  !DriveOut:
+    jmp DriveOut
+
+  !Proceed: // Tank from left
+    lda c64lib.SPRITE_MSB_X
+    and #%10000000
+    beq !+
+    lda #$1
+  !:
+    sta SpriteCollision.OtherX + 1
+    lda c64lib.SPRITE_7_X
+    sta SpriteCollision.OtherX
+    lda c64lib.SPRITE_7_Y
+    sta SpriteCollision.OtherY
+    jsr SpriteCollision
+    bne RangerTankMet
+
+    inc PollutionFrameWait
+    lda PollutionFrameWait
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    bcc !Done+
+
+    lda #$00
+    sta PollutionFrameWait
+
+    lda PollutionCounter
+    cmp #PollutionCounterLimit
+    bne !+
+    inc Polluted
+
+    EnableSprite(7, false)
+
+    lda #<LakeCoordinates
+    sta SetLakeToBlack.StartAddress
+    lda #>(LakeCoordinates + 1)
+    sta SetLakeToBlack.StartAddress + 1
+    jsr SetLakeToBlack
+    jsr AddColorToMap
+
+    jsr Hud.ReduceDismissalCounter
+    jmp Done
+
+  !:
+    inc PollutionCounter
+
+    inc PollutionFrame
+    lda PollutionFrame
+    sta SPRITE_7
+
+    cmp #SPRITES.PIPE_4
+    bne !Done+
+
+    lda #SPRITES.PIPE_1
+    sta PollutionFrame
+
+  !Done:
+    jmp Done
+
+  RangerTankMet:
+    AddPoints(0, 0, 5, 0);
+
+    inc TankFined
+    EnableSprite(7, false)
+    jmp Done
+
+  DriveOut:
+    lda TankOut
+    bne DriveOutDone
+
+    // Lake pollution is completed, tank should go out
+    lda c64lib.SPRITE_5_X
+    cmp #TankLeftXStart
+    beq DriveOutDone
+
+    dec c64lib.SPRITE_6_X
+    bne !DecOtherSprite+
+    EnableSprite(6, false)
+
+  !DecOtherSprite:
+    dec c64lib.SPRITE_5_X
+
+    CallTankSetPosition(c64lib.SPRITE_5_X, TankLeftY, $0, $0a, $0b);
+    CallTankSetPosition(c64lib.SPRITE_6_X, TankLeftY, $0, $0c, $0d);
+
+    jmp Done
+
+  DriveOutDone:
+    // Tank is out of screen
+    EnableSprite(5, false)
+    inc TankOut
+
+  CleanForNextRun:
+    lda #$00
+    sta AddTankTruck.TruckActive
+
+    jsr CleanTankLeft
+
+    lda Polluted
+    sta LakeNotAvailable
+
+  Done:
+    rts
+
+  LakeNotAvailable: .byte $00
+  PipeShown: .byte $00
+  SpritesCreated: .byte $00
+  TankIn: .byte $00
+  TankOut: .byte $00
+  TankFined: .byte $00
+  Polluted: .byte $00
+
+  PollutionCounter: .byte $00
+  PollutionFrame: .byte $00
+  PollutionFrameWait: .byte $01
+
+  .label PollutionCounterLimit = 20
+
+  .label TankLeftXStart = 0
+  .label TankLeftXEnd   = 32
+  .label TankLeftX1BitStart = 0
+  .label TankLeftY      = 115
+  .label TankLeftBodySpriteNum = $67
+  .label TankLeftTailSpriteNum = $66
+
+  .label LakeCoordinates = ScreenMemoryBaseAddress + c64lib_getTextOffset(6, 9)
+}
+
+* = * "Level3 CleanTankLeft"
+CleanTankLeft: {
+    lda #$00
+    sta TankTruckFromLeft.PipeShown
+    sta TankTruckFromLeft.SpritesCreated
+    sta TankTruckFromLeft.TankIn
+    sta TankTruckFromLeft.TankOut
+    sta TankTruckFromLeft.TankFined
+
+    sta TankTruckFromLeft.PollutionCounter
+    sta TankTruckFromLeft.PollutionFrame
+
+    lda #$01
+    sta TankTruckFromLeft.PollutionFrameWait
+
     rts
 }
 
@@ -1185,6 +1440,25 @@ TimedRoutine: {
     beq DelayTriggered        // when counter is zero stop decrementing
     dec DelayCounter      // decrement the counter
 
+    cmp #10
+    beq Delay10
+    cmp #20
+    beq Delay20
+
+    jmp Exit
+
+  Delay10:
+    lda TankTruckFromRight.Polluted
+    bne Exit
+    AnimateLake(Char1, $61, $65)
+    AnimateLake(Char2, $62, $66)
+    jmp Exit
+
+  Delay20:
+    lda TankTruckFromLeft.Polluted
+    bne Exit
+    AnimateLake(Char3, $61, $65)
+    AnimateLake(Char4, $62, $66)
     jmp Exit
 
   DelayTriggered:
@@ -1198,17 +1472,17 @@ TimedRoutine: {
     jsr AddTankTruck
     jsr AddArsionist
 
-    jmp Exit
-
-  NotWaiting:
-
   Exit:
     rts
 
-  DelayCounter:
-    .byte 50                  // Counter storage
-  DelayRequested:
-    .byte 50                  // 1 second delay
+  .label Char1 = ScreenMemoryBaseAddress + c64lib_getTextOffset(32, 16)
+  .label Char2 = ScreenMemoryBaseAddress + c64lib_getTextOffset(33, 16)
+
+  .label Char3 = ScreenMemoryBaseAddress + c64lib_getTextOffset(7, 10)
+  .label Char4 = ScreenMemoryBaseAddress + c64lib_getTextOffset(8, 10)
+
+  DelayCounter: .byte 50    // Counter storage
+  DelayRequested: .byte 50  // 1 second delay
 }
 
 TimedRoutine10th: {
