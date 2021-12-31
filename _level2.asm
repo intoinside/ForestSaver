@@ -1612,13 +1612,12 @@ TimedRoutine: {
   Exit:
     rts
 
-// TODO(): refactor
 // Char position in screen ram
-  .label Char1 = $4800 + (40 * 10 + 29)
-  .label Char2 = $4800 + (40 * 10 + 30)
+  .label Char1 = ScreenMemoryBaseAddress + c64lib_getTextOffset(29, 10)
+  .label Char2 = ScreenMemoryBaseAddress + c64lib_getTextOffset(30, 10)
 
-  .label Char3 = $4800 + (40 * 11 + 8)
-  .label Char4 = $4800 + (40 * 11 + 9)
+  .label Char3 = ScreenMemoryBaseAddress + c64lib_getTextOffset(8, 11)
+  .label Char4 = ScreenMemoryBaseAddress + c64lib_getTextOffset(9, 11)
 
   DelayCounter:
     .byte 50                  // Counter storage
@@ -1682,3 +1681,5 @@ LevelCompleted: .byte $00
 #import "_woodcutter.asm"
 #import "_hatchet.asm"
 #import "_tanktruck.asm"
+
+#import "chipset/lib/vic2-global.asm"
