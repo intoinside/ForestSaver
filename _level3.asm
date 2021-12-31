@@ -605,30 +605,30 @@ SetLeftWoodCutterTrack: {
 
 // First woodcutter track data
   .label TrackWalk1XStart = 0
-  .label TrackWalk1XEnd   = 56
-  .label TrackWalk1Y      = 111
+  .label TrackWalk1XEnd   = 87
+  .label TrackWalk1Y      = 94
   .label DirectionX1      = 1
   .label DirectionY1      = 0
 
-  TreeStartAddress1: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(5, 6)
+  TreeStartAddress1: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(9, 4)
 
 // Second woodcutter track data
   .label TrackWalk2XStart = 0
-  .label TrackWalk2XEnd   = 46
-  .label TrackWalk2Y      = 166
+  .label TrackWalk2XEnd   = 55
+  .label TrackWalk2Y      = 175
   .label DirectionX2      = 1
   .label DirectionY2      = 0
 
-  TreeStartAddress2: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(4, 13)
+  TreeStartAddress2: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(5, 14)
 
 // Third woodcutter track data
   .label TrackWalk3XStart = 0
-  .label TrackWalk3XEnd   = 112
-  .label TrackWalk3Y      = 191
+  .label TrackWalk3XEnd   = 111
+  .label TrackWalk3Y      = 199
   .label DirectionX3      = 1
   .label DirectionY3      = 0
 
-  TreeStartAddress3: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(12, 16)
+  TreeStartAddress3: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(12, 17)
 }
 
 * = * "Level3 AddTankTruck"
