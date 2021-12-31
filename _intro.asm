@@ -90,7 +90,7 @@ DrawHiScore: {
 
     rts
 
-    .label ScorePtr = $4372
+    .label ScorePtr = ScreenMemoryBaseAddress + c64lib_getTextOffset(2, 22)
 }
 
 * = * "Intro Instruction"
@@ -98,7 +98,7 @@ Instruction: {
     ldx #InstructionLabelLen
   LabelLoop:
     lda InstructionLabel, x
-    sta $4387, x
+    sta ScreenMemoryBaseAddress + c64lib_getTextOffset(23, 22), x
     dex
     bne LabelLoop
 
@@ -195,17 +195,17 @@ TimedRoutine: {
     rts
 
 // Char position in screen ram
-  .label Char1 = $4000 + (40 * 3 + 27)
-  .label Char2 = $4000 + (40 * 4 + 26)
+  .label Char1 = ScreenMemoryBaseAddress + c64lib_getTextOffset(27, 3)
+  .label Char2 = ScreenMemoryBaseAddress + c64lib_getTextOffset(26, 4)
 
-  .label Char3 = $4000 + (40 * 13 + 4)
-  .label Char4 = $4000 + (40 * 13 + 5)
+  .label Char3 = ScreenMemoryBaseAddress + c64lib_getTextOffset(4, 13)
+  .label Char4 = ScreenMemoryBaseAddress + c64lib_getTextOffset(5, 13)
 
-  .label Char5 = $4000 + (40 * 20 + 10)
-  .label Char6 = $4000 + (40 * 19 + 10)
+  .label Char5 = ScreenMemoryBaseAddress + c64lib_getTextOffset(10, 20)
+  .label Char6 = ScreenMemoryBaseAddress + c64lib_getTextOffset(10, 19)
 
-  .label Char7 = $4000 + (40 * 19 + 35)
-  .label Char8 = $4000 + (40 * 19 + 36)
+  .label Char7 = ScreenMemoryBaseAddress + c64lib_getTextOffset(35, 19)
+  .label Char8 = ScreenMemoryBaseAddress + c64lib_getTextOffset(36, 19)
 
   DelayCounter:   .byte 50    // Counter storage
   DelayRequested: .byte 50    // 1 second delay
@@ -216,6 +216,8 @@ HiScoreLabel: .byte $09, $0a, $27, $14, $04, $10, $13, $06, $34, $00
               .byte ZeroChar, ZeroChar, ZeroChar, ZeroChar
 
 .label ZeroChar = $2a
+
+.label ScreenMemoryBaseAddress = $4000
 
 #import "_utils.asm"
 #import "_keyboard.asm"
