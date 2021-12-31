@@ -1216,7 +1216,6 @@ TankTruckFromLeft: {
     lda #$1
   !:
     sta SpriteCollision.OtherX + 1
-
     lda c64lib.SPRITE_7_X
     sta SpriteCollision.OtherX
     lda c64lib.SPRITE_7_Y

@@ -178,6 +178,8 @@ Finalize: {
 
     sta AddArsionist.ArsionistActive
 
+    sta ArsionistFromRight.ArsionistFined
+
     sta Hud.ReduceDismissalCounter.DismissalCompleted
 
     jsr CleanTankLeft
@@ -203,7 +205,7 @@ AddEnemy: {
     lda LevelCompleted
     bne Done
 
-    GetRandomUpTo(3)
+    GetRandomUpTo(4)
 
     cmp #$02
     beq StartWoodCutterFromLeft
@@ -467,7 +469,7 @@ WoodCutterFromLeft: {
     bne LookForTreeAvailable
     jmp Done
   CheckNextWoodCutter:
-    GetRandomUpTo(3)
+    GetRandomUpTo(4)
     tax
     lda TreeAlreadyCut, x
     bne CheckNextWoodCutter
@@ -646,7 +648,7 @@ AddTankTruck: {
     lda TruckActive
     bne Done
 
-    GetRandomUpTo(6)
+    GetRandomUpTo(8)
 
     cmp #$01
     beq StartTankTruckFromLeft
@@ -912,9 +914,9 @@ TankTruckFromLeft: {
   .label PollutionCounterLimit = 20
 
   .label TankLeftXStart = 0
-  .label TankLeftXEnd   = 32
+  .label TankLeftXEnd   = 33
   .label TankLeftX1BitStart = 0
-  .label TankLeftY      = 115
+  .label TankLeftY      = 114
   .label TankLeftBodySpriteNum = $67
   .label TankLeftTailSpriteNum = $66
 
@@ -1168,7 +1170,7 @@ AddArsionist: {
     lda ArsionistActive
     bne Done
 
-    GetRandomUpTo(3)
+    GetRandomUpTo(4)
 
     cmp #$02
     beq StartArsionistRight
@@ -1272,7 +1274,21 @@ ArsionistFromRight: {
   ArsionistIsBurning:
     lda BushBurned
     cmp #8
-    beq ArsionistReadyForWalkOut
+    beq ArsionistReadyForWalkOutFar
+    lda ArsionistFined
+    bne ArsionistReadyForWalkOutFar
+
+    lda c64lib.SPRITE_MSB_X
+    and #%00001000
+    beq !+
+    lda #$1    
+    sta SpriteCollision.OtherX + 1
+    lda c64lib.SPRITE_3_X
+    sta SpriteCollision.OtherX
+    lda c64lib.SPRITE_3_Y
+    sta SpriteCollision.OtherY
+    jsr SpriteCollision
+    bne ArsionistMet
 
     CallUseTheFlameThrower(FlameFrame, SPRITES.FLAME_3);
 
@@ -1282,6 +1298,12 @@ ArsionistFromRight: {
 
     inc BurnStep
     bcc !BurnStepCompleted+
+
+    jmp !NewBurnStep+
+
+  ArsionistReadyForWalkOutFar:
+    jmp ArsionistReadyForWalkOut
+
   !NewBurnStep:
     lda #$ff
     sta BurnStep
@@ -1310,6 +1332,13 @@ ArsionistFromRight: {
     jsr RepaintBush
   !BurnStepCompleted:
     inc BurnStep
+    jmp Done
+
+  ArsionistMet:
+    AddPoints(0, 0, 6, 0);
+
+    inc ArsionistFined
+    EnableSprite(4, false)
     jmp Done
 
   ArsionistReadyForWalkOut:
@@ -1357,9 +1386,10 @@ ArsionistFromRight: {
     ArsionistFrame: .byte $00
     FlameFrame: .byte $00
     BurnStep: .byte $00
+    ArsionistFined: .byte $00
 
     ArsionistStartX: .byte 90
-    ArsionistEndX: .byte 28
+    ArsionistEndX: .byte 50 //28
     ArsionistStartY: .byte 90
 
     BushNotAvailable: .byte $00
@@ -1428,6 +1458,7 @@ CleanArsionist: {
     sta ArsionistFromRight.FlameThrowerShown
     sta ArsionistFromRight.FlamingDone
     sta ArsionistFromRight.ArsionistOut
+    sta ArsionistFromRight.ArsionistFined
 
     rts
 }
