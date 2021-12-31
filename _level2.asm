@@ -72,13 +72,13 @@ Init: {
 
     jsr SetSpriteToForeground
 // Set background and border color to brown
-    lda #$08
+    lda #ORANGE
     sta c64lib.BORDER_COL
     sta c64lib.BG_COL_0
 
-    lda #$00
+    lda #BLACK
     sta c64lib.BG_COL_1
-    lda #$01
+    lda #WHITE
     sta c64lib.BG_COL_2
 
 // Set pointer to char memory to $7800-$7fff (xxxx111x)
@@ -87,10 +87,10 @@ Init: {
     sta c64lib.MEMORY_CONTROL       
 
 // Init common sprite color
-    lda #$0a
+    lda #LIGHT_RED
     sta c64lib.SPRITE_COL_0
 
-    lda #$00
+    lda #BLACK
     sta c64lib.SPRITE_COL_1
 
 // Woodcutter sprite init

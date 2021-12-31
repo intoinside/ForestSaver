@@ -49,12 +49,12 @@ Handler: {
     lda #0
     sta c64lib.SPRITE_MSB_X
 
-    lda #$07
+    lda #YELLOW
     sta c64lib.SPRITE_0_COLOR
-    lda #$08
+    lda #ORANGE
     sta c64lib.SPRITE_1_COLOR
 
-    lda #$01
+    lda #WHITE
     sta c64lib.SPRITE_2_COLOR
     sta c64lib.SPRITE_3_COLOR
 
