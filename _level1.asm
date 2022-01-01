@@ -455,7 +455,7 @@ WoodCutterFromLeft: {
     sta GameEnded
     beq !+
 
-    lda #$44
+    lda #<ScreenMemoryBaseAddress
     sta ShowGameEndedMessage.StartAddress + 1
     jsr ShowGameEndedMessage
 
@@ -861,7 +861,7 @@ WoodCutterFromRight: {
     sta GameEnded
     beq !+
 
-    lda #$44
+    lda #<ScreenMemoryBaseAddress
     sta ShowGameEndedMessage.StartAddress + 1
     jsr ShowGameEndedMessage
 

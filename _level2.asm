@@ -643,7 +643,7 @@ SetLeftWoodCutterTrack: {
   .label DirectionX1      = 1
   .label DirectionY1      = 0
 
-  TreeStartAddress1: .word $4882
+  TreeStartAddress1: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(10, 3)
 
 // Second woodcutter track data
   .label TrackWalk2XStart = 0
@@ -652,7 +652,7 @@ SetLeftWoodCutterTrack: {
   .label DirectionX2      = 1
   .label DirectionY2      = 0
 
-  TreeStartAddress2: .word $4a89
+  TreeStartAddress2: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(9, 16)
 }
 
 * = * "Level2 WoodCutterFromRight"
@@ -837,10 +837,8 @@ WoodCutterFromRight: {
     sta GameEnded
     beq !+
 
-// Optimize this assignation
-    lda #$48
+    lda #<ScreenMemoryBaseAddress
     sta ShowGameEndedMessage.StartAddress + 1
-// END Optimize request
     jsr ShowGameEndedMessage
 
   !:
@@ -1038,7 +1036,7 @@ SetRightWoodCutterTrack: {
   .label DirectionX1      = 255
   .label DirectionY1      = 0
 
-  TreeStartAddress1: .word $4844
+  TreeStartAddress1: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(28, 1)
 
 // Second woodcutter track data
   .label TrackWalk2XStart = 70
@@ -1048,7 +1046,7 @@ SetRightWoodCutterTrack: {
   .label DirectionX2      = 255
   .label DirectionY2      = 0
 
-  TreeStartAddress2: .word $49f7
+  TreeStartAddress2: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(23, 12)
 }
 
 * = * "Level2 AddTankTruck"
@@ -1242,9 +1240,9 @@ TankTruckFromLeft: {
 
     EnableSprite(7, false)
 
-    lda #$97
+    lda #<LakeCoordinates
     sta SetLakeToBlack.StartAddress
-    lda #$49
+    lda #>(LakeCoordinates + 1)
     sta SetLakeToBlack.StartAddress + 1
     jsr SetLakeToBlack
     jsr AddColorToMap
@@ -1333,6 +1331,8 @@ TankTruckFromLeft: {
   .label TankLeftY      = 120
   .label TankLeftBodySpriteNum = $67
   .label TankLeftTailSpriteNum = $66
+
+  .label LakeCoordinates = ScreenMemoryBaseAddress + c64lib_getTextOffset(7, 10)
 }
 
 * = * "Level2 CleanTankLeft"
@@ -1461,9 +1461,9 @@ TankTruckFromRight: {
 
     EnableSprite(7, false)
 
-    lda #$84
+    lda #<LakeCoordinates
     sta SetLakeToBlack.StartAddress
-    lda #$49
+    lda #>(LakeCoordinates + 1)
     sta SetLakeToBlack.StartAddress + 1
     jsr SetLakeToBlack
     jsr AddColorToMap
@@ -1549,6 +1549,8 @@ TankTruckFromRight: {
   .label TankRightY      = 110
   .label TankRightBodySpriteNum = $68
   .label TankRightTailSpriteNum = $69
+
+  .label LakeCoordinates = ScreenMemoryBaseAddress + c64lib_getTextOffset(28, 9)
 }
 
 * = * "Level2 CleanTankRight"
