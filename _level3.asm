@@ -48,7 +48,7 @@ Manager: {
 
   CloseLevelAndGame:
     jsr SetSpriteToBackground
-    lda Keyboard.ReturnPressed
+    IsReturnPressed()
     bne LevelDone
 
   EndLoop:
@@ -1368,12 +1368,11 @@ ArsionistFromRight: {
   ArsionistAlreadyOut:
     lda BushBurned
     cmp #$08
-    bne Done
+    bne CleanForNextRun
 
     inc BushNotAvailable
 
-    jmp Done
-
+* = * "Level3 CleanForNextRun"
   CleanForNextRun:
     lda #$00
     sta AddArsionist.ArsionistActive
@@ -1389,7 +1388,7 @@ ArsionistFromRight: {
     ArsionistFined: .byte $00
 
     ArsionistStartX: .byte 90
-    ArsionistEndX: .byte 50 //28
+    ArsionistEndX: .byte 35
     ArsionistStartY: .byte 90
 
     BushNotAvailable: .byte $00
@@ -1458,6 +1457,9 @@ CleanArsionist: {
     sta ArsionistFromRight.FlameThrowerShown
     sta ArsionistFromRight.FlamingDone
     sta ArsionistFromRight.ArsionistOut
+    sta ArsionistFromRight.ArsionistFrame
+    sta ArsionistFromRight.FlameFrame
+    sta ArsionistFromRight.BurnStep
     sta ArsionistFromRight.ArsionistFined
 
     rts
