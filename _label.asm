@@ -56,9 +56,10 @@ SPRITES: {
   .label ARSIONIST_WALKING     = $74
   .label ARSIONIST_STANDING_R  = $75
   .label ARSIONIST_WALKING_R   = $76
-  .label FLAME_1            = $77
-  .label FLAME_2            = $78
-  .label FLAME_3            = $79
+  .label ARSIONIST_FRONT    = $77
+  .label FLAME_1            = $78
+  .label FLAME_2            = $79
+  .label FLAME_3            = $7a
 
   // These label will be modified with self-modification code
   .label SPRITE_0           = $bef8
