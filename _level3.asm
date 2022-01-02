@@ -419,7 +419,7 @@ WoodCutterFromLeft: {
     sta GameEnded
     beq !+
 
-    lda #<ScreenMemoryBaseAddress
+    lda #>ScreenMemoryBaseAddress
     sta ShowGameEndedMessage.StartAddress + 1
     jsr ShowGameEndedMessage
 
@@ -836,6 +836,15 @@ TankTruckFromLeft: {
     jsr AddColorToMap
 
     jsr Hud.ReduceDismissalCounter
+
+    lda Hud.ReduceDismissalCounter.DismissalCompleted
+    sta GameEnded
+    beq !Done+
+
+    lda #>ScreenMemoryBaseAddress
+    sta ShowGameEndedMessage.StartAddress + 1
+    jsr ShowGameEndedMessage
+
     jmp Done
 
   !:
@@ -1057,6 +1066,15 @@ TankTruckFromRight: {
     jsr AddColorToMap
 
     jsr Hud.ReduceDismissalCounter
+
+    lda Hud.ReduceDismissalCounter.DismissalCompleted
+    sta GameEnded
+    beq !Done+
+
+    lda #>ScreenMemoryBaseAddress
+    sta ShowGameEndedMessage.StartAddress + 1
+    jsr ShowGameEndedMessage
+
     jmp Done
 
   !:
@@ -1324,7 +1342,7 @@ ArsionistFromRight: {
     sta GameEnded
     beq !+
 
-    lda #<ScreenMemoryBaseAddress
+    lda #>ScreenMemoryBaseAddress
     sta ShowGameEndedMessage.StartAddress + 1
     jsr ShowGameEndedMessage
 
