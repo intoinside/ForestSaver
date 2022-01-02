@@ -17,7 +17,7 @@ Handler: {
 
     ClearScreen($4000)
 
-    lda #$02
+    lda #RED
     sta c64lib.BORDER_COL
     sta c64lib.BG_COL_0
 
@@ -39,10 +39,16 @@ Handler: {
     sty c64lib.SPRITE_2_Y
     sty c64lib.SPRITE_3_Y
 
+    lda #SPRITES.ARSIONIST_FRONT
+    sta SPRITE_4
+    ldy #$a0
+    sty c64lib.SPRITE_4_Y
+
     ldx #$30
     stx c64lib.SPRITE_0_X
     stx c64lib.SPRITE_1_X
     stx c64lib.SPRITE_2_X
+    stx c64lib.SPRITE_4_X
     ldx #$45
     stx c64lib.SPRITE_3_X
 
@@ -53,6 +59,7 @@ Handler: {
     sta c64lib.SPRITE_0_COLOR
     lda #ORANGE
     sta c64lib.SPRITE_1_COLOR
+    sta c64lib.SPRITE_4_COLOR
 
     lda #WHITE
     sta c64lib.SPRITE_2_COLOR
@@ -100,6 +107,13 @@ Handler: {
   !:
     lda TankLabel, x
     sta ScreenMemoryBaseAddress + c64lib_getTextOffset(10, 12), x
+    dex
+    bne !-
+
+    ldx #ArsionistLabelLen
+  !:
+    lda ArsionistLabel, x
+    sta ScreenMemoryBaseAddress + c64lib_getTextOffset(10, 15), x
     dex
     bne !-
 
@@ -166,12 +180,16 @@ Handler: {
   TankLabel:        .byte $00, $2f, $2a, $00, $11, $10, $0a, $0f, $15, $14
                     .byte $00, $07, $10, $13, $00, $15, $02, $0f, $0c
 
+  .label ArsionistLabelLen = 23
+  ArsionistLabel:   .byte $00, $30, $2a, $00, $11, $10, $0a, $0f, $15, $14
+                    .byte $00, $07, $10, $13, $00, $02, $13, $14, $0a, $10
+                    .byte $0f, $0a, $14, $15
+
   .label FireLabelLen = 32
   FireLabel:        .byte $00, $07, $0a, $13, $06, $00, $00, $13, $02, $0f
                     .byte $08, $06, $13, $00, $08, $10, $00, $02, $04, $13
                     .byte $10, $14, $14, $00, $10, $03, $14, $15, $02, $04
                     .byte $0d, $06, $14
-
 
   .label Fire2LabelLen = 17
   Fire2Label:       .byte $00, $22, $11, $10, $0a, $0f, $15, $14, $00, $13
