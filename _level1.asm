@@ -107,14 +107,10 @@ Init: {
 
 // Optimization may be done
 // Ranger module init
-    lda #<ScreenMemoryBaseAddress
-    sta Ranger.ScreenMemoryAddress + 1
     lda #>ScreenMemoryBaseAddress
     sta Ranger.ScreenMemoryAddress
     jsr Ranger.Init
 
-    lda #<ScreenMemoryBaseAddress
-    sta WoodCutter.ScreenMemoryAddress + 1
     lda #>ScreenMemoryBaseAddress
     sta WoodCutter.ScreenMemoryAddress
     jsr WoodCutter.Init

@@ -231,7 +231,7 @@ SetPosition: {
     .byte $00
 }
 
-ScreenMemoryAddress: .word $be00
+ScreenMemoryAddress: .byte $be
 
 .label SPRITE_PTR = $beef
 

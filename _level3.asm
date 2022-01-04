@@ -64,9 +64,6 @@ Manager: {
 Init: {
     CopyScreenRam(ScreenMemoryBaseAddress, MapDummyArea)
 
-    lda #<ScreenMemoryBaseAddress
-    sta ShowGameNextLevelMessage.StartAddress + 1
-
     jsr SetSpriteToForeground
 // Set background and border color to brown
     lda #BROWN
@@ -100,20 +97,14 @@ Init: {
 
 // Optimization may be done
 // Ranger module init
-    lda #<ScreenMemoryBaseAddress
-    sta Ranger.ScreenMemoryAddress + 1
     lda #>ScreenMemoryBaseAddress
     sta Ranger.ScreenMemoryAddress
     jsr Ranger.Init
 
-    lda #<ScreenMemoryBaseAddress
-    sta WoodCutter.ScreenMemoryAddress + 1
     lda #>ScreenMemoryBaseAddress
     sta WoodCutter.ScreenMemoryAddress
     jsr WoodCutter.Init
 
-    lda #<ScreenMemoryBaseAddress
-    sta Arsionist.ScreenMemoryAddress + 1
     lda #>ScreenMemoryBaseAddress
     sta Arsionist.ScreenMemoryAddress
     jsr Arsionist.Init

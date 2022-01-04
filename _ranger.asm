@@ -288,7 +288,7 @@ IsFining: .byte $00
 .label LIMIT_LEFT   = $16
 .label LIMIT_RIGHT  = $46
 
-ScreenMemoryAddress: .word $beef
+ScreenMemoryAddress: .byte $be
 
 #import "_label.asm"
 #import "_joystick.asm"

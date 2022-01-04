@@ -294,4 +294,3 @@ DismissalLabel: .byte $05, $0a, $14, $0e, $0a, $14, $14, $02, $0d, $34, $00
 .label DismissalAliveChar = $a4
 
 ScreenMemoryAddress: .word $be00
-
