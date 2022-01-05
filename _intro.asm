@@ -185,9 +185,6 @@ TimedRoutine: {
     jmp Exit
 
   DelayTriggered:
-    AnimateLake(Char7, $61, $65)
-    AnimateLake(Char8, $62, $66)
-
     lda DelayRequested      // delay reached 0, reset it
     sta DelayCounter
 
@@ -195,17 +192,14 @@ TimedRoutine: {
     rts
 
 // Char position in screen ram
-  .label Char1 = ScreenMemoryBaseAddress + c64lib_getTextOffset(27, 3)
-  .label Char2 = ScreenMemoryBaseAddress + c64lib_getTextOffset(26, 4)
+  .label Char1 = ScreenMemoryBaseAddress + c64lib_getTextOffset(28, 2)
+  .label Char2 = ScreenMemoryBaseAddress + c64lib_getTextOffset(27, 3)
 
-  .label Char3 = ScreenMemoryBaseAddress + c64lib_getTextOffset(4, 13)
-  .label Char4 = ScreenMemoryBaseAddress + c64lib_getTextOffset(5, 13)
+  .label Char3 = ScreenMemoryBaseAddress + c64lib_getTextOffset(5, 12)
+  .label Char4 = ScreenMemoryBaseAddress + c64lib_getTextOffset(6, 12)
 
-  .label Char5 = ScreenMemoryBaseAddress + c64lib_getTextOffset(10, 20)
-  .label Char6 = ScreenMemoryBaseAddress + c64lib_getTextOffset(10, 19)
-
-  .label Char7 = ScreenMemoryBaseAddress + c64lib_getTextOffset(35, 19)
-  .label Char8 = ScreenMemoryBaseAddress + c64lib_getTextOffset(36, 19)
+  .label Char5 = ScreenMemoryBaseAddress + c64lib_getTextOffset(34, 19)
+  .label Char6 = ScreenMemoryBaseAddress + c64lib_getTextOffset(34, 18)
 
   DelayCounter:   .byte 50    // Counter storage
   DelayRequested: .byte 50    // 1 second delay
