@@ -43,7 +43,6 @@ GamePlay: {
 
     InitNewGame()
 
-/* Code commented only for level3 develop
 // Play on level 1
     jsr Level1.Manager
     lda GameEnded
@@ -53,12 +52,9 @@ GamePlay: {
     jsr Level2.Manager
     lda GameEnded
     bne GamePlay
-*/
 
 // Play on level 3
     jsr Level3.Manager
-    lda GameEnded
-    bne GamePlay
 
     jmp GamePlay
 }
