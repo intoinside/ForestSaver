@@ -40,14 +40,13 @@ Manager: {
     lda GameEnded
     bne CloseLevelAndGame
 
-    jmp EndLoop
+    jmp JoystickMovement
 
   CloseLevelAndGame:
     jsr SetSpriteToBackground
     IsReturnPressed()
     bne LevelDone
 
-  EndLoop:
     jmp JoystickMovement
 
   LevelDone:

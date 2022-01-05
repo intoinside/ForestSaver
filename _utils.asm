@@ -809,20 +809,6 @@ WaitRoutine: {
     rts
 }
 
-StupidWaitRoutine: {
-    ldy #$bf
-  LoopY:
-    ldx #$ff
-  LoopX:
-    nop
-    nop
-    dex
-    bne LoopX
-    dey
-    bne LoopY
-    rts
-}
-
 .macro DrawAccumulator(position) {
     pha
     and #$0f
