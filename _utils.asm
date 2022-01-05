@@ -407,6 +407,9 @@ SetSpriteToForeground: {
     cmp arg2
   end:
 }
+.assert "bmi16($0102, $0304) ", { bmi16($0102, $0304) }, {
+  lda $0103; cmp $0305; bmi end ; lda $0102; cmp $0304; end:
+}
 
 * = * "Utils SetLakeToBlack"
 SetLakeToBlack: {
@@ -527,16 +530,6 @@ BackgroundCollision: {
   Collision: .byte $00
 }
 
-.macro add16(value, dest) {
-    clc
-    lda dest
-    adc value
-    sta dest
-    lda dest + 1
-    adc value + 1
-    sta dest + 1
-}
-
 .macro add16byte(value, dest) {
     clc
     lda dest
@@ -555,6 +548,9 @@ BackgroundCollision: {
     lda dest + 1
     adc #>value
     sta dest + 1
+}
+.assert "add16value($0102, $0123) ", { add16value($0102, $0123) }, {
+  clc ; lda $0123; adc #<$0102; sta $0123 ; lda $0124 ; adc #>$0102 ; sta $0124
 }
 
 .macro sub16byte(value, low) {
