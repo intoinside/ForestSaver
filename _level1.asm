@@ -24,7 +24,6 @@
 Manager: {
     jsr Init
     jsr AddColorToMap
-    jsr StupidWaitRoutine
 
   JoystickMovement:
     jsr WaitRoutine
@@ -58,6 +57,10 @@ Manager: {
 
   LevelDone:
     jsr Finalize
+  !:
+    IsReturnPressed()
+    bne !-
+
     rts
 }
 

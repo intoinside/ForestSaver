@@ -26,7 +26,6 @@
 Manager: {
     jsr Init
     jsr AddColorToMap
-    jsr StupidWaitRoutine
 
   JoystickMovement:
     jsr WaitRoutine
@@ -37,9 +36,6 @@ Manager: {
     jsr HandleEnemyMove
     jsr HandleTankTruckMove
     jsr HandleArsionistMove
-
-    //jsr CheckLevelCompleted
-    //bne CloseLevelAndGotoNext
 
     lda GameEnded
     bne CloseLevelAndGame
@@ -56,6 +52,10 @@ Manager: {
 
   LevelDone:
     jsr Finalize
+  !:
+    IsReturnPressed()
+    bne !-
+
     rts
 }
 

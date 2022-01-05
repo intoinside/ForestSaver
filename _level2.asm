@@ -27,7 +27,6 @@
 Manager: {
     jsr Init
     jsr AddColorToMap
-    jsr StupidWaitRoutine
 
   JoystickMovement:
     jsr WaitRoutine
@@ -62,6 +61,10 @@ Manager: {
 
   LevelDone:
     jsr Finalize
+  !:
+    IsReturnPressed()
+    bne !-
+
     rts
 }
 
@@ -69,6 +72,9 @@ Manager: {
 * = * "Level2 Init"
 Init: {
     CopyScreenRam(ScreenMemoryBaseAddress, MapDummyArea)
+
+    lda #>ScreenMemoryBaseAddress
+    sta ShowGameNextLevelMessage.StartAddress + 1
 
     jsr SetSpriteToForeground
 // Set background and border color to brown
