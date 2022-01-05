@@ -194,6 +194,8 @@ Finalize: {
 
     sta Hud.ReduceDismissalCounter.DismissalCompleted
 
+    sta ShowGameNextLevelMessage.IsShown
+
     jsr CleanTankLeft
     jsr CleanTankRight
 
@@ -1058,6 +1060,11 @@ AddTankTruck: {
     jmp Done
 
   !:
+    lda LevelCompleted
+    beq !+
+    jmp Done
+
+  !:
 // If there is already a truck active, no new truck is needed
     lda TruckActive
     bne Done
@@ -1137,6 +1144,11 @@ HandleTankTruckMove: {
 * = * "Level2 TankTruckFromLeft"
 TankTruckFromLeft: {
     lda LakeNotAvailable
+    beq !+
+    jmp CleanForNextRun
+
+  !:
+    lda LevelCompleted
     beq LakeGood
     jmp CleanForNextRun
 
@@ -1367,6 +1379,11 @@ CleanTankLeft: {
 * = * "Level2 TankTruckFromRight"
 TankTruckFromRight: {
     lda LakeNotAvailable
+    beq !+
+    jmp CleanForNextRun
+
+  !:
+    lda LevelCompleted
     beq LakeGood
     jmp CleanForNextRun
 
@@ -1609,12 +1626,16 @@ TimedRoutine: {
   Delay10:
     lda TankTruckFromRight.Polluted
     bne Exit
+    lda LevelCompleted
+    bne Exit
     AnimateLake(Char1, $61, $65)
     AnimateLake(Char2, $62, $66)
     jmp Exit
 
   Delay20:
     lda TankTruckFromLeft.Polluted
+    bne Exit
+    lda LevelCompleted
     bne Exit
     AnimateLake(Char3, $61, $65)
     AnimateLake(Char4, $62, $66)
