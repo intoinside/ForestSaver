@@ -50,7 +50,7 @@ Manager: {
 
   CloseLevelAndGame:
     jsr SetSpriteToBackground
-    lda Keyboard.ReturnPressed
+    IsReturnPressed()
     bne LevelDone
 
   EndLoop:
@@ -66,7 +66,7 @@ Manager: {
 Init: {
     CopyScreenRam(ScreenMemoryBaseAddress, MapDummyArea)
 
-    lda #<ScreenMemoryBaseAddress
+    lda #>ScreenMemoryBaseAddress
     sta ShowGameNextLevelMessage.StartAddress + 1
 
     jsr SetSpriteToForeground
