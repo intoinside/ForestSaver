@@ -542,6 +542,9 @@ BackgroundCollision: {
     inc dest + 1
   !:
 }
+.assert "add16byte($cc, $0123) ", { add16byte($cc, $0123) }, {
+  clc; lda $0123; adc $cc; sta $0123; bcc !+; inc $0124; !:
+}
 
 .macro add16value(value, dest) {
     clc
@@ -553,17 +556,20 @@ BackgroundCollision: {
     sta dest + 1
 }
 .assert "add16value($0102, $0123) ", { add16value($0102, $0123) }, {
-  clc ; lda $0123; adc #<$0102; sta $0123 ; lda $0124 ; adc #>$0102 ; sta $0124
+  clc; lda $0123; adc #<$0102; sta $0123 ; lda $0124 ; adc #>$0102 ; sta $0124
 }
 
-.macro sub16byte(value, low) {
+.macro sub16byte(value, dest) {
     sec
-    lda low
+    lda dest
     sbc value
-    sta low
-    lda low + 1
+    sta dest
+    lda dest + 1
     sbc #$00
-    sta low + 1
+    sta dest + 1
+}
+.assert "sub16byte($cc, $0123) ", { sub16byte($cc, $0123) }, {
+  sec; lda $0123; sbc $cc; sta $0123; lda $0124; sbc #$00; sta $0124
 }
 
 * = * "Utils HandleWoodCutterFined"
