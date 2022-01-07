@@ -375,6 +375,12 @@ SetSpriteToForeground: {
     }
     sta c64lib.SPRITE_ENABLE       // Set the new value into the sprite enable register
 }
+.assert "EnableSprite($00, true) ", { EnableSprite($be, true) }, {
+  ldy #$be; lda SpriteNumberMask, y; ora $d015; sta $d015
+}
+.assert "EnableSprite($00, false) ", { EnableSprite($be, false) }, {
+  ldy #$be; lda SpriteNumberMask, y; eor #$ff; and $d015; sta $d015
+}
 
 .macro EnableMultiSprite(SpriteMask, bEnable) {
     lda #SpriteMask
@@ -389,14 +395,11 @@ SetSpriteToForeground: {
     }
     sta c64lib.SPRITE_ENABLE       // Set the new value into the sprite enable register
 }
-
-.macro bpl16(arg1, arg2) {
-    lda arg1 + 1
-    cmp arg2 + 1
-    bpl end     // branch to end if value is bigger or equal than low
-    lda arg1
-    cmp arg2
-  end:
+.assert "EnableMultiSprite($be, true) ", { EnableMultiSprite($be, true) }, {
+  lda #$be; ora $d015; sta $d015
+}
+.assert "EnableMultiSprite($00, false) ", { EnableMultiSprite($be, false) }, {
+  lda #$be; eor #$ff; and $d015; sta $d015
 }
 
 .macro bmi16(arg1, arg2) {
@@ -407,8 +410,8 @@ SetSpriteToForeground: {
     cmp arg2
   end:
 }
-.assert "bmi16($0102, $0304) ", { bmi16($0102, $0304) }, {
-  lda $0103; cmp $0305; bmi end ; lda $0102; cmp $0304; end:
+.assert "bmi16($0102, $0a0b) ", { bmi16($0102, $0a0b) }, {
+  lda $0103; cmp $0a0c; bmi end; lda $0102; cmp $0a0b; end:
 }
 
 * = * "Utils SetLakeToBlack"
