@@ -56,8 +56,7 @@ GetJoystickMove: {
     rts
 
   CheckOnlyFirePress:
-    jsr GetOnlyFirePress
-    rts
+    jmp GetOnlyFirePress
 }
 
 // Read joystick (port 2) status and set FirePressed to $ff if fire is pressed

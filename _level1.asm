@@ -1166,9 +1166,7 @@ AddColorToMap: {
     lda #>ScreenMemoryBaseAddress
     sta SetColorToChars.ScreenMemoryAddress
 
-    jsr SetColorToChars
-
-    rts
+    jmp SetColorToChars
 }
 
 LevelCompleted: .byte $00

@@ -171,9 +171,7 @@ RemoveTree: {
   SelfMod16:
     stx $beef
 
-    jsr SetColorToChars
-
-    rts
+    jmp SetColorToChars
 
     StartAddress: .word $beef
 }
@@ -229,9 +227,7 @@ ShowGameEndedMessage: {
     cpy #$03
     bne MainLoop
 
-    jsr SetColorToChars
-
-    rts
+    jmp SetColorToChars
 
   .label FrameChar = $a4
   StartAddress: .word $beef

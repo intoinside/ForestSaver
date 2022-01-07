@@ -93,9 +93,7 @@ Init: {
     adc #$16
     sta DrawDismissal.SelfMod + 1
 
-    jsr DrawDismissal
-
-    rts
+    jmp DrawDismissal
 }
 
 * = * "Hud AddScore"
@@ -140,8 +138,7 @@ SubScore: {
     bne !-
 
   Done:
-    jsr DrawScore
-    rts
+    jmp DrawScore
 
   Points: .byte $00, $00, $00, $00
 }
@@ -237,8 +234,7 @@ ReduceDismissalCounter: {
     sta DismissalLabel, x
 
   Done:
-    jsr DrawDismissal
-    rts
+    jmp DrawDismissal
 
   DismissalCompleted: .byte $00
 }

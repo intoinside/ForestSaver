@@ -1461,8 +1461,7 @@ RepaintBush: {
     cpx #3
     bne Loop
 
-    jsr AddColorToMap
-    rts
+    jmp AddColorToMap
 
   Table: .byte 0, 40, 80
   Dummy: .word $beef
@@ -1569,9 +1568,7 @@ AddColorToMap: {
     lda #>ScreenMemoryBaseAddress
     sta SetColorToChars.ScreenMemoryAddress
 
-    jsr SetColorToChars
-
-    rts
+    jmp SetColorToChars
 }
 
 LevelCompleted: .byte $00
