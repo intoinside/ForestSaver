@@ -101,8 +101,6 @@ HandleRangerMove: {
     lda Direction
     beq CheckDirectionY
 
-    jsr UpdateRangerFrame
-
 // Handle horizontal move
     lda Direction
     cmp #$ff
@@ -146,9 +144,7 @@ HandleRangerMove: {
 
   CheckDirectionY:
     lda DirectionY
-    beq Done
-
-    jsr UpdateRangerFrame
+    beq UpdateRangerFrame
 
     ldy c64lib.SPRITE_0_Y          // Calculate new position
 
@@ -159,16 +155,19 @@ HandleRangerMove: {
   MoveToDown:
     iny
     cpy #LIMIT_DOWN
-    bcs Done
+    bcs UpdateFrame
     sty c64lib.SPRITE_0_Y
 
-    jmp Done
+    jmp UpdateFrame
 
   MoveToUp:
     dey
     cpy #LIMIT_UP
-    bcc Done
+    bcc UpdateFrame
     sty c64lib.SPRITE_0_Y
+
+  UpdateFrame:
+    jsr UpdateRangerFrame
 
   Done:
     rts
