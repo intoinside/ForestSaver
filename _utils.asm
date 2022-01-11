@@ -329,6 +329,61 @@ ShowGameNextLevelMessage: {
     bne !-
 }
 
+CopyDialogIntoScreenRam: {
+    lda StartAddress + 1
+    sta StartAddressHi
+
+    c64lib_add16(c64lib_getTextOffset(DialogStartX, DialogStartY), StartAddress)
+
+    ldy #DialogHeight
+  !Row:
+    dey
+
+    lda DialogAddress
+    sta DialogAddressPtr + 1
+    lda DialogAddress + 1
+    sta DialogAddressPtr + 2
+
+    lda StartAddress
+    sta StartAddressPtr + 1
+    lda StartAddress + 1
+    sta StartAddressPtr + 2
+
+    ldx #DialogWidth
+
+  !:
+    dex
+  DialogAddressPtr:
+    lda DialogAddress, x
+  StartAddressPtr:
+    sta StartAddress, x
+    cpx #0
+    bne !-
+
+    c64lib_add16(40, StartAddress)
+    c64lib_add16(DialogWidth, DialogAddress)
+
+    cpy #0
+    bne !Row-
+
+    lda StartAddressHi
+    sta SetColorToChars.ScreenMemoryAddress
+
+    jsr SetColorToChars
+
+    rts
+
+  .label DialogStartX = 10;
+  .label DialogStartY = 6;
+
+  .label DialogWidth = 20;
+  .label DialogHeight = 7;
+
+  StartAddress: .word $beef
+  DialogAddress: .word $beef
+  StartAddressHi: .byte $be
+}
+
 .macro SetupColorMap(screenRamHiAddress) {
     lda #screenRamHiAddress
     sta SetColorToChars.ScreenMemoryAddress
@@ -849,3 +904,4 @@ WaitRoutine: {
 
 #import "common/lib/math-global.asm"
 #import "chipset/lib/vic2.asm"
+#import "chipset/lib/vic2-global.asm"

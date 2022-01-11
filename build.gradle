@@ -83,6 +83,28 @@ preprocess {
                 interleaver {
                 }
             }
+            map {
+                left = 160
+                top = 0
+                right = 180
+                bottom = 7
+                interleaver {
+                    output = file("maps/dialoggreen.bin")
+                }
+                interleaver {
+                }
+            }
+            map {
+                left = 160
+                top = 7
+                right = 180
+                bottom = 14
+                interleaver {
+                    output = file("maps/dialogbrown.bin")
+                }
+                interleaver {
+                }
+            }
         }
     }
 }
