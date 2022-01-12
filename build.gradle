@@ -89,7 +89,7 @@ preprocess {
                 right = 180
                 bottom = 7
                 interleaver {
-                    output = file("maps/dialoggreen.bin")
+                    output = file("maps/dialognextlevel.bin")
                 }
                 interleaver {
                 }
@@ -100,7 +100,7 @@ preprocess {
                 right = 180
                 bottom = 14
                 interleaver {
-                    output = file("maps/dialogbrown.bin")
+                    output = file("maps/dialoggameover.bin")
                 }
                 interleaver {
                 }

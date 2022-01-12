@@ -176,130 +176,6 @@ RemoveTree: {
     StartAddress: .word $beef
 }
 
-* = * "Utils ShowGameEndedMessage"
-ShowGameEndedMessage: {
-    lda #$00
-    sta StartAddress
-
-    c64lib_add16($014a, StartAddress)
-
-// First and third row (border)
-    lda #FrameChar
-    ldy #$00
-  MainLoop:
-    cpy #$01
-    beq DrawMessage
-
-    lda StartAddress
-    sta SelfMod1 + 1
-    lda StartAddress + 1
-    sta SelfMod1 + 2
-
-    lda #FrameChar
-
-// Second row (message)
-  RowLoop:
-    ldx #$14
-  SelfMod1:
-    sta $beef, x
-    dex
-    bne SelfMod1
-    jmp SetNextCicle
-
-  DrawMessage:
-    lda StartAddress
-    sta SelfModLabel + 1
-    lda StartAddress + 1
-    sta SelfModLabel + 2
-
-    ldx #GameOverLabelLen
-  LabelLoop:
-    lda GameOverLabel, x
-  SelfModLabel:
-    sta $beef, x
-    dex
-    bne LabelLoop
-
-  SetNextCicle:
-    c64lib_add16($0028, StartAddress)
-    iny
-
-    cpy #$03
-    bne MainLoop
-
-    jmp SetColorToChars
-
-  .label FrameChar = $a4
-  StartAddress: .word $beef
-  .label GameOverLabelLen = $0a
-  GameOverLabel: .byte $00, $08, $02, $0e, $06, $00, $10, $17, $06, $13
-}
-
-* = * "Utils ShowGameNextLevelMessage"
-ShowGameNextLevelMessage: {
-    lda #$00
-    sta StartAddress
-
-    c64lib_add16($014a, StartAddress)
-
-// First and third row (border)
-    lda #FrameChar
-    ldy #$00
-  MainLoop:
-    cpy #$01
-    beq DrawMessage
-
-    lda StartAddress
-    sta SelfMod1 + 1
-    lda StartAddress + 1
-    sta SelfMod1 + 2
-
-    lda #FrameChar
-
-// Second row (message)
-  RowLoop:
-    ldx #$14
-  SelfMod1:
-    sta $beef, x
-    dex
-    bne SelfMod1
-    jmp SetNextCicle
-
-  DrawMessage:
-    lda StartAddress
-    sta SelfModLabel + 1
-    lda StartAddress + 1
-    sta SelfModLabel + 2
-
-    ldx #NextLevelLabelLen
-  LabelLoop:
-    lda NextLevelLabel, x
-  SelfModLabel:
-    sta $beef, x
-    dex
-    bne LabelLoop
-
-  SetNextCicle:
-    c64lib_add16($0028, StartAddress)
-    iny
-
-    cpy #$03
-    bne MainLoop
-
-    jsr SetColorToChars
-
-    inc IsShown
-
-    rts
-
-  IsShown: .byte $00
-
-  .label FrameChar = $a4
-  StartAddress: .word $beef
-  .label NextLevelLabelLen = $0b
-  NextLevelLabel: .byte $00, $0f, $06, $19, $15, $00, $0d, $06, $17, $06, $0d
-}
-
 // Fill screen with $00 char (preserve sprite pointer memory area)
 .macro ClearScreen(screenram) {
     lda #$00
@@ -329,7 +205,31 @@ ShowGameNextLevelMessage: {
     bne !-
 }
 
-CopyDialogIntoScreenRam: {
+.macro ShowDialogNextLevel(ScreenMemoryBaseAddress) {
+    lda #<ScreenMemoryBaseAddress
+    sta ShowDialog.StartAddress
+    lda #>ScreenMemoryBaseAddress
+    sta ShowDialog.StartAddress + 1
+    lda #<DialogNextLevel
+    sta ShowDialog.DialogAddress
+    lda #>DialogNextLevel
+    sta ShowDialog.DialogAddress + 1
+    jsr ShowDialog
+}
+
+.macro ShowDialogGameOver(ScreenMemoryBaseAddress) {
+    lda #<ScreenMemoryBaseAddress
+    sta ShowDialog.StartAddress
+    lda #>ScreenMemoryBaseAddress
+    sta ShowDialog.StartAddress + 1
+    lda #<DialogGameOver
+    sta ShowDialog.DialogAddress
+    lda #>DialogGameOver
+    sta ShowDialog.DialogAddress + 1
+    jsr ShowDialog
+}
+
+ShowDialog: {
     lda StartAddress + 1
     sta StartAddressHi
 
@@ -371,6 +271,7 @@ CopyDialogIntoScreenRam: {
 
     jsr SetColorToChars
 
+    inc IsShown
     rts
 
   .label DialogStartX = 10;
@@ -378,6 +279,8 @@ CopyDialogIntoScreenRam: {
 
   .label DialogWidth = 20;
   .label DialogHeight = 7;
+
+  IsShown: .byte $00
 
   StartAddress: .word $beef
   DialogAddress: .word $beef
@@ -905,3 +808,5 @@ WaitRoutine: {
 #import "common/lib/math-global.asm"
 #import "chipset/lib/vic2.asm"
 #import "chipset/lib/vic2-global.asm"
+
+#import "_allimport.asm"

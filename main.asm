@@ -16,13 +16,16 @@
 .segmentdef Sprites [start=$5400]
 .segmentdef Charsets [start=$7800]
 .segmentdef CharsetsColors [start=$c000]
+.segmentdef Dialogs [start=$c100]
 
-.file [name="./main.prg", segments="Code, Charsets, CharsetsColors, MapData, Sprites", modify="BasicUpstart", _start=$0810]
-.file [name="./ForestSaver.prg", segments="Code, Charsets, CharsetsColors, MapData, Sprites", modify="BasicUpstart", _start=$0810]
+#import "_allimport.asm"
+
+.file [name="./main.prg", segments="Code, Charsets, CharsetsColors, MapData, Sprites, Dialogs", modify="BasicUpstart", _start=$0810]
+.file [name="./ForestSaver.prg", segments="Code, Charsets, CharsetsColors, MapData, Sprites, Dialogs", modify="BasicUpstart", _start=$0810]
 .disk [filename="./ForestSaver.d64", name="\FORESTSAVER", id="C2021", showInfo]
 {
   [name="----------------", type="rel"],
-  [name="FORESTSAVER", type="prg", segments="Code, Charsets, CharsetsColors, MapData, Sprites", modify="BasicUpstart", _start=$0810],
+  [name="FORESTSAVER", type="prg", segments="Code, Charsets, CharsetsColors, MapData, Sprites, Dialogs", modify="BasicUpstart", _start=$0810],
   [name="----------------", type="rel"]
 }
 
@@ -93,4 +96,4 @@ MainGameSettings: {
 #import "_level2.asm"
 #import "_level3.asm"
 #import "_keyboard.asm"
-#import "_allimport.asm"
+//#import "_allimport.asm"

@@ -31,6 +31,12 @@ MapDummyArea:
 Charset:
   .import binary "./maps/charset.bin"
 
+.segment Dialogs
+DialogNextLevel:
+  .import binary "./maps/dialognextlevel.bin"
+DialogGameOver:
+  .import binary "./maps/dialoggameover.bin"
+
 .segment CharsetsColors
 CharColors:
   .import binary "./maps/charcolors.bin"

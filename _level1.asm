@@ -30,10 +30,15 @@ Manager: {
     jsr TimedRoutine
     jsr GetJoystickMove
 
+    lda LevelCompleted
+    bne !+
+
     jsr Ranger.HandleRangerMove
+  !:
     jsr HandleEnemyMove
 
     jsr CheckLevelCompleted
+    lda LevelCompleted
     bne CloseLevelAndGotoNext
 
     lda GameEnded
@@ -68,9 +73,6 @@ Manager: {
 * = * "Level1 Init"
 Init: {
     CopyScreenRam(ScreenMemoryBaseAddress, MapDummyArea)
-
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameNextLevelMessage.StartAddress + 1
 
     jsr SetSpriteToForeground
 // Set background and border color to brown
@@ -179,7 +181,7 @@ Finalize: {
 
     sta Hud.ReduceDismissalCounter.DismissalCompleted
 
-    sta ShowGameNextLevelMessage.IsShown
+    sta ShowDialog.IsShown
 
     jsr CompareAndUpdateHiScore
 
@@ -191,14 +193,14 @@ Finalize: {
 * = * "Level1 CheckLevelCompleted"
 CheckLevelCompleted: {
     lda Hud.CurrentScore + 1
-    and #2
-    beq Done
-    lda ShowGameNextLevelMessage.IsShown
+    cmp #2
+    bcc Done
+    lda ShowDialog.IsShown
     bne Done
 
-    inc LevelCompleted
+    ShowDialogNextLevel(ScreenMemoryBaseAddress)
 
-    jsr ShowGameNextLevelMessage
+    inc LevelCompleted
 
   Done:
     rts
@@ -454,9 +456,7 @@ WoodCutterFromLeft: {
     sta GameEnded
     beq !+
 
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameEndedMessage.StartAddress + 1
-    jsr ShowGameEndedMessage
+    ShowDialogGameOver(ScreenMemoryBaseAddress)
 
   !:
     jmp Done
@@ -860,9 +860,7 @@ WoodCutterFromRight: {
     sta GameEnded
     beq !+
 
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameEndedMessage.StartAddress + 1
-    jsr ShowGameEndedMessage
+    ShowDialogGameOver(ScreenMemoryBaseAddress)
 
   !:
     jmp Done

@@ -33,11 +33,16 @@ Manager: {
     jsr TimedRoutine
     jsr GetJoystickMove
 
+    lda LevelCompleted
+    bne !+
+
     jsr Ranger.HandleRangerMove
+  !:
     jsr HandleEnemyMove
     jsr HandleTankTruckMove
 
     jsr CheckLevelCompleted
+    lda LevelCompleted
     bne CloseLevelAndGotoNext
 
     lda GameEnded
@@ -72,9 +77,6 @@ Manager: {
 * = * "Level2 Init"
 Init: {
     CopyScreenRam(ScreenMemoryBaseAddress, MapDummyArea)
-
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameNextLevelMessage.StartAddress + 1
 
     jsr SetSpriteToForeground
 // Set background and border color to brown
@@ -194,7 +196,7 @@ Finalize: {
 
     sta Hud.ReduceDismissalCounter.DismissalCompleted
 
-    sta ShowGameNextLevelMessage.IsShown
+    sta ShowDialog.IsShown
 
     jsr CleanTankLeft
     jsr CleanTankRight
@@ -209,14 +211,14 @@ Finalize: {
 * = * "Level2 CheckLevelCompleted"
 CheckLevelCompleted: {
     lda Hud.CurrentScore + 1
-    and #6
-    beq Done
-    lda ShowGameNextLevelMessage.IsShown
+    cmp #6
+    bcc Done
+    lda ShowDialog.IsShown
     bne Done
 
-    inc LevelCompleted
+    ShowDialogNextLevel(ScreenMemoryBaseAddress)
 
-    jsr ShowGameNextLevelMessage
+    inc LevelCompleted
 
   Done:
     rts
@@ -473,9 +475,7 @@ WoodCutterFromLeft: {
     sta GameEnded
     beq !+
 
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameEndedMessage.StartAddress + 1
-    jsr ShowGameEndedMessage
+    ShowDialogGameOver(ScreenMemoryBaseAddress)
 
   !:
     jmp Done
@@ -841,9 +841,7 @@ WoodCutterFromRight: {
     sta GameEnded
     beq !+
 
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameEndedMessage.StartAddress + 1
-    jsr ShowGameEndedMessage
+    ShowDialogGameOver(ScreenMemoryBaseAddress)
 
   !:
     jmp Done
@@ -1267,9 +1265,7 @@ TankTruckFromLeft: {
     sta GameEnded
     beq !Done+
 
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameEndedMessage.StartAddress + 1
-    jsr ShowGameEndedMessage
+    ShowDialogGameOver(ScreenMemoryBaseAddress)
 
     jmp Done
 
@@ -1502,9 +1498,7 @@ TankTruckFromRight: {
     sta GameEnded
     beq !Done+
 
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameEndedMessage.StartAddress + 1
-    jsr ShowGameEndedMessage
+    ShowDialogGameOver(ScreenMemoryBaseAddress)
 
     jmp Done
 

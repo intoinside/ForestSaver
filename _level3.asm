@@ -172,7 +172,7 @@ Finalize: {
 
     sta Hud.ReduceDismissalCounter.DismissalCompleted
 
-    sta ShowGameNextLevelMessage.IsShown
+    sta ShowDialog.IsShown
 
     jsr CleanTankLeft
     jsr CleanTankRight
@@ -406,9 +406,7 @@ WoodCutterFromLeft: {
     sta GameEnded
     beq !+
 
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameEndedMessage.StartAddress + 1
-    jsr ShowGameEndedMessage
+    ShowDialogGameOver(ScreenMemoryBaseAddress)
 
   !:
     jmp Done
@@ -838,9 +836,7 @@ TankTruckFromLeft: {
     sta GameEnded
     beq !Done+
 
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameEndedMessage.StartAddress + 1
-    jsr ShowGameEndedMessage
+    ShowDialogGameOver(ScreenMemoryBaseAddress)
 
     jmp Done
 
@@ -1073,9 +1069,7 @@ TankTruckFromRight: {
     sta GameEnded
     beq !Done+
 
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameEndedMessage.StartAddress + 1
-    jsr ShowGameEndedMessage
+    ShowDialogGameOver(ScreenMemoryBaseAddress)
 
     jmp Done
 
@@ -1300,7 +1294,10 @@ ArsionistFromRight: {
 
     lda c64lib.SPRITE_MSB_X
     and #%00001000
-    beq !+
+    bne !CheckCollision+
+    jmp !+
+
+  !CheckCollision:
     lda #$1    
     sta SpriteCollision.OtherX + 1
     lda c64lib.SPRITE_3_X
@@ -1344,9 +1341,7 @@ ArsionistFromRight: {
     sta GameEnded
     beq !+
 
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameEndedMessage.StartAddress + 1
-    jsr ShowGameEndedMessage
+    ShowDialogGameOver(ScreenMemoryBaseAddress)
 
   !:
     jsr RepaintBush
