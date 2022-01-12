@@ -4,14 +4,14 @@
 // Target    : Commodore 64
 // Author    : Raffaele Intorcia - raffaele.intorcia@gmail.com
 //
-// Manager for level 2.
+// Manager for level 3.
 //
 // Sprite pointer settings:
 // * Ranger       Sprite 0
 // * Hatchet 1    Sprite 1
 // * Woodcutter 1 Sprite 2
-// * Hatchet 2    Sprite 3
-// * Woodcutter 2 Sprite 4
+// * Arsionist    Sprite 3
+// * Flame        Sprite 4 
 // * Tank tail    Sprite 5
 // * Tank body    Sprite 6
 // * Tank pipe    Sprite 7
@@ -20,10 +20,9 @@
 
 #importonce
 
-.filenamespace Level2
+.filenamespace Level3
 
-// Manager of level 2
-* = * "Level2 Manager"
+* = * "Level3 Manager"
 Manager: {
     jsr Init
     jsr AddColorToMap
@@ -36,19 +35,11 @@ Manager: {
     jsr Ranger.HandleRangerMove
     jsr HandleEnemyMove
     jsr HandleTankTruckMove
-
-    jsr CheckLevelCompleted
-    bne CloseLevelAndGotoNext
+    jsr HandleArsionistMove
 
     lda GameEnded
     bne CloseLevelAndGame
 
-    jmp JoystickMovement
-
-  CloseLevelAndGotoNext:
-    jsr SetSpriteToBackground
-    IsReturnPressed()
-    bne LevelDone
     jmp JoystickMovement
 
   CloseLevelAndGame:
@@ -56,7 +47,6 @@ Manager: {
     IsReturnPressed()
     bne LevelDone
 
-  EndLoop:
     jmp JoystickMovement
 
   LevelDone:
@@ -68,17 +58,14 @@ Manager: {
     rts
 }
 
-// Initialization of level 2
-* = * "Level2 Init"
+// Initialization of level 3
+* = * "Level3 Init"
 Init: {
     CopyScreenRam(ScreenMemoryBaseAddress, MapDummyArea)
 
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameNextLevelMessage.StartAddress + 1
-
     jsr SetSpriteToForeground
 // Set background and border color to brown
-    lda #ORANGE
+    lda #BROWN
     sta c64lib.BORDER_COL
     sta c64lib.BG_COL_0
 
@@ -88,8 +75,8 @@ Init: {
     sta c64lib.BG_COL_2
 
 // Set pointer to char memory to $7800-$7fff (xxxx111x)
-// and pointer to screen memory to $4800-$4fff (0010xxxx)
-    lda #%00101110
+// and pointer to screen memory to $4c00-$4fff (0011xxxx)
+    lda #%00111110
     sta c64lib.MEMORY_CONTROL       
 
 // Init common sprite color
@@ -98,11 +85,6 @@ Init: {
 
     lda #BLACK
     sta c64lib.SPRITE_COL_1
-
-// Woodcutter sprite init
-    lda #SPRITES.ENEMY_STANDING
-    sta SPRITE_2
-    sta SPRITE_4
 
 // Ranger coordinates
     lda #$0
@@ -122,6 +104,10 @@ Init: {
     sta WoodCutter.ScreenMemoryAddress
     jsr WoodCutter.Init
 
+    lda #>ScreenMemoryBaseAddress
+    sta Arsionist.ScreenMemoryAddress
+    jsr Arsionist.Init
+
     lda #<ScreenMemoryBaseAddress
     sta Hud.ScreenMemoryAddress + 1
     lda #>ScreenMemoryBaseAddress
@@ -131,12 +117,12 @@ Init: {
 // Sprite color setting
     lda #YELLOW
     sta c64lib.SPRITE_0_COLOR
+    sta c64lib.SPRITE_4_COLOR
     lda #ORANGE
     sta c64lib.SPRITE_1_COLOR
     sta c64lib.SPRITE_3_COLOR
     lda #RED
     sta c64lib.SPRITE_2_COLOR
-    sta c64lib.SPRITE_4_COLOR
     lda #WHITE
     sta c64lib.SPRITE_5_COLOR
     sta c64lib.SPRITE_6_COLOR
@@ -146,18 +132,15 @@ Init: {
 // Enable the first sprite (ranger)
     EnableSprite(0, true)
 
-    GetRandomUpTo(2)
+    GetRandomUpTo(3)
     sta WoodCutterFromLeft.CurrentWoodCutter
-    GetRandomUpTo(2)
-    sta WoodCutterFromRight.CurrentWoodCutter
 
     jsr SetLeftWoodCutterTrack
-    jsr SetRightWoodCutterTrack
 
     rts
 }
 
-* = * "Level2 Finalize"
+* = * "Level3 Finalize"
 Finalize: {
     CopyScreenRam(MapDummyArea, ScreenMemoryBaseAddress)
 
@@ -175,15 +158,6 @@ Finalize: {
     sta WoodCutterFromLeft.TreeAlreadyCut
     sta WoodCutterFromLeft.TreeAlreadyCut + 1
 
-    sta WoodCutterFromRight.WoodCutterFined
-    sta WoodCutterFromRight.ComplaintShown
-    sta WoodCutterFromRight.CutCompleted
-    sta WoodCutterFromRight.WalkInCompleted
-    sta WoodCutterFromRight.HatchetShown
-
-    sta WoodCutterFromRight.TreeAlreadyCut
-    sta WoodCutterFromRight.TreeAlreadyCut + 1
-
     sta AddTankTruck.TruckActive
 
     sta TankTruckFromLeft.LakeNotAvailable
@@ -191,6 +165,10 @@ Finalize: {
 
     sta TankTruckFromRight.LakeNotAvailable
     sta TankTruckFromRight.Polluted
+
+    sta AddArsionist.ArsionistActive
+
+    sta ArsionistFromRight.ArsionistFined
 
     sta Hud.ReduceDismissalCounter.DismissalCompleted
 
@@ -206,23 +184,7 @@ Finalize: {
     rts
 }
 
-* = * "Level2 CheckLevelCompleted"
-CheckLevelCompleted: {
-    lda Hud.CurrentScore + 1
-    and #6
-    beq Done
-    lda ShowGameNextLevelMessage.IsShown
-    bne Done
-
-    inc LevelCompleted
-
-    jsr ShowGameNextLevelMessage
-
-  Done:
-    rts
-}
-
-* = * "Level2 AddEnemy"
+* = * "Level3 AddEnemy"
 AddEnemy: {
     lda GameEnded
     bne Done
@@ -230,13 +192,10 @@ AddEnemy: {
     lda LevelCompleted
     bne Done
 
-    GetRandomUpTo(6)
+    GetRandomUpTo(4)
 
     cmp #$02
     beq StartWoodCutterFromLeft
-
-    cmp #$03
-    beq StartWoodCutterFromRight
 
     jmp Done
 
@@ -255,50 +214,24 @@ AddEnemy: {
 
     EnableSprite(2, true)
 
-    jmp Done
-
-  StartWoodCutterFromRight:
-    lda EnemyActive
-    and #%00001000
-    bne Done
-    lda EnemyActive
-    ora #%00001000
-    sta EnemyActive
-
-    lda #$10
-    sta c64lib.SPRITE_4_X
-    lda #$cf
-    sta c64lib.SPRITE_4_Y
-    lda c64lib.SPRITE_MSB_X
-    ora #%00010000
-    sta c64lib.SPRITE_MSB_X
-
-    EnableSprite(4, true)
-
   Done:
     rts
 
   EnemyActive:      .byte $00
 }
 
-* = * "Level2 HandleEnemyMove"
+* = * "Level3 HandleEnemyMove"
 HandleEnemyMove: {
     lda AddEnemy.EnemyActive
     and #%00000100
-    beq IsEnemyFromRight3Alive
-    jsr WoodCutterFromLeft
-
-  IsEnemyFromRight3Alive:
-    lda AddEnemy.EnemyActive
-    and #%00001000
     beq Done
-    jsr WoodCutterFromRight
+    jsr WoodCutterFromLeft
 
   Done:
     rts
 }
 
-* = * "Level2 WoodCutterFromLeft"
+* = * "Level3 WoodCutterFromLeft"
 WoodCutterFromLeft: {
     lda WoodCutterFined
     beq CutCompletedCheck
@@ -519,11 +452,11 @@ WoodCutterFromLeft: {
     iny
   !Next:
     inx
-    cpx #$02
+    cpx #$03
     bne LookForTreeAvailable
     jmp Done
   CheckNextWoodCutter:
-    GetRandomUpTo(2)
+    GetRandomUpTo(4)
     tax
     lda TreeAlreadyCut, x
     bne CheckNextWoodCutter
@@ -548,7 +481,7 @@ WoodCutterFromLeft: {
   Done:
     rts
 
-  TreeAlreadyCut: .byte $00, $00
+  TreeAlreadyCut: .byte $00, $00, $00
 
   // Number of strokes to cut tree
   .label HatchetStrokesMax = 20
@@ -586,9 +519,11 @@ WoodCutterFromLeft: {
   TreeStartAddress: .word $beef
 }
 
-* = * "Level2 SetLeftWoodCutterTrack"
+* = * "Level3 SetLeftWoodCutterTrack"
 SetLeftWoodCutterTrack: {
     lda WoodCutterFromLeft.CurrentWoodCutter
+    cmp #$02
+    beq FixForWoodCutter3
     cmp #$01
     beq FixForWoodCutter2
 
@@ -630,6 +565,27 @@ SetLeftWoodCutterTrack: {
     lda TreeStartAddress2
     sta WoodCutterFromLeft.TreeStartAddress
     lda TreeStartAddress2 + 1
+    sta WoodCutterFromLeft.TreeStartAddress + 1
+
+    jmp Done
+
+  FixForWoodCutter3:
+    lda #TrackWalk3XStart
+    sta WoodCutterFromLeft.TrackWalkXStart
+    lda #TrackWalk3XEnd
+    sta WoodCutterFromLeft.TrackWalkXEnd
+
+    lda #TrackWalk3Y
+    sta WoodCutterFromLeft.TrackWalkY
+
+    lda #DirectionX3
+    sta WoodCutterFromLeft.DirectionX
+    lda #DirectionY3
+    sta WoodCutterFromLeft.DirectionY
+
+    lda TreeStartAddress3
+    sta WoodCutterFromLeft.TreeStartAddress
+    lda TreeStartAddress3 + 1
     sta WoodCutterFromLeft.TreeStartAddress + 1
 
   Done:
@@ -642,418 +598,33 @@ SetLeftWoodCutterTrack: {
 
 // First woodcutter track data
   .label TrackWalk1XStart = 0
-  .label TrackWalk1XEnd   = 94
-  .label TrackWalk1Y      = 86
+  .label TrackWalk1XEnd   = 87
+  .label TrackWalk1Y      = 94
   .label DirectionX1      = 1
   .label DirectionY1      = 0
 
-  TreeStartAddress1: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(10, 3)
+  TreeStartAddress1: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(9, 4)
 
 // Second woodcutter track data
   .label TrackWalk2XStart = 0
-  .label TrackWalk2XEnd   = 81
-  .label TrackWalk2Y      = 189
+  .label TrackWalk2XEnd   = 55
+  .label TrackWalk2Y      = 175
   .label DirectionX2      = 1
   .label DirectionY2      = 0
 
-  TreeStartAddress2: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(9, 16)
+  TreeStartAddress2: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(5, 14)
+
+// Third woodcutter track data
+  .label TrackWalk3XStart = 0
+  .label TrackWalk3XEnd   = 111
+  .label TrackWalk3Y      = 199
+  .label DirectionX3      = 1
+  .label DirectionY3      = 0
+
+  TreeStartAddress3: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(12, 17)
 }
 
-* = * "Level2 WoodCutterFromRight"
-WoodCutterFromRight: {
-    lda WoodCutterFined
-    beq CutCompletedCheck
-    lda ComplaintShown
-    bne GoToWalkOutFar
-
-    EnableSprite(3, false)
-
-    lda TreeStartAddress
-    sta HandleWoodCutterFined.MapComplain
-    lda TreeStartAddress + 1
-    sta HandleWoodCutterFined.MapComplain + 1
-    lda #$00
-    sta HandleWoodCutterFined.AddOrSub
-    lda #$05
-    sta HandleWoodCutterFined.Offset
-    jsr HandleWoodCutterFined
-    inc ComplaintShown
-
-    lda #$2f
-    sta Ranger.IsFining
-
-    AddPoints(0, 0, 2, 0);
-
-    jmp Done
-
-  CutCompletedCheck:
-    lda CutCompleted
-    bne GoToWalkOutFar
-    jmp CutNotCompleted
-
-  GoToWalkOutFar:
-    jmp WalkOut
-
-  CutNotCompleted:
-    lda WalkInCompleted
-    bne ShowHatchetFar
-    jmp WalkIn
-
-  ShowHatchetFar:
-    jmp ShowHatchet
-
-  WalkIn:
-    // Woodcutter walks in
-    ldx c64lib.SPRITE_3_X
-    cpx TrackWalkXEnd
-    beq WalkInDone
-
-    // Woodcutter is not in end position, update x-pos
-    dec c64lib.SPRITE_3_X
-    dex
-    cpx #$ff
-    bne !+
-    // X-pos had an underflow, set XBit to 0
-    dec XBit
-
-  !:
-    lda XBit
-    beq XBitNotSet2
-    CallSetPosition(c64lib.SPRITE_3_X, TrackWalkY, $ff, $08, $09);
-    jmp !+
-
-  XBitNotSet2:
-    CallSetPosition(c64lib.SPRITE_3_X, TrackWalkY, $0, $08, $09);
-
-  !:
-    lda #<SPRITE_4
-    sta WoodCutter.ScreenMemoryAddress + 1
-    lda #>SPRITE_4
-    sta WoodCutter.ScreenMemoryAddress
-
-    CallUpdateWoodCutterFrame(DirectionX, DirectionY, WoodCutterFrame);
-
-    jmp Done
-
-    // Woodcutter is in position, stop walk
-  WalkInDone:
-    inc WalkInCompleted
-
-    jmp Done
-
-  ShowHatchet:
-    // Woodcutter is in position, start to cut the tree
-    lda HatchetShown
-    bne HatchetStrike
-
-    // Walk is done, hatchet must be set
-    lda c64lib.SPRITE_4_X
-    sta c64lib.SPRITE_3_X
-    lda c64lib.SPRITE_4_Y
-    sta c64lib.SPRITE_3_Y
-
-    lda c64lib.SPRITE_MSB_X
-    and #%00010000
-    beq SetHatchetBitToZero
-    lda c64lib.SPRITE_MSB_X
-    ora #%00001000
-    jmp !+
-
-  SetHatchetBitToZero:
-    lda c64lib.SPRITE_MSB_X
-    and #%11110111
-
-  !:
-    sta c64lib.SPRITE_MSB_X
-
-    lda #SPRITES.HATCHET
-    sta SPRITE_3
-
-    EnableSprite(3, true)
-
-    inc HatchetShown
-
-    jmp Done
-
-  HatchetStrike:
-    lda c64lib.SPRITE_MSB_X
-    and #%00001000
-    beq !+
-    lda #$01
-  !:
-    sta SpriteCollision.OtherX + 1
-    lda c64lib.SPRITE_3_X
-    sta SpriteCollision.OtherX
-    lda c64lib.SPRITE_3_Y
-    sta SpriteCollision.OtherY
-    jsr SpriteCollision
-    bne RangerWoodCutterMet
-
-    lda #<SPRITE_3
-    sta Hatchet.ScreenMemoryAddress + 1
-    lda #>SPRITE_3
-    sta Hatchet.ScreenMemoryAddress
-
-    CallUseTheHatchet(HatchetFrame, SPRITES.HATCHET);
-
-    lda Hatchet.UseTheHatchet.StrokeHappened
-    bne StrokeHappened
-    jmp Done
-
-  StrokeHappened:
-    dec HatchetStrokes
-    lda HatchetStrokes
-    bne DoneFar
-    inc CutCompleted
-    jmp HideHatchet
-
-  RangerWoodCutterMet:
-    inc WoodCutterFined
-    jmp Done
-
-  DoneFar:
-    jmp Done
-  HideHatchet:
-    lda #$00
-    sta HatchetShown
-    lda #HatchetStrokesMax
-    sta HatchetStrokes
-
-    EnableSprite(3, false)
-
-  // Tree has been cut, remove tree
-    lda TreeStartAddress
-    sta RemoveTree.StartAddress
-    lda TreeStartAddress + 1
-    sta RemoveTree.StartAddress + 1
-    jsr RemoveTree
-
-    ldx CurrentWoodCutter
-    lda #$01
-    sta TreeAlreadyCut, x
-
-    lda GameEnded
-    bne !+
-
-    jsr Hud.ReduceDismissalCounter
-
-    lda Hud.ReduceDismissalCounter.DismissalCompleted
-    sta GameEnded
-    beq !+
-
-    lda #>ScreenMemoryBaseAddress
-    sta ShowGameEndedMessage.StartAddress + 1
-    jsr ShowGameEndedMessage
-
-  !:
-    jmp Done
-
-  WalkOut:
-  // Hide hatchet and move woodcutter out of screen
-    ldx c64lib.SPRITE_3_X
-    cpx TrackWalkXStart
-    beq CheckXBitBeforeWalkOutDone
-    jmp NoNeedToGoOut
-
-  CheckXBitBeforeWalkOutDone:
-    lda XBit
-    bne WalkOutDone   // If XBit!=0, woodcutter is out of screen
-
-  NoNeedToGoOut:
-    inc c64lib.SPRITE_3_X    // Woodcutter is not out of screen
-    bne DontSetXBit   // If x-pos not overflow, don't increment XBit
-
-    inc XBit
-  DontSetXBit:
-    lda XBit
-    beq XBitNotSet
-    CallSetPosition(c64lib.SPRITE_3_X, TrackWalkY, $ff, $08, $09);
-    jmp !+
-
-  XBitNotSet:
-    CallSetPosition(c64lib.SPRITE_3_X, TrackWalkY, $0, $08, $09);
-
-  !:
-    lda #<SPRITE_4
-    sta WoodCutter.ScreenMemoryAddress + 1
-    lda #>SPRITE_4
-    sta WoodCutter.ScreenMemoryAddress
-
-    CallUpdateWoodCutterFrameReverse(DirectionX, DirectionY, WoodCutterFrame);
-
-    jmp Done
-
-  WalkOutDone:
-    lda TreeStartAddress
-    sta HandleWoodCutterFinedOut.MapComplain
-    lda TreeStartAddress + 1
-    sta HandleWoodCutterFinedOut.MapComplain + 1
-    lda #$00
-    sta HandleWoodCutterFinedOut.AddOrSub
-    lda #$05
-    sta HandleWoodCutterFinedOut.Offset
-    jsr HandleWoodCutterFinedOut
-
-    EnableSprite(4, false)
-
-    // Prepare next sprite track
-    ldx #$00
-  LookForTreeAvailable:
-    lda TreeAlreadyCut, x
-    beq CheckNextWoodCutter
-    iny
-  !Next:
-    inx
-    cpx #$02
-    bne LookForTreeAvailable
-    jmp Done
-  CheckNextWoodCutter:
-    GetRandomUpTo(2)
-    tax
-    lda TreeAlreadyCut, x
-    bne CheckNextWoodCutter
-    stx CurrentWoodCutter
-    jsr SetRightWoodCutterTrack
-
-    // Clear sprite
-    lda AddEnemy.EnemyActive
-    and #%11110111
-    sta AddEnemy.EnemyActive
-
-    lda #0
-    sta HatchetShown
-    sta CutCompleted
-    sta WalkInCompleted
-    sta ComplaintShown
-    sta WoodCutterFined
-
-    lda #HatchetStrokesMax
-    sta HatchetStrokes
-
-  Done:
-    rts
-
-  TreeAlreadyCut: .byte $00, $00
-
-  // Number of strokes to cut tree
-  .label HatchetStrokesMax = 20
-  HatchetStrokes:
-    .byte HatchetStrokesMax
-
-  HatchetFrame:
-    .byte $ff
-
-  WoodCutterFrame:
-    .byte $00
-
-  WoodCutterFined:
-    .byte $00
-
-  ComplaintShown:
-    .byte 0
-
-  HatchetShown:
-    .byte 0
-  CutCompleted:
-    .byte 0
-  WalkInCompleted:
-    .byte 0
-
-  CurrentWoodCutter: .byte $00
-
-// Woodcutter dummy data
-  TrackWalkXStart:  .byte $00
-  TrackWalkXEnd:    .byte $00
-  TrackWalkY:       .byte $00
-  XBit:             .byte $00
-
-  DirectionX:       .byte $00
-  DirectionY:       .byte $00
-
-  TreeStartAddress: .word $beef
-}
-
-* = * "Level2 SetRightWoodCutterTrack"
-SetRightWoodCutterTrack: {
-    lda WoodCutterFromRight.CurrentWoodCutter
-    cmp #$01
-    beq FixForWoodCutter2
-
-  FixForWoodCutter1:
-    lda #TrackWalk1XStart
-    sta WoodCutterFromRight.TrackWalkXStart
-    lda #TrackWalk1XEnd
-    sta WoodCutterFromRight.TrackWalkXEnd
-
-    lda #X1BitStart
-    sta WoodCutterFromRight.XBit
-
-    lda #TrackWalk1Y
-    sta WoodCutterFromRight.TrackWalkY
-
-    lda #DirectionX1
-    sta WoodCutterFromRight.DirectionX
-    lda #DirectionY1
-    sta WoodCutterFromRight.DirectionY
-
-    lda TreeStartAddress1
-    sta WoodCutterFromRight.TreeStartAddress
-    lda TreeStartAddress1 + 1
-    sta WoodCutterFromRight.TreeStartAddress + 1
-    jmp Done
-
-  FixForWoodCutter2:
-    lda #TrackWalk2XStart
-    sta WoodCutterFromRight.TrackWalkXStart
-    lda #TrackWalk2XEnd
-    sta WoodCutterFromRight.TrackWalkXEnd
-
-    lda #X2BitStart
-    sta WoodCutterFromRight.XBit
-
-    lda #TrackWalk2Y
-    sta WoodCutterFromRight.TrackWalkY
-
-    lda #DirectionX2
-    sta WoodCutterFromRight.DirectionX
-    lda #DirectionY2
-    sta WoodCutterFromRight.DirectionY
-
-    lda TreeStartAddress2
-    sta WoodCutterFromRight.TreeStartAddress
-    lda TreeStartAddress2 + 1
-    sta WoodCutterFromRight.TreeStartAddress + 1
-
-  Done:
-    lda WoodCutterFromRight.TrackWalkXStart
-    sta c64lib.SPRITE_3_X
-    lda WoodCutterFromRight.TrackWalkY
-    sta c64lib.SPRITE_3_Y
-
-    rts
-
-// First woodcutter track data
-  .label TrackWalk1XStart = 70
-  .label TrackWalk1XEnd   = 15
-  .label X1BitStart       = 1
-  .label TrackWalk1Y      = 71
-  .label DirectionX1      = 255
-  .label DirectionY1      = 0
-
-  TreeStartAddress1: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(28, 1)
-
-// Second woodcutter track data
-  .label TrackWalk2XStart = 70
-  .label TrackWalk2XEnd   = 233
-  .label X2BitStart       = 1
-  .label TrackWalk2Y      = 158
-  .label DirectionX2      = 255
-  .label DirectionY2      = 0
-
-  TreeStartAddress2: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(23, 12)
-}
-
-* = * "Level2 AddTankTruck"
+* = * "Level3 AddTankTruck"
 AddTankTruck: {
     lda GameEnded
     beq !+
@@ -1069,7 +640,7 @@ AddTankTruck: {
     lda TruckActive
     bne Done
 
-    GetRandomUpTo(6)
+    GetRandomUpTo(8)
 
     cmp #$01
     beq StartTankTruckFromLeft
@@ -1123,7 +694,7 @@ AddTankTruck: {
   TruckActive:      .byte $00
 }
 
-* = * "Level2 HandleTankTruckMove"
+* = * "Level3 HandleTankTruckMove"
 HandleTankTruckMove: {
     lda AddTankTruck.TruckActive
     cmp #$01
@@ -1141,7 +712,7 @@ HandleTankTruckMove: {
     rts
 }
 
-* = * "Level2 TankTruckFromLeft"
+* = * "Level3 TankTruckFromLeft"
 TankTruckFromLeft: {
     lda LakeNotAvailable
     beq !+
@@ -1349,16 +920,16 @@ TankTruckFromLeft: {
   .label PollutionCounterLimit = 20
 
   .label TankLeftXStart = 0
-  .label TankLeftXEnd   = 40
+  .label TankLeftXEnd   = 33
   .label TankLeftX1BitStart = 0
-  .label TankLeftY      = 120
+  .label TankLeftY      = 114
   .label TankLeftBodySpriteNum = $67
   .label TankLeftTailSpriteNum = $66
 
-  .label LakeCoordinates = ScreenMemoryBaseAddress + c64lib_getTextOffset(7, 10)
+  .label LakeCoordinates = ScreenMemoryBaseAddress + c64lib_getTextOffset(6, 9)
 }
 
-* = * "Level2 CleanTankLeft"
+* = * "Level3 CleanTankLeft"
 CleanTankLeft: {
     lda #$00
     sta TankTruckFromLeft.PipeShown
@@ -1376,7 +947,7 @@ CleanTankLeft: {
     rts
 }
 
-* = * "Level2 TankTruckFromRight"
+* = * "Level3 TankTruckFromRight"
 TankTruckFromRight: {
     lda LakeNotAvailable
     beq !+
@@ -1580,17 +1151,17 @@ TankTruckFromRight: {
 
   .label PollutionCounterLimit = 20
 
-  .label TankRightXStart = 70
-  .label TankRightXEnd   = 44
+  .label TankRightXStart = 92
+  .label TankRightXEnd   = 64
   .label TankRightX1BitStart = 1
-  .label TankRightY      = 110
+  .label TankRightY      = 160
   .label TankRightBodySpriteNum = $68
   .label TankRightTailSpriteNum = $69
 
-  .label LakeCoordinates = ScreenMemoryBaseAddress + c64lib_getTextOffset(28, 9)
+  .label LakeCoordinates = ScreenMemoryBaseAddress + c64lib_getTextOffset(31, 15)
 }
 
-* = * "Level2 CleanTankRight"
+* = * "Level3 CleanTankRight"
 CleanTankRight: {
     lda #$00
     sta TankTruckFromRight.PipeShown
@@ -1608,7 +1179,312 @@ CleanTankRight: {
     rts
 }
 
-* = * "Level2 TimedRoutine"
+* = * "Level3 AddArsionist"
+AddArsionist: {
+    lda GameEnded
+    beq !+
+    jmp Done
+
+  !:
+// If there is already an arsionist on screen, no arsionist needed
+    lda ArsionistActive
+    bne Done
+
+    GetRandomUpTo(4)
+
+    cmp #$02
+    beq StartArsionistRight
+
+    jmp Done
+
+  StartArsionistRight:
+    lda ArsionistFromRight.BushNotAvailable
+    bne Done
+
+    lda #$01
+    sta ArsionistActive
+
+    lda #SPRITES.ARSIONIST_STANDING
+    sta SPRITE_3
+
+  Done:
+    rts
+
+  ArsionistActive: .byte $00
+}
+
+* = * "Level3 HandleArsionistMove"
+HandleArsionistMove: {
+    lda AddArsionist.ArsionistActive
+    cmp #$01
+    bne Done
+    jsr ArsionistFromRight
+
+  Done:
+    rts
+}
+
+* = * "Level3 ArsionistFromRight"
+ArsionistFromRight: {
+    lda BushNotAvailable
+    beq BushNotBurned
+    jmp CleanForNextRun
+
+  BushNotBurned:
+    lda ArsionistReady
+    bne ArsionistReadyForWalkIn
+
+    // Code for arsionist sprite preparing
+    lda ArsionistStartX
+    sta c64lib.SPRITE_3_X
+    lda c64lib.SPRITE_MSB_X
+    ora #%00011000
+    sta c64lib.SPRITE_MSB_X
+
+    lda ArsionistStartY
+    sta c64lib.SPRITE_3_Y
+
+    EnableSprite(3, true)
+
+    inc ArsionistReady
+    jmp Done
+
+  ArsionistReadyForWalkIn:
+    lda ArsionistIn
+    bne ShowFlameThrower
+
+    lda c64lib.SPRITE_3_X
+    cmp ArsionistEndX
+    bne !+
+
+    inc ArsionistIn
+    jmp ShowFlameThrower
+
+  !:
+    // Code for arsionist walk in
+    dec c64lib.SPRITE_3_X
+
+    lda #<SPRITE_3
+    sta Arsionist.ScreenMemoryAddress + 1
+    lda #>SPRITE_3
+    sta Arsionist.ScreenMemoryAddress
+
+    CallUpdateArsionistFrame(ArsionistFrame);
+    jmp Done
+
+  ShowFlameThrower:
+    lda FlameThrowerShown
+    bne ArsionistIsBurning
+
+    lda #SPRITES.FLAME_1
+    sta SPRITE_4
+
+    lda c64lib.SPRITE_3_X
+    clc
+    sbc #18
+    sta c64lib.SPRITE_4_X
+    lda c64lib.SPRITE_3_Y
+    sta c64lib.SPRITE_4_Y
+
+    EnableSprite(4, true)
+    inc FlameThrowerShown
+
+    jmp Done
+
+  ArsionistIsBurning:
+    lda BushBurned
+    cmp #8
+    beq ArsionistReadyForWalkOutFar
+    lda ArsionistFined
+    bne ArsionistReadyForWalkOutFar
+
+    lda c64lib.SPRITE_MSB_X
+    and #%00001000
+    beq !+
+    lda #$1    
+    sta SpriteCollision.OtherX + 1
+    lda c64lib.SPRITE_3_X
+    sta SpriteCollision.OtherX
+    lda c64lib.SPRITE_3_Y
+    sta SpriteCollision.OtherY
+    jsr SpriteCollision
+    bne ArsionistMet
+
+    CallUseTheFlameThrower(FlameFrame, SPRITES.FLAME_3);
+
+    lda BurnStep
+    cmp #160
+    beq !NewBurnStep+
+
+    inc BurnStep
+    bcc !BurnStepCompleted+
+
+    jmp !NewBurnStep+
+
+  ArsionistReadyForWalkOutFar:
+    jmp ArsionistReadyForWalkOut
+
+  !NewBurnStep:
+    lda #$ff
+    sta BurnStep
+
+    inc BushBurned
+    lda BushBurned
+    sta RepaintBush.ColumnToRepaint
+    cmp #8
+    bne !+
+    EnableSprite(4, false)
+
+    lda GameEnded
+    bne !+
+
+    jsr Hud.ReduceDismissalCounter
+
+    lda Hud.ReduceDismissalCounter.DismissalCompleted
+    sta GameEnded
+    beq !+
+
+    lda #>ScreenMemoryBaseAddress
+    sta ShowGameEndedMessage.StartAddress + 1
+    jsr ShowGameEndedMessage
+
+  !:
+    jsr RepaintBush
+  !BurnStepCompleted:
+    inc BurnStep
+    jmp Done
+
+  ArsionistMet:
+    AddPoints(0, 0, 6, 0);
+
+    inc ArsionistFined
+    EnableSprite(4, false)
+    jmp Done
+
+  ArsionistReadyForWalkOut:
+    lda ArsionistOut
+    bne ArsionistAlreadyOut
+
+    // Code for arsionist walk out
+    inc c64lib.SPRITE_3_X
+
+    lda #<SPRITE_3
+    sta Arsionist.ScreenMemoryAddress + 1
+    lda #>SPRITE_3
+    sta Arsionist.ScreenMemoryAddress
+
+    CallUpdateArsionistFrameReverse(ArsionistFrame);
+
+    lda c64lib.SPRITE_3_X
+    cmp ArsionistStartX
+    bne Done
+
+    inc ArsionistOut
+
+    EnableSprite(3, false)
+
+    jmp Done
+
+  ArsionistAlreadyOut:
+    lda BushBurned
+    cmp #$08
+    bne CleanForNextRun
+
+    inc BushNotAvailable
+
+* = * "Level3 CleanForNextRun"
+  CleanForNextRun:
+    lda #$00
+    sta AddArsionist.ArsionistActive
+
+    jsr CleanArsionist
+
+  Done:
+    rts
+
+    ArsionistFrame: .byte $00
+    FlameFrame: .byte $00
+    BurnStep: .byte $00
+    ArsionistFined: .byte $00
+
+    ArsionistStartX: .byte 90
+    ArsionistEndX: .byte 35
+    ArsionistStartY: .byte 90
+
+    BushNotAvailable: .byte $00
+    ArsionistReady: .byte $00
+    ArsionistIn: .byte $00
+    FlameThrowerShown: .byte $00
+    FlamingDone: .byte $00
+    ArsionistOut: .byte $00
+    BushBurned: .byte $00   // When is 8, bush is completely burnt
+}
+
+* = * "Level3 RepaintBush"
+RepaintBush: {
+    dec ColumnToRepaint
+
+    lda #<ScreenMemoryBaseAddress
+    sta Dummy
+    lda #>ScreenMemoryBaseAddress
+    sta Dummy + 1
+
+    c64lib_add16((4 * 40) + 26, Dummy)
+    lda ColumnToRepaint
+    beq !+
+
+    lda Dummy
+    clc
+    adc ColumnToRepaint
+    sta Dummy
+    bcc !+
+    inc Dummy + 1
+
+  !:
+    lda Dummy
+    sta ReadData + 1
+    sta SaveData + 1
+    lda Dummy + 1
+    sta ReadData + 2
+    sta SaveData + 2
+
+    ldx #0
+  Loop:
+    ldy Table, x
+  ReadData:
+    lda $beef, y
+    clc
+    adc #$46
+  SaveData:
+    sta $beef, y
+    inx
+    cpx #3
+    bne Loop
+
+    jmp AddColorToMap
+
+  Table: .byte 0, 40, 80
+  Dummy: .word $beef
+  ColumnToRepaint: .byte 0
+}
+
+* = * "Level3 CleanArsionist"
+CleanArsionist: {
+    lda #$00
+    sta ArsionistFromRight.ArsionistReady
+    sta ArsionistFromRight.ArsionistIn
+    sta ArsionistFromRight.FlameThrowerShown
+    sta ArsionistFromRight.FlamingDone
+    sta ArsionistFromRight.ArsionistOut
+    sta ArsionistFromRight.ArsionistFrame
+    sta ArsionistFromRight.FlameFrame
+    sta ArsionistFromRight.BurnStep
+    sta ArsionistFromRight.ArsionistFined
+
+    rts
+}
+
+* = * "Level3 TimedRoutine"
 TimedRoutine: {
     jsr TimedRoutine10th
 
@@ -1642,7 +1518,7 @@ TimedRoutine: {
     jmp Exit
 
   DelayTriggered:
-    // inc $4810
+    // inc $4410
 
     lda DelayRequested      // delay reached 0, reset it
     sta DelayCounter
@@ -1650,16 +1526,16 @@ TimedRoutine: {
   Waiting:
     jsr AddEnemy
     jsr AddTankTruck
+    jsr AddArsionist
 
   Exit:
     rts
 
-// Char position in screen ram
-  .label Char1 = ScreenMemoryBaseAddress + c64lib_getTextOffset(29, 10)
-  .label Char2 = ScreenMemoryBaseAddress + c64lib_getTextOffset(30, 10)
+  .label Char1 = ScreenMemoryBaseAddress + c64lib_getTextOffset(32, 16)
+  .label Char2 = ScreenMemoryBaseAddress + c64lib_getTextOffset(33, 16)
 
-  .label Char3 = ScreenMemoryBaseAddress + c64lib_getTextOffset(8, 11)
-  .label Char4 = ScreenMemoryBaseAddress + c64lib_getTextOffset(9, 11)
+  .label Char3 = ScreenMemoryBaseAddress + c64lib_getTextOffset(7, 10)
+  .label Char4 = ScreenMemoryBaseAddress + c64lib_getTextOffset(8, 10)
 
   DelayCounter: .byte 50    // Counter storage
   DelayRequested: .byte 50  // 1 second delay
@@ -1673,7 +1549,7 @@ TimedRoutine10th: {
     jmp Exit
 
   DelayTriggered:
-    // inc $4811
+    // inc $4411
 
     lda DelayRequested      // delay reached 0, reset it
     sta DelayCounter
@@ -1687,6 +1563,7 @@ TimedRoutine10th: {
     .byte 8                  // 8/50 second delay
 }
 
+* = * "Level3 AddColorToMap"
 AddColorToMap: {
     lda #>ScreenMemoryBaseAddress
     sta SetColorToChars.ScreenMemoryAddress
@@ -1696,7 +1573,7 @@ AddColorToMap: {
 
 LevelCompleted: .byte $00
 
-.label ScreenMemoryBaseAddress = $4800
+.label ScreenMemoryBaseAddress = $4c00
 
 // Hatchet sprite pointer
 .label SPRITE_1     = ScreenMemoryBaseAddress + $3f9
@@ -1719,5 +1596,7 @@ LevelCompleted: .byte $00
 #import "_woodcutter.asm"
 #import "_hatchet.asm"
 #import "_tanktruck.asm"
+#import "_arsionist.asm"
 
+#import "chipset/lib/vic2.asm"
 #import "chipset/lib/vic2-global.asm"

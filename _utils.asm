@@ -13,7 +13,19 @@
 SpriteNumberMask:
     .byte %00000001, %00000010, %00000100, %00001000, %00010000, %00100000, %01000000, %10000000
 
-#import "common/lib/math-global.asm"
+// Switch char at CharPosition from CharFrame1 to CharFrame2 and back
+.macro AnimateLake(CharPosition, CharFrame1, CharFrame2) {
+    lda CharPosition
+    cmp #CharFrame1
+    beq !+
+    ldx #CharFrame1
+    jmp Set
+  !:
+    ldx #CharFrame2
+
+  Set:
+    stx CharPosition
+}
 
 * = * "Utils RemoveTree"
 RemoveTree: {
@@ -159,9 +171,7 @@ RemoveTree: {
   SelfMod16:
     stx $beef
 
-    jsr SetColorToChars
-
-    rts
+    jmp SetColorToChars
 
     StartAddress: .word $beef
 }
@@ -217,19 +227,82 @@ ShowGameEndedMessage: {
     cpy #$03
     bne MainLoop
 
+    jmp SetColorToChars
+
+  .label FrameChar = $a4
+  StartAddress: .word $beef
+  .label GameOverLabelLen = $0a
+  GameOverLabel: .byte $00, $08, $02, $0e, $06, $00, $10, $17, $06, $13
+}
+
+* = * "Utils ShowGameNextLevelMessage"
+ShowGameNextLevelMessage: {
+    lda #$00
+    sta StartAddress
+
+    c64lib_add16($014a, StartAddress)
+
+// First and third row (border)
+    lda #FrameChar
+    ldy #$00
+  MainLoop:
+    cpy #$01
+    beq DrawMessage
+
+    lda StartAddress
+    sta SelfMod1 + 1
+    lda StartAddress + 1
+    sta SelfMod1 + 2
+
+    lda #FrameChar
+
+// Second row (message)
+  RowLoop:
+    ldx #$14
+  SelfMod1:
+    sta $beef, x
+    dex
+    bne SelfMod1
+    jmp SetNextCicle
+
+  DrawMessage:
+    lda StartAddress
+    sta SelfModLabel + 1
+    lda StartAddress + 1
+    sta SelfModLabel + 2
+
+    ldx #NextLevelLabelLen
+  LabelLoop:
+    lda NextLevelLabel, x
+  SelfModLabel:
+    sta $beef, x
+    dex
+    bne LabelLoop
+
+  SetNextCicle:
+    c64lib_add16($0028, StartAddress)
+    iny
+
+    cpy #$03
+    bne MainLoop
+
     jsr SetColorToChars
+
+    inc IsShown
 
     rts
 
-    .label FrameChar = $a4
-    StartAddress: .word $beef
-    .label GameOverLabelLen = $0a
-    GameOverLabel: .byte $00, $08, $02, $0e, $06, $00, $10, $17, $06, $13
+  IsShown: .byte $00
+
+  .label FrameChar = $a4
+  StartAddress: .word $beef
+  .label NextLevelLabelLen = $0b
+  NextLevelLabel: .byte $00, $0f, $06, $19, $15, $00, $0d, $06, $17, $06, $0d
 }
 
-// Fill screen with $20 char (preserve sprite pointer memory area)
+// Fill screen with $00 char (preserve sprite pointer memory area)
 .macro ClearScreen(screenram) {
-    lda #$20
+    lda #$00
     ldx #250
   !:
     dex
@@ -256,21 +329,87 @@ ShowGameEndedMessage: {
     bne !-
 }
 
+CopyDialogIntoScreenRam: {
+    lda StartAddress + 1
+    sta StartAddressHi
+
+    c64lib_add16(c64lib_getTextOffset(DialogStartX, DialogStartY), StartAddress)
+
+    ldy #DialogHeight
+  !Row:
+    dey
+
+    lda DialogAddress
+    sta DialogAddressPtr + 1
+    lda DialogAddress + 1
+    sta DialogAddressPtr + 2
+
+    lda StartAddress
+    sta StartAddressPtr + 1
+    lda StartAddress + 1
+    sta StartAddressPtr + 2
+
+    ldx #DialogWidth
+
+  !:
+    dex
+  DialogAddressPtr:
+    lda DialogAddress, x
+  StartAddressPtr:
+    sta StartAddress, x
+    cpx #0
+    bne !-
+
+    c64lib_add16(40, StartAddress)
+    c64lib_add16(DialogWidth, DialogAddress)
+
+    cpy #0
+    bne !Row-
+
+    lda StartAddressHi
+    sta SetColorToChars.ScreenMemoryAddress
+
+    jsr SetColorToChars
+
+    rts
+
+  .label DialogStartX = 10;
+  .label DialogStartY = 6;
+
+  .label DialogWidth = 20;
+  .label DialogHeight = 7;
+
+  StartAddress: .word $beef
+  DialogAddress: .word $beef
+  StartAddressHi: .byte $be
+}
+
+.macro SetupColorMap(screenRamHiAddress) {
+    lda #screenRamHiAddress
+    sta SetColorToChars.ScreenMemoryAddress
+
+    jsr SetColorToChars
+}
+
 DisableAllSprites: {
     lda #$00
-    sta VIC.SPRITE_ENABLE
+    sta c64lib.SPRITE_ENABLE
 
     rts
 }
 
-.macro SetSpriteToBackground() {
+SetSpriteToBackground: {
     lda #$ff
-    sta SPRITES.PRIORITY
+    sta c64lib.SPRITE_PRIORITY
+
+    rts
 }
 
-.macro SetSpriteToForeground() {
+SetSpriteToForeground: {
     lda #$00
-    sta SPRITES.PRIORITY
+    sta c64lib.SPRITE_PRIORITY
+
+    rts
 }
 
 .macro EnableSprite(bSprite, bEnable) {
@@ -278,82 +417,140 @@ DisableAllSprites: {
     lda SpriteNumberMask, y
     .if (bEnable)   // Build-time condition (not run-time)
     {
-      ora VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
+      ora c64lib.SPRITE_ENABLE   // Merge with the current sprite enable register
     }
     else
     {
       eor #$ff    // Get mask compliment
-      and VIC.SPRITE_ENABLE   // Merge with the current sprite enable register
+      and c64lib.SPRITE_ENABLE   // Merge with the current sprite enable register
     }
-    sta VIC.SPRITE_ENABLE       // Set the new value into the sprite enable register
+    sta c64lib.SPRITE_ENABLE       // Set the new value into the sprite enable register
+}
+.assert "EnableSprite($00, true) ", { EnableSprite($be, true) }, {
+  ldy #$be; lda SpriteNumberMask, y; ora $d015; sta $d015
+}
+.assert "EnableSprite($00, false) ", { EnableSprite($be, false) }, {
+  ldy #$be; lda SpriteNumberMask, y; eor #$ff; and $d015; sta $d015
 }
 
-.macro bpl16(value, low) {
-    lda value + 1
-    cmp low + 1
-    bpl end     // branch to end if value is bigger
-    lda value
-    cmp low
-  end:
+.macro EnableMultiSprite(SpriteMask, bEnable) {
+    lda #SpriteMask
+    .if (bEnable)   // Build-time condition (not run-time)
+    {
+      ora c64lib.SPRITE_ENABLE   // Merge with the current sprite enable register
+    }
+    else
+    {
+      eor #$ff    // Get mask compliment
+      and c64lib.SPRITE_ENABLE   // Merge with the current sprite enable register
+    }
+    sta c64lib.SPRITE_ENABLE       // Set the new value into the sprite enable register
+}
+.assert "EnableMultiSprite($be, true) ", { EnableMultiSprite($be, true) }, {
+  lda #$be; ora $d015; sta $d015
+}
+.assert "EnableMultiSprite($00, false) ", { EnableMultiSprite($be, false) }, {
+  lda #$be; eor #$ff; and $d015; sta $d015
 }
 
-.macro bmi16(value, low) {
-    lda value + 1
-    cmp low + 1
-    bmi end     // branch to end if value is smaller
-    lda value
-    cmp low
+.macro bmi16(arg1, arg2) {
+    lda arg1 + 1
+    cmp arg2 + 1
+    bmi end     // branch to end if value is smaller than low
+    lda arg1
+    cmp arg2
   end:
+}
+.assert "bmi16($0102, $0a0b) ", { bmi16($0102, $0a0b) }, {
+  lda $0103; cmp $0a0c; bmi end; lda $0102; cmp $0a0b; end:
+}
+
+* = * "Utils SetLakeToBlack"
+SetLakeToBlack: {
+    lda StartAddress
+    sta Loop1 + 1
+    lda StartAddress + 1
+    sta Loop1 + 2
+
+    ldx #$00
+    lda #$a5
+  Loop1:
+    sta StartAddress, x
+    clc
+    adc #$01
+    inx
+    cpx #$04
+    bne Loop1
+
+    c64lib_add16($0028, StartAddress)
+    lda StartAddress
+    sta Loop2 + 1
+    lda StartAddress + 1
+    sta Loop2 + 2
+
+    ldx #$00
+    lda #$a9
+  Loop2:
+    sta StartAddress, x
+    clc
+    adc #$01
+    inx
+    cpx #$04
+    bne Loop2
+
+    rts
+
+  StartAddress: .word $beef
 }
 
 * = * "Utils SpriteCollision"
 SpriteCollision: {
-    lda #%00000001
-    and SPRITES.COLLISION_REGISTER
-    bne CollisionHappened
-    jmp NoCollisionDetected
-
-// Sprite 0 collided with someone, detect sprite0 corner
-  CollisionHappened:
-    lda SPRITES.EXTRA_BIT
-    cmp #%00000001
-    beq SetExtraBit
-    lda #$00
-    jmp NextArg
-  SetExtraBit:
-    lda #$01
-  NextArg:
-    sta X1 + 1
-
-    lda SPRITES.X0
-    sta X1
+    c64lib_add16($000c, OtherX)
+    lda OtherY
     clc
-    adc #$08
-    sta X2
-    bcc !+
-    lda #$01
-    jmp !Next+
-  !:
-    lda #$00
-  !Next:
-    sta X2 + 1
+    adc #10
+    sta OtherY
 
-    lda SPRITES.Y0
-    sta Y1
+    lda c64lib.SPRITE_MSB_X
+    and #%00000001
+    sta RangerX1 + 1
+    sta RangerX2 + 1
+
+    lda c64lib.SPRITE_0_X
+    sta RangerX1
+    sta RangerX2
+    add16value($0018, RangerX2)
+
+    lda c64lib.SPRITE_0_Y
+    sta RangerY1
     clc
-    adc #$08
-    sta Y2
+    adc #21
+    sta RangerY2
 
-// REMIND: BMI means jump if a is lower than b
-    bmi16(I1, X1)
-    bmi NoCollisionDetected
-    bmi16(X2, I1)
+    // Collision happened if OtherSprite coordinates is inside Ranger
+    // square. This means that
+    // * RangerX1 < OtherX < RangerX2
+    // * RangerY1 < OtherY < RangerY2
+
+    // REMIND: BMI means jump if first value is lower than second value
+
+    // Is like if OtherX < RangerX1 then jump (no collision)
+    bmi16(OtherX, RangerX1)             // OtherSpriteX - Ranger Left
     bmi NoCollisionDetected
 
-    bmi16(J1, Y1)
+    // Is like if RangerX2 < OtherX then jump (no collision)
+    bmi16(RangerX2, OtherX)             // Ranger Right - OtherSpriteX
     bmi NoCollisionDetected
-    bmi16(Y2, J1)
-    bmi NoCollisionDetected
+
+    // Is like if OtherY < RangerY1 then jump (no collision)
+    lda OtherY
+    cmp RangerY1
+    bmi NoCollisionDetected     // branch to end if value is smaller than low
+
+    // Is like if RangerY2 < OtherY then jump (no collision)
+    lda RangerY2
+    cmp OtherY
+    bmi NoCollisionDetected     // branch to end if value is smaller than low
 
   CollisionDetected:
     lda #$01
@@ -363,30 +560,28 @@ SpriteCollision: {
     lda #$00
 
   Done:
+    rts
+
+// Ranger square
+  RangerX1: .word $0000
+  RangerX2: .word $0000
+  RangerY1: .byte $00
+  RangerY2: .byte $00
+
+// Other sprite initial coordinate
+  OtherX: .word $0000
+  OtherY: .byte $00
+}
+
+* = * "Utils BackgroundCollision"
+BackgroundCollision: {
+    lda c64lib.SPRITE_2B_COLLISION
+    and #%00000001
+
     sta Collision
     rts
 
-// Woodcutter square
-  X1: .word $0000
-  X2: .word $0000
-  Y1: .word $0000
-  Y2: .word $0000
-
-// Other sprite initial coordinate
-  I1: .word $0000
-  J1: .word $0000
-
   Collision: .byte $00
-}
-
-.macro add16(value, dest) {
-    clc
-    lda dest
-    adc value
-    sta dest
-    lda dest + 1
-    adc value + 1
-    sta dest + 1
 }
 
 .macro add16byte(value, dest) {
@@ -398,6 +593,9 @@ SpriteCollision: {
     inc dest + 1
   !:
 }
+.assert "add16byte($cc, $0123) ", { add16byte($cc, $0123) }, {
+  clc; lda $0123; adc $cc; sta $0123; bcc !+; inc $0124; !:
+}
 
 .macro add16value(value, dest) {
     clc
@@ -408,15 +606,21 @@ SpriteCollision: {
     adc #>value
     sta dest + 1
 }
+.assert "add16value($0102, $0123) ", { add16value($0102, $0123) }, {
+  clc; lda $0123; adc #<$0102; sta $0123 ; lda $0124 ; adc #>$0102 ; sta $0124
+}
 
-.macro sub16byte(value, low) {
+.macro sub16byte(value, dest) {
     sec
-    lda low
+    lda dest
     sbc value
-    sta low
-    lda low + 1
+    sta dest
+    lda dest + 1
     sbc #$00
-    sta low + 1
+    sta dest + 1
+}
+.assert "sub16byte($cc, $0123) ", { sub16byte($cc, $0123) }, {
+  sec; lda $0123; sbc $cc; sta $0123; lda $0124; sbc #$00; sta $0124
 }
 
 * = * "Utils HandleWoodCutterFined"
@@ -584,7 +788,7 @@ HandleWoodCutterFinedOut: {
   MapComplain:      .word $4569 //, $456a, $456b, $4591, $4592, $4593
 }
 
-* = * "SetColorToChars"
+* = * "Utils SetColorToChars"
 SetColorToChars: {
     lda ScreenMemoryAddress
     sta Dummy1 + 2
@@ -624,8 +828,8 @@ SetColorToChars: {
   Done:
     rts
 
-  ScreenMemoryAddress:
-    .byte $be
+  ScreenMemoryAddress: .byte $be
+
   .label DummyScreenRam = $be00
 
   CleanLoop:
@@ -661,18 +865,43 @@ WaitRoutine: {
     rts
 }
 
-StupidWaitRoutine: {
-    ldy #$bf
-  LoopY:
-    ldx #$ff
-  LoopX:
-    nop
-    nop
-    dex
-    bne LoopX
-    dey
-    bne LoopY
-    rts
+.macro DrawAccumulator(position) {
+    pha
+    and #$0f
+    cmp #$0a
+    bpl !bigger+
+    clc
+    adc #$2a
+    jmp !write+
+
+  !bigger:
+    sec
+    sbc #$08
+
+  !write:
+    sta position + 1
+
+    pla
+    and #$f0
+    clc
+    ror
+    ror
+    ror
+    ror
+    cmp #$0a
+    bpl !bigger+
+    clc
+    adc #$2a
+    jmp !write+
+
+  !bigger:
+    sec
+    sbc #$08
+
+  !write:
+    sta position
 }
 
-#import "_allimport.asm"
+#import "common/lib/math-global.asm"
+#import "chipset/lib/vic2.asm"
+#import "chipset/lib/vic2-global.asm"

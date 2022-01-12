@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/intoinside/ForestSaver/tree/main.svg?style=svg)](https://circleci.com/gh/intoinside/ForestSaver/tree/main)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Gitter](https://badges.gitter.im/intoinside/community.svg)](https://gitter.im/intoinside/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![CircleCI](https://circleci.com/gh/intoinside/ForestSaver/tree/main.svg?style=svg)](https://circleci.com/gh/intoinside/ForestSaver/tree/main)
 
 # ForestSaver
 
@@ -10,15 +10,20 @@ A ranger has to do a lot of work to preserve the forest. He must be careful of t
 * A real Commodore 64
 * Vice emulator https://vice-emu.sourceforge.io/
 * FrodoC64 for Android&trade; https://play.google.com/store/apps/details?id=org.ab.c64
+* Don't know if there's an emulator for Iphone
 
 ### Development
+Install your preferred Ide:
 * Sublime Text https://www.sublimetext.com/3 with Kick Assembler http://theweb.dk/KickAssembler/
+* Visual Studio Code https://code.visualstudio.com/download with Kick Assembler (check Paul Hocker extension https://marketplace.visualstudio.com/items?itemName=paulhocker.kick-assembler-vscode-ext)
+
+Other useful tool are:
 * CharPad https://subchristsoftware.itch.io/charpad-free-edition
 * SpritePad https://www.subchristsoftware.com/spritepadfree/
 * Vice emulator https://vice-emu.sourceforge.io/
 * C64 debugger Gui https://magoarcade.org/wp/c64debuggui/
 * Java JDK (at least v11) https://www.oracle.com/java/technologies/downloads/
-* c64lib https://github.com/c64lib
+* c64lib https://github.com/c64lib (common, chipset)
 
 These are used for CI/CD, not needed (but helpful) for development
 * Gradle build tool https://gradle.org/
@@ -31,18 +36,9 @@ These are used for CI/CD, not needed (but helpful) for development
 ### Download ForestSaver only for play
 Look into [Releases](https://github.com/intoinside/ForestSaver/releases) and check for the latest prg/d64 available.
 
-### Download ForestSaver for develop
-
-* Clone repository on your folder
-`git clone https://github.com/intoinside/ForestSaver.git`
-* Switch to game folder
-`cd ForestSaver`
-* Clone libraries
-`git clone https://github.com/c64lib/common.git --branch 0.2.0`
-
 At this point you should be able to build project inside KickAssembler.
 
-### Download ForestSaver for build and play
+### Download ForestSaver for develop, build and play
 
 * Clone repository on your folder
 `git clone https://github.com/intoinside/ForestSaver.git`

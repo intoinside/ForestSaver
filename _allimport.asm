@@ -10,25 +10,19 @@
 
 #importonce
 
-.segmentdef Code [start=$0810]
-.segmentdef Charsets [start=$7800]
-.segmentdef CharsetsColors [start=$c000]
-.segmentdef Sprites [start=$5400]
-.segmentdef MapData [start=$4000]
-
 .segment MapData
 * = $4000 "IntroMap"
   .import binary "./maps/intro.bin"
 * = $4400 "Level1"
   .import binary "./maps/level1.bin"
-/*
 * = $4800 "Level2"
   .import binary "./maps/level2.bin"
-* = $4c00 "Map3"
-  .import binary "./maps/map2.bin"
-* = $5000 "Map4"
-  .import binary "./maps/map2.bin"
-*/
+* = $4c00 "Level3"
+  .import binary "./maps/level3.bin"
+
+.segment MapDummyArea
+* = $5000 "MapDummyArea"
+MapDummyArea:
 
 .segment Sprites
   .import binary "./sprites/sprites.bin"
@@ -40,5 +34,3 @@ Charset:
 .segment CharsetsColors
 CharColors:
   .import binary "./maps/charcolors.bin"
-
-#import "main.asm"

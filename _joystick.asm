@@ -10,8 +10,7 @@
 
 #importonce
 
-FirePressed:
-  .byte $00
+FirePressed: .byte $00
 
 Direction:          // Player sprite direction
   .byte $01         // $00 - no move, $01 - right, $ff - left
@@ -57,8 +56,7 @@ GetJoystickMove: {
     rts
 
   CheckOnlyFirePress:
-    jsr GetOnlyFirePress
-    rts
+    jmp GetOnlyFirePress
 }
 
 // Read joystick (port 2) status and set FirePressed to $ff if fire is pressed
@@ -78,5 +76,3 @@ GetOnlyFirePress: {
 
     rts
 }
-
-#import "main.asm"

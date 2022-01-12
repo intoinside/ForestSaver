@@ -1,6 +1,6 @@
 
 plugins {
-    id "com.github.c64lib.retro-assembler" version "1.4.4"
+    id "com.github.c64lib.retro-assembler" version "1.5.1"
 }
 
 repositories {
@@ -11,13 +11,14 @@ apply plugin: "com.github.c64lib.retro-assembler"
 
 retroProject {
     dialect = "KickAssembler"
-    dialectVersion = "5.22"
+    dialectVersion = "5.24"
     libDirs = [".ra/deps/c64lib"]
     srcDirs = ["."]
     excludes = ["**/_*.asm", ".ra/**/*", "libs/*"]
 
     // dependencies
-    libFromGitHub "c64lib/common", "0.2.0"
+    libFromGitHub "c64lib/common", "0.3.0"
+    libFromGitHub "c64lib/chipset", "0.3.0"
 }
 
 preprocess {
@@ -67,6 +68,39 @@ preprocess {
                 bottom = 22
                 interleaver {
                     output = file("maps/level2.bin")
+                }
+                interleaver {
+                }
+            }
+            map {
+                left = 120
+                top = 0
+                right = 160
+                bottom = 22
+                interleaver {
+                    output = file("maps/level3.bin")
+                }
+                interleaver {
+                }
+            }
+            map {
+                left = 160
+                top = 0
+                right = 180
+                bottom = 7
+                interleaver {
+                    output = file("maps/dialoggreen.bin")
+                }
+                interleaver {
+                }
+            }
+            map {
+                left = 160
+                top = 7
+                right = 180
+                bottom = 14
+                interleaver {
+                    output = file("maps/dialogbrown.bin")
                 }
                 interleaver {
                 }
