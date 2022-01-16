@@ -29,6 +29,8 @@ SpriteNumberMask:
 
 * = * "Utils RemoveTree"
 RemoveTree: {
+    jsr Sfx.TreeFall
+
 // Row #1
     lda StartAddress
     sta SelfMod1 + 1
@@ -810,3 +812,4 @@ WaitRoutine: {
 #import "chipset/lib/vic2-global.asm"
 
 #import "_allimport.asm"
+#import "_sounds.asm"
