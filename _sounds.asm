@@ -28,8 +28,28 @@ SID: {
 	.label VOLUME_FILTER_MODES	= $d418
 }
 
-* = * "Sfx TreeFall"
+* = * "Sfx Walkstep"
+Walkstep: {
+      lda #%00011001
+      sta SID.VOLUME_FILTER_MODES
+      lda #%00000000        
+      sta SID.VOICE1_FREQ_1
+      lda #%00000010        
+      sta SID.VOICE1_FREQ_2
+      lda #%00000010        
+      sta SID.VOICE1_ATTACK_DECAY
+      lda #%00000010
+      sta SID.VOICE1_SUSTAIN_RELEASE
+      lda #%00000000        
+      sta SID.VOICE1_CTRL
+      lda #%10000001
+      sta SID.VOICE1_CTRL
+
+      rts
+}
+
 // Voice 2
+* = * "Sfx TreeFall"
 TreeFall: {
       lda #%00011011
       sta SID.VOLUME_FILTER_MODES
@@ -49,6 +69,7 @@ TreeFall: {
       rts
 }
 
+// Voice 1
 * = * "Sfx HatchetStrike"
 HatchetStrike: {
       lda #%00011001
