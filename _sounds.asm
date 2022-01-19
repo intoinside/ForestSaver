@@ -13,21 +13,22 @@
 .filenamespace Sfx
 
 SID: {
-	.label VOICE1_FREQ_1		= $d400
-	.label VOICE1_FREQ_2		= $d401
-	.label VOICE1_CTRL		= $d404
-	.label VOICE1_ATTACK_DECAY	= $d405
-	.label VOICE1_SUSTAIN_RELEASE	= $d406
+  .label VOICE1_FREQ_1          = $d400
+  .label VOICE1_FREQ_2          = $d401
+  .label VOICE1_CTRL            = $d404
+  .label VOICE1_ATTACK_DECAY    = $d405
+  .label VOICE1_SUSTAIN_RELEASE = $d406
 
-	.label VOICE2_FREQ_1		= $d407
-	.label VOICE2_FREQ_2		= $d408
-	.label VOICE2_CTRL		= $d40b
-	.label VOICE2_ATTACK_DECAY	= $d40c
-	.label VOICE2_SUSTAIN_RELEASE	= $d40d
+  .label VOICE2_FREQ_1          = $d407
+  .label VOICE2_FREQ_2          = $d408
+  .label VOICE2_CTRL            = $d40b
+  .label VOICE2_ATTACK_DECAY    = $d40c
+  .label VOICE2_SUSTAIN_RELEASE = $d40d
 
-	.label VOLUME_FILTER_MODES	= $d418
+  .label VOLUME_FILTER_MODES    = $d418
 }
 
+// Voice 1
 * = * "Sfx Walkstep"
 Walkstep: {
       lda #%00011001
