@@ -77,6 +77,7 @@ UseTheHatchet: {
   SwitchUpFrame:
     inc SPRITE_PTR
     inx
+    jsr Sfx.HatchetStrike
 
   Done:
     stx StrokeHappened
@@ -95,3 +96,4 @@ UseTheHatchet: {
 ScreenMemoryAddress: .word $be00
 
 #import "_label.asm"
+#import "_sounds.asm"

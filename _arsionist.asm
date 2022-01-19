@@ -100,6 +100,8 @@ UpdateFrame: {
     beq RightUpdate
     inx
 
+    jsr Sfx.Walkstep
+
   RightUpdate:
     // If right frame edit occours, no other frame switch will be performed
   StoreSprite1:
@@ -113,6 +115,8 @@ UpdateFrame: {
     cmp #SPRITES.ARSIONIST_STANDING + 3
     beq LeftUpdate
     inx
+
+    jsr Sfx.Walkstep
 
   LeftUpdate:
     // If left frame edit occours, no other frame switch will be performed
@@ -172,3 +176,4 @@ ScreenMemoryAddress: .word $be00
 .label SPRITE_PTR = $beef
 
 #import "_label.asm"
+#import "_sounds.asm"

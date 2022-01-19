@@ -220,6 +220,8 @@ UpdateRangerFrame: {
     beq RightUpdate
     inx
 
+    jsr Sfx.Walkstep
+
   RightUpdate:
     // If right frame edit occours, no other frame switch will be performed
   StoreSprite1:
@@ -233,6 +235,8 @@ UpdateRangerFrame: {
     cmp #SPRITES.RANGER_STANDING + 8
     beq LeftUpdate
     inx
+
+    jsr Sfx.Walkstep
 
   LeftUpdate:
     // If left frame edit occours, no other frame switch will be performed
@@ -254,6 +258,8 @@ UpdateRangerFrame: {
     beq UpUpdate
     inx
 
+    jsr Sfx.Walkstep
+
   DownUpdate:
   StoreSprite3:
     stx SPRITES.SPRITE_0
@@ -266,6 +272,8 @@ UpdateRangerFrame: {
     cmp #SPRITES.RANGER_STANDING + 4
     beq UpUpdate
     inx
+
+    jsr Sfx.Walkstep
 
   UpUpdate:
   StoreSprite4:
@@ -293,4 +301,6 @@ ScreenMemoryAddress: .byte $be
 #import "_joystick.asm"
 #import "_hud.asm"
 #import "_utils.asm"
+#import "_sounds.asm"
+
 #import "chipset/lib/vic2.asm"

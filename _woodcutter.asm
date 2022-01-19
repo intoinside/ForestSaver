@@ -141,6 +141,8 @@ UpdateWoodCutterFrame: {
     beq RightUpdate
     inx
 
+    jsr Sfx.Walkstep
+
   RightUpdate:
     // If right frame edit occours, no other frame switch will be performed
   StoreSprite1:
@@ -154,6 +156,8 @@ UpdateWoodCutterFrame: {
     cmp #SPRITES.ENEMY_STANDING + 8
     beq LeftUpdate
     inx
+
+    jsr Sfx.Walkstep
 
   LeftUpdate:
     // If left frame edit occours, no other frame switch will be performed
@@ -176,6 +180,8 @@ UpdateWoodCutterFrame: {
     beq UpUpdate
     inx
 
+    jsr Sfx.Walkstep
+
   DownUpdate:
   StoreSprite3:
     stx SPRITE_PTR
@@ -188,6 +194,8 @@ UpdateWoodCutterFrame: {
     cmp #SPRITES.ENEMY_STANDING + 4
     beq UpUpdate
     inx
+
+    jsr Sfx.Walkstep
 
   UpUpdate:
   StoreSprite4:
@@ -236,4 +244,6 @@ ScreenMemoryAddress: .byte $be
 .label SPRITE_PTR = $beef
 
 #import "_label.asm"
+#import "_sounds.asm"
+
 #import "chipset/lib/vic2.asm"
