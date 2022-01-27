@@ -194,6 +194,23 @@ FiningInAction: {
     rts
 }
 
+ConvertDismissalToPoint: {
+    lda Hud.ReduceDismissalCounter.DismissalCompleted
+    bne Done
+
+    ldx #15
+  !:
+    jsr WaitRoutine
+    dex
+    bne !-
+
+    jsr Hud.ReduceDismissalCounter
+    AddPoints(0, 0, 5, 0)
+
+  Done:
+    rts
+}
+
 * = * "Ranger UpdateRangerFrame"
 UpdateRangerFrame: {
     inc RangerFrame
