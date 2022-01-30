@@ -205,6 +205,7 @@ ConvertDismissalToPoint: {
     bne !-
 
     jsr Hud.ReduceDismissalCounter
+    jsr Sfx.PointConversion
     AddPoints(0, 0, 5, 0)
 
   Done:

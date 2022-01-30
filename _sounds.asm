@@ -90,3 +90,24 @@ HatchetStrike: {
 
       rts
 }
+
+// Voice 1
+* = * "Sfx PointConversion"
+PointConversion: {
+      lda #%00000111
+      sta SID.VOLUME_FILTER_MODES
+      lda #%00000000        
+      sta SID.VOICE1_FREQ_1
+      lda #%00001000      
+      sta SID.VOICE1_FREQ_2
+      lda #%00100100  
+      sta SID.VOICE1_ATTACK_DECAY
+      lda #%00000110
+      sta SID.VOICE1_SUSTAIN_RELEASE
+      lda #%00000000        
+      sta SID.VOICE1_CTRL
+      lda #%00010001
+      sta SID.VOICE1_CTRL
+
+      rts
+}
