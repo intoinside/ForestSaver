@@ -48,6 +48,7 @@ Manager: {
 
   CloseLevelAndGotoNext:
     jsr SetSpriteToBackground
+    jsr Ranger.ConvertDismissalToPoint
     IsReturnPressed()
     bne LevelDone
     jmp JoystickMovement
