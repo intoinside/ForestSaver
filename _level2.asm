@@ -212,7 +212,7 @@ Finalize: {
 * = * "Level2 CheckLevelCompleted"
 CheckLevelCompleted: {
     lda Hud.CurrentScore + 1
-    cmp #6
+    cmp #9
     bcc Done
     lda ShowDialog.IsShown
     bne Done
