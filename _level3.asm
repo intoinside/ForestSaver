@@ -167,9 +167,9 @@ Finalize: {
     sta TankTruckFromRight.Polluted
 
     sta AddArsionist.ArsionistActive
-    sta AddArsionist.ComplaintShown
 
     sta ArsionistFromRight.ArsionistFined
+    sta ArsionistFromRight.ComplaintShown
 
     sta Hud.ReduceDismissalCounter.DismissalCompleted
 
