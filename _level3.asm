@@ -167,6 +167,7 @@ Finalize: {
     sta TankTruckFromRight.Polluted
 
     sta AddArsionist.ArsionistActive
+    sta AddArsionist.ComplaintShown
 
     sta ArsionistFromRight.ArsionistFined
 
@@ -1245,14 +1246,14 @@ ArsionistFromRight: {
 
   ArsionistReadyForWalkIn:
     lda ArsionistIn
-    bne ShowFlameThrower
+    bne HasBeenFined
 
     lda c64lib.SPRITE_3_X
     cmp ArsionistEndX
     bne !+
 
     inc ArsionistIn
-    jmp ShowFlameThrower
+    jmp HasBeenFined
 
   !:
     // Code for arsionist walk in
@@ -1266,6 +1267,23 @@ ArsionistFromRight: {
     CallUpdateArsionistFrame(ArsionistFrame);
     jmp Done
 
+  HasBeenFined:
+    lda ArsionistFined
+    beq ShowFlameThrower    // Not fined, go to classic path
+
+    lda ComplaintShown      // Fined, check if complain has been shown
+    bne GoToWalkOutFar      // Complain shown, don't show it again
+
+    // Fined and complain not shown, show it
+    ShowComplain(Arsionist.ScreenMemoryAddress, 37, 3)
+    inc ComplaintShown
+
+    lda #$2f
+    sta Ranger.IsFining
+
+  GoToWalkOutFar:
+    jmp ArsionistReadyForWalkOut
+    
   ShowFlameThrower:
     lda FlameThrowerShown
     bne ArsionistIsBurning
@@ -1381,6 +1399,9 @@ ArsionistFromRight: {
     jmp Done
 
   ArsionistAlreadyOut:
+    HideComplain(Arsionist.ScreenMemoryAddress, 37, 3)
+    dec ComplaintShown
+
     lda BushBurned
     cmp #$08
     bne CleanForNextRun
@@ -1401,6 +1422,7 @@ ArsionistFromRight: {
     FlameFrame: .byte $00
     BurnStep: .byte $00
     ArsionistFined: .byte $00
+    ComplaintShown: .byte $00
 
     ArsionistStartX: .byte 90
     ArsionistEndX: .byte 35
@@ -1413,6 +1435,78 @@ ArsionistFromRight: {
     FlamingDone: .byte $00
     ArsionistOut: .byte $00
     BushBurned: .byte $00   // When is 8, bush is completely burnt
+}
+
+.macro ShowComplain(address, x, y) {
+    lda #<address
+    sta ShowComplainRoutine.Dummy
+    lda #>address
+    sta ShowComplainRoutine.Dummy + 1
+
+    c64lib_add16((y * 40) + x, ShowComplainRoutine.Dummy)
+
+    jsr ShowComplainRoutine
+}
+
+// TODO(intoinside): #45 can be generalized and refactored
+* = * "Level3 ShowComplain"
+ShowComplainRoutine: {
+    lda #<ScreenMemoryBaseAddress
+    sta Dummy
+    lda #>ScreenMemoryBaseAddress
+    sta Dummy + 1
+
+    c64lib_add16((3 * 40) + 37, Dummy)
+
+    lda Dummy
+    sta HandleWoodCutterFined.MapComplain
+    lda Dummy + 1
+    sta HandleWoodCutterFined.MapComplain + 1
+    lda #$01
+    sta HandleWoodCutterFined.AddOrSub
+    lda #$03
+    sta HandleWoodCutterFined.Offset
+    jsr HandleWoodCutterFined
+
+    rts
+
+  Dummy: .word $beef
+}
+
+.macro HideComplain(address, x, y) {
+    lda #<address
+    sta HideComplainRoutine.Dummy
+    lda #>address
+    sta HideComplainRoutine.Dummy + 1
+
+    c64lib_add16((y * 40) + x, HideComplainRoutine.Dummy)
+
+    jsr HideComplainRoutine
+}
+
+// TODO(intoinside): #46 HideComplain can be generalized and refactored
+* = * "Level3 HideComplainRoutine"
+HideComplainRoutine: {
+    lda #<ScreenMemoryBaseAddress
+    sta Dummy
+    lda #>ScreenMemoryBaseAddress
+    sta Dummy + 1
+
+    c64lib_add16((3 * 40) + 37, Dummy)
+
+    lda Dummy
+    sta HandleWoodCutterFinedOut.MapComplain
+    lda Dummy + 1
+    sta HandleWoodCutterFinedOut.MapComplain + 1
+    lda #$01
+    sta HandleWoodCutterFinedOut.AddOrSub
+    lda #$03
+    sta HandleWoodCutterFinedOut.Offset
+    jsr HandleWoodCutterFinedOut
+
+    rts
+
+  Dummy: .word $beef
 }
 
 * = * "Level3 RepaintBush"
