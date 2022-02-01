@@ -1277,6 +1277,9 @@ ArsionistFromRight: {
     ShowComplain(Arsionist.ScreenMemoryAddress, 37, 3)
     inc ComplaintShown
 
+    lda #$2f
+    sta Ranger.IsFining
+
   GoToWalkOutFar:
     jmp ArsionistReadyForWalkOut
     
