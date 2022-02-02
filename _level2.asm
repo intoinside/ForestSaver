@@ -1289,6 +1289,11 @@ TankTruckFromLeft: {
   RangerTankMet:
     AddPoints(0, 0, 5, 0);
 
+    lda #$2f
+    sta Ranger.IsFining
+
+    ShowComplain(ScreenMemoryBaseAddress, 6, 6)
+
     inc TankFined
     EnableSprite(7, false)
     jmp Done
@@ -1315,7 +1320,7 @@ TankTruckFromLeft: {
     jmp Done
 
   DriveOutDone:
-    // Tank is out of screen
+    HideComplain(ScreenMemoryBaseAddress, 6, 6);
     EnableSprite(5, false)
     inc TankOut
 
@@ -1522,6 +1527,11 @@ TankTruckFromRight: {
   RangerTankMet:
     AddPoints(0, 0, 5, 0);
 
+    lda #$2f
+    sta Ranger.IsFining
+
+    ShowComplain(ScreenMemoryBaseAddress, 36, 5)
+
     inc TankFined
     EnableSprite(7, false)
     jmp Done
@@ -1546,6 +1556,7 @@ TankTruckFromRight: {
     jmp Done
 
   DriveOutDone:
+    HideComplain(ScreenMemoryBaseAddress, 36, 5)
     EnableSprite(5, false)
     inc TankOut
 
@@ -1575,14 +1586,72 @@ TankTruckFromRight: {
 
   .label PollutionCounterLimit = 20
 
-  .label TankRightXStart = 70
-  .label TankRightXEnd   = 44
+  .label TankRightXStart = 90
+  .label TankRightXEnd   = 43
   .label TankRightX1BitStart = 1
   .label TankRightY      = 110
   .label TankRightBodySpriteNum = $68
   .label TankRightTailSpriteNum = $69
 
   .label LakeCoordinates = ScreenMemoryBaseAddress + c64lib_getTextOffset(28, 9)
+}
+
+.macro ShowComplain(address, x, y) {
+    lda #<address
+    sta ShowComplainRoutine.Dummy
+    lda #>address
+    sta ShowComplainRoutine.Dummy + 1
+
+    c64lib_add16((y * 40) + x, ShowComplainRoutine.Dummy)
+
+    jsr ShowComplainRoutine
+}
+
+// TODO(intoinside): #45 can be generalized and refactored
+* = * "Level2 ShowComplain"
+ShowComplainRoutine: {
+    lda Dummy
+    sta HandleWoodCutterFined.MapComplain
+    lda Dummy + 1
+    sta HandleWoodCutterFined.MapComplain + 1
+    lda #$01
+    sta HandleWoodCutterFined.AddOrSub
+    lda #$03
+    sta HandleWoodCutterFined.Offset
+    jsr HandleWoodCutterFined
+
+    rts
+
+  Dummy: .word $beef
+}
+
+.macro HideComplain(address, x, y) {
+    lda #<address
+    sta HideComplainRoutine.Dummy
+    lda #>address
+    sta HideComplainRoutine.Dummy + 1
+
+    c64lib_add16((y * 40) + x, HideComplainRoutine.Dummy)
+
+    jsr HideComplainRoutine
+}
+
+// TODO(intoinside): #46 HideComplain can be generalized and refactored
+* = * "Level2 HideComplainRoutine"
+HideComplainRoutine: {
+    lda Dummy
+    sta HandleWoodCutterFinedOut.MapComplain
+    lda Dummy + 1
+    sta HandleWoodCutterFinedOut.MapComplain + 1
+    lda #$01
+    sta HandleWoodCutterFinedOut.AddOrSub
+    lda #$03
+    sta HandleWoodCutterFinedOut.Offset
+    jsr HandleWoodCutterFinedOut
+
+    rts
+
+  Dummy: .word $beef
 }
 
 * = * "Level2 CleanTankRight"

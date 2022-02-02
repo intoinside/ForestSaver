@@ -860,6 +860,11 @@ TankTruckFromLeft: {
   RangerTankMet:
     AddPoints(0, 0, 5, 0);
 
+    lda #$2f
+    sta Ranger.IsFining
+
+    ShowComplain(ScreenMemoryBaseAddress, 6, 6)
+
     inc TankFined
     EnableSprite(7, false)
     jmp Done
@@ -886,7 +891,7 @@ TankTruckFromLeft: {
     jmp Done
 
   DriveOutDone:
-    // Tank is out of screen
+    HideComplain(ScreenMemoryBaseAddress, 6, 6);
     EnableSprite(5, false)
     inc TankOut
 
@@ -1093,6 +1098,11 @@ TankTruckFromRight: {
   RangerTankMet:
     AddPoints(0, 0, 5, 0);
 
+    lda #$2f
+    sta Ranger.IsFining
+
+    ShowComplain(ScreenMemoryBaseAddress, 38, 11)
+
     inc TankFined
     EnableSprite(7, false)
     jmp Done
@@ -1117,6 +1127,7 @@ TankTruckFromRight: {
     jmp Done
 
   DriveOutDone:
+    HideComplain(ScreenMemoryBaseAddress, 38, 11)
     EnableSprite(5, false)
     inc TankOut
 
@@ -1275,7 +1286,7 @@ ArsionistFromRight: {
     bne GoToWalkOutFar      // Complain shown, don't show it again
 
     // Fined and complain not shown, show it
-    ShowComplain(Arsionist.ScreenMemoryAddress, 37, 3)
+    ShowComplain(ScreenMemoryBaseAddress, 37, 3)
     inc ComplaintShown
 
     lda #$2f
@@ -1399,7 +1410,7 @@ ArsionistFromRight: {
     jmp Done
 
   ArsionistAlreadyOut:
-    HideComplain(Arsionist.ScreenMemoryAddress, 37, 3)
+    HideComplain(ScreenMemoryBaseAddress, 37, 3)
     dec ComplaintShown
 
     lda BushBurned
@@ -1451,13 +1462,6 @@ ArsionistFromRight: {
 // TODO(intoinside): #45 can be generalized and refactored
 * = * "Level3 ShowComplain"
 ShowComplainRoutine: {
-    lda #<ScreenMemoryBaseAddress
-    sta Dummy
-    lda #>ScreenMemoryBaseAddress
-    sta Dummy + 1
-
-    c64lib_add16((3 * 40) + 37, Dummy)
-
     lda Dummy
     sta HandleWoodCutterFined.MapComplain
     lda Dummy + 1
@@ -1487,13 +1491,6 @@ ShowComplainRoutine: {
 // TODO(intoinside): #46 HideComplain can be generalized and refactored
 * = * "Level3 HideComplainRoutine"
 HideComplainRoutine: {
-    lda #<ScreenMemoryBaseAddress
-    sta Dummy
-    lda #>ScreenMemoryBaseAddress
-    sta Dummy + 1
-
-    c64lib_add16((3 * 40) + 37, Dummy)
-
     lda Dummy
     sta HandleWoodCutterFinedOut.MapComplain
     lda Dummy + 1
