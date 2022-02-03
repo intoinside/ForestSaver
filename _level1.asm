@@ -293,14 +293,14 @@ WoodCutterFromLeft: {
     EnableSprite(1, false)
 
     lda TreeStartAddress
-    sta HandleWoodCutterFined.MapComplain
+    sta HandleEnemyFined.MapComplain
     lda TreeStartAddress + 1
-    sta HandleWoodCutterFined.MapComplain + 1
+    sta HandleEnemyFined.MapComplain + 1
     lda #$01
-    sta HandleWoodCutterFined.AddOrSub
+    sta HandleEnemyFined.AddOrSub
     lda #$03
-    sta HandleWoodCutterFined.Offset
-    jsr HandleWoodCutterFined
+    sta HandleEnemyFined.Offset
+    jsr HandleEnemyFined
     inc ComplaintShown
 
     lda LevelCompleted
@@ -482,14 +482,14 @@ WoodCutterFromLeft: {
 
   WalkOutDone:
     lda TreeStartAddress
-    sta HandleWoodCutterFinedOut.MapComplain
+    sta HandleEnemyFinedOut.MapComplain
     lda TreeStartAddress + 1
-    sta HandleWoodCutterFinedOut.MapComplain + 1
+    sta HandleEnemyFinedOut.MapComplain + 1
     lda #$01
-    sta HandleWoodCutterFinedOut.AddOrSub
+    sta HandleEnemyFinedOut.AddOrSub
     lda #$03
-    sta HandleWoodCutterFinedOut.Offset
-    jsr HandleWoodCutterFinedOut
+    sta HandleEnemyFinedOut.Offset
+    jsr HandleEnemyFinedOut
 
     EnableSprite(2, false)
 
@@ -683,14 +683,14 @@ WoodCutterFromRight: {
     EnableSprite(3, false)
 
     lda TreeStartAddress
-    sta HandleWoodCutterFined.MapComplain
+    sta HandleEnemyFined.MapComplain
     lda TreeStartAddress + 1
-    sta HandleWoodCutterFined.MapComplain + 1
+    sta HandleEnemyFined.MapComplain + 1
     lda #$00
-    sta HandleWoodCutterFined.AddOrSub
+    sta HandleEnemyFined.AddOrSub
     lda #$05
-    sta HandleWoodCutterFined.Offset
-    jsr HandleWoodCutterFined
+    sta HandleEnemyFined.Offset
+    jsr HandleEnemyFined
     inc ComplaintShown
 
     lda LevelCompleted
@@ -903,14 +903,14 @@ WoodCutterFromRight: {
 
   WalkOutDone:
     lda TreeStartAddress
-    sta HandleWoodCutterFinedOut.MapComplain
+    sta HandleEnemyFinedOut.MapComplain
     lda TreeStartAddress + 1
-    sta HandleWoodCutterFinedOut.MapComplain + 1
+    sta HandleEnemyFinedOut.MapComplain + 1
     lda #$00
-    sta HandleWoodCutterFinedOut.AddOrSub
+    sta HandleEnemyFinedOut.AddOrSub
     lda #$05
-    sta HandleWoodCutterFinedOut.Offset
-    jsr HandleWoodCutterFinedOut
+    sta HandleEnemyFinedOut.Offset
+    jsr HandleEnemyFinedOut
 
     EnableSprite(4, false)
 

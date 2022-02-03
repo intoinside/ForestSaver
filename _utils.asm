@@ -528,8 +528,8 @@ BackgroundCollision: {
   sec; lda $0123; sbc $cc; sta $0123; lda $0124; sbc #$00; sta $0124
 }
 
-* = * "Utils HandleWoodCutterFined"
-HandleWoodCutterFined: {
+* = * "Utils HandleEnemyFined"
+HandleEnemyFined: {
 // Char self mod
     lda ComplainChars
     sta EditMap1 + 1
@@ -620,8 +620,8 @@ HandleWoodCutterFined: {
   MapComplain:    .word $4569
 }
 
-* = * "Utils HandleWoodCutterFinedOut"
-HandleWoodCutterFinedOut: {
+* = * "Utils HandleEnemyFinedOut"
+HandleEnemyFinedOut: {
     lda AddOrSub
     beq !Add+
   !Sub:
