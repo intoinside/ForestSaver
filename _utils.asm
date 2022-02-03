@@ -667,8 +667,6 @@ HideComplainRoutine: {
     sta HandleEnemyFinedOut.AddOrSub
     jmp HandleEnemyFinedOut  // jsr + rts
 
-    rts
-
   Dummy: .word $beef
 }
 
