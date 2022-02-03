@@ -1596,35 +1596,6 @@ TankTruckFromRight: {
   .label LakeCoordinates = ScreenMemoryBaseAddress + c64lib_getTextOffset(28, 9)
 }
 
-.macro HideComplain(address, x, y) {
-    lda #<address
-    sta HideComplainRoutine.Dummy
-    lda #>address
-    sta HideComplainRoutine.Dummy + 1
-
-    c64lib_add16((y * 40) + x, HideComplainRoutine.Dummy)
-
-    jsr HideComplainRoutine
-}
-
-// TODO(intoinside): #46 HideComplain can be generalized and refactored
-* = * "Level2 HideComplainRoutine"
-HideComplainRoutine: {
-    lda Dummy
-    sta HandleEnemyFinedOut.MapComplain
-    lda Dummy + 1
-    sta HandleEnemyFinedOut.MapComplain + 1
-    lda #$01
-    sta HandleEnemyFinedOut.AddOrSub
-    lda #$03
-    sta HandleEnemyFinedOut.Offset
-    jsr HandleEnemyFinedOut
-
-    rts
-
-  Dummy: .word $beef
-}
-
 * = * "Level2 CleanTankRight"
 CleanTankRight: {
     lda #$00
