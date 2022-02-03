@@ -863,7 +863,7 @@ TankTruckFromLeft: {
     lda #$2f
     sta Ranger.IsFining
 
-    ShowComplain(ScreenMemoryBaseAddress, 6, 6)
+    ShowComplain(ScreenMemoryBaseAddress, 3, 6)
 
     inc TankFined
     EnableSprite(7, false)
@@ -891,7 +891,7 @@ TankTruckFromLeft: {
     jmp Done
 
   DriveOutDone:
-    HideComplain(ScreenMemoryBaseAddress, 6, 6);
+    HideComplain(ScreenMemoryBaseAddress, 3, 6);
     EnableSprite(5, false)
     inc TankOut
 
@@ -1101,7 +1101,7 @@ TankTruckFromRight: {
     lda #$2f
     sta Ranger.IsFining
 
-    ShowComplain(ScreenMemoryBaseAddress, 38, 11)
+    ShowComplain(ScreenMemoryBaseAddress, 35, 11)
 
     inc TankFined
     EnableSprite(7, false)
@@ -1127,7 +1127,7 @@ TankTruckFromRight: {
     jmp Done
 
   DriveOutDone:
-    HideComplain(ScreenMemoryBaseAddress, 38, 11)
+    HideComplain(ScreenMemoryBaseAddress, 35, 11)
     EnableSprite(5, false)
     inc TankOut
 
@@ -1286,7 +1286,7 @@ ArsionistFromRight: {
     bne GoToWalkOutFar      // Complain shown, don't show it again
 
     // Fined and complain not shown, show it
-    ShowComplain(ScreenMemoryBaseAddress, 37, 3)
+    ShowComplain(ScreenMemoryBaseAddress, 34, 3)
     inc ComplaintShown
 
     lda #$2f
@@ -1410,7 +1410,7 @@ ArsionistFromRight: {
     jmp Done
 
   ArsionistAlreadyOut:
-    HideComplain(ScreenMemoryBaseAddress, 37, 3)
+    HideComplain(ScreenMemoryBaseAddress, 34, 3)
     dec ComplaintShown
 
     lda BushBurned
@@ -1446,35 +1446,6 @@ ArsionistFromRight: {
     FlamingDone: .byte $00
     ArsionistOut: .byte $00
     BushBurned: .byte $00   // When is 8, bush is completely burnt
-}
-
-.macro ShowComplain(address, x, y) {
-    lda #<address
-    sta ShowComplainRoutine.Dummy
-    lda #>address
-    sta ShowComplainRoutine.Dummy + 1
-
-    c64lib_add16((y * 40) + x, ShowComplainRoutine.Dummy)
-
-    jsr ShowComplainRoutine
-}
-
-// TODO(intoinside): #45 can be generalized and refactored
-* = * "Level3 ShowComplain"
-ShowComplainRoutine: {
-    lda Dummy
-    sta HandleEnemyFined.MapComplain
-    lda Dummy + 1
-    sta HandleEnemyFined.MapComplain + 1
-    lda #$01
-    sta HandleEnemyFined.AddOrSub
-    lda #$03
-    sta HandleEnemyFined.Offset
-    jsr HandleEnemyFined
-
-    rts
-
-  Dummy: .word $beef
 }
 
 .macro HideComplain(address, x, y) {
