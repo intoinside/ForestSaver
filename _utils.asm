@@ -737,8 +737,7 @@ SetColorToChars: {
 
   .label DummyScreenRam = $be00
 
-  CleanLoop:
-    .byte $03
+  CleanLoop: .byte $03
 }
 
 // Generates a random number up to maxNumber (excluded)

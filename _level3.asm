@@ -1643,10 +1643,8 @@ TimedRoutine10th: {
   Exit:
     rts
 
-  DelayCounter:
-    .byte 8                  // Counter storage
-  DelayRequested:
-    .byte 8                  // 8/50 second delay
+  DelayCounter: .byte 8                  // Counter storage
+  DelayRequested: .byte 8                  // 8/50 second delay
 }
 
 * = * "Level3 AddColorToMap"

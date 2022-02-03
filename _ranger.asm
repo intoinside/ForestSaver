@@ -300,8 +300,7 @@ UpdateRangerFrame: {
   NoMove:
     rts
 
-  RangerFrame:
-    .byte $ff
+  RangerFrame: .byte $ff
 }
 
 // If > 0 indicates that fining is in progress (remaining time)

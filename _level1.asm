@@ -536,25 +536,13 @@ WoodCutterFromLeft: {
   .label HatchetStrokesMax = 20
   HatchetStrokes: .byte HatchetStrokesMax
 
-  HatchetFrame:
-    .byte $ff
-
-  WoodCutterFrame:
-    .byte $00
-
-  WoodCutterFined:
-    .byte $00
-
-  ComplaintShown:
-    .byte 0
-
-  HatchetShown:
-    .byte 0
-  CutCompleted:
-    .byte 0
-  WalkInCompleted:
-    .byte 0
-
+  HatchetFrame: .byte $ff
+  WoodCutterFrame: .byte $00
+  WoodCutterFined: .byte $00
+  ComplaintShown: .byte 0
+  HatchetShown: .byte 0
+  CutCompleted: .byte 0
+  WalkInCompleted: .byte 0
   CurrentWoodCutter: .byte $00
 
 // Woodcutter dummy data
@@ -958,25 +946,13 @@ WoodCutterFromRight: {
   HatchetStrokes:
     .byte HatchetStrokesMax
 
-  HatchetFrame:
-    .byte $ff
-
-  WoodCutterFrame:
-    .byte $00
-
-  WoodCutterFined:
-    .byte $00
-
-  ComplaintShown:
-    .byte 0
-
-  HatchetShown:
-    .byte 0
-  CutCompleted:
-    .byte 0
-  WalkInCompleted:
-    .byte 0
-
+  HatchetFrame: .byte $ff
+  WoodCutterFrame: .byte $00
+  WoodCutterFined: .byte $00
+  ComplaintShown: .byte 0
+  HatchetShown: .byte 0
+  CutCompleted: .byte 0
+  WalkInCompleted: .byte 0
   CurrentWoodCutter: .byte $00
 
 // Woodcutter dummy data
@@ -1133,10 +1109,8 @@ TimedRoutine: {
   Exit:
     rts
 
-  DelayCounter:
-    .byte 50                  // Counter storage
-  DelayRequested:
-    .byte 50                  // 1 second delay
+  DelayCounter: .byte 50                  // Counter storage
+  DelayRequested: .byte 50                  // 1 second delay
 }
 
 TimedRoutine10th: {
@@ -1155,10 +1129,8 @@ TimedRoutine10th: {
   Exit:
     rts
 
-  DelayCounter:
-    .byte 8                  // Counter storage
-  DelayRequested:
-    .byte 8                  // 8/50 second delay
+  DelayCounter: .byte 8                  // Counter storage
+  DelayRequested: .byte 8                  // 8/50 second delay
 }
 
 AddColorToMap: {
