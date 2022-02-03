@@ -1292,7 +1292,7 @@ TankTruckFromLeft: {
     lda #$2f
     sta Ranger.IsFining
 
-    ShowComplain(ScreenMemoryBaseAddress, 6, 6)
+    ShowComplain(ScreenMemoryBaseAddress, 3, 6)
 
     inc TankFined
     EnableSprite(7, false)
@@ -1320,7 +1320,7 @@ TankTruckFromLeft: {
     jmp Done
 
   DriveOutDone:
-    HideComplain(ScreenMemoryBaseAddress, 6, 6);
+    HideComplain(ScreenMemoryBaseAddress, 3, 6);
     EnableSprite(5, false)
     inc TankOut
 
@@ -1530,7 +1530,7 @@ TankTruckFromRight: {
     lda #$2f
     sta Ranger.IsFining
 
-    ShowComplain(ScreenMemoryBaseAddress, 36, 5)
+    ShowComplain(ScreenMemoryBaseAddress, 33, 5)
 
     inc TankFined
     EnableSprite(7, false)
@@ -1556,7 +1556,7 @@ TankTruckFromRight: {
     jmp Done
 
   DriveOutDone:
-    HideComplain(ScreenMemoryBaseAddress, 36, 5)
+    HideComplain(ScreenMemoryBaseAddress, 33, 5)
     EnableSprite(5, false)
     inc TankOut
 
@@ -1594,35 +1594,6 @@ TankTruckFromRight: {
   .label TankRightTailSpriteNum = $69
 
   .label LakeCoordinates = ScreenMemoryBaseAddress + c64lib_getTextOffset(28, 9)
-}
-
-.macro ShowComplain(address, x, y) {
-    lda #<address
-    sta ShowComplainRoutine.Dummy
-    lda #>address
-    sta ShowComplainRoutine.Dummy + 1
-
-    c64lib_add16((y * 40) + x, ShowComplainRoutine.Dummy)
-
-    jsr ShowComplainRoutine
-}
-
-// TODO(intoinside): #45 can be generalized and refactored
-* = * "Level2 ShowComplain"
-ShowComplainRoutine: {
-    lda Dummy
-    sta HandleEnemyFined.MapComplain
-    lda Dummy + 1
-    sta HandleEnemyFined.MapComplain + 1
-    lda #$01
-    sta HandleEnemyFined.AddOrSub
-    lda #$03
-    sta HandleEnemyFined.Offset
-    jsr HandleEnemyFined
-
-    rts
-
-  Dummy: .word $beef
 }
 
 .macro HideComplain(address, x, y) {

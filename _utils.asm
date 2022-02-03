@@ -528,6 +528,30 @@ BackgroundCollision: {
   sec; lda $0123; sbc $cc; sta $0123; lda $0124; sbc #$00; sta $0124
 }
 
+.macro ShowComplain(address, x, y) {
+    lda #<address
+    sta ShowComplainRoutine.Dummy
+    lda #>address
+    sta ShowComplainRoutine.Dummy + 1
+
+    c64lib_add16((y * 40) + x, ShowComplainRoutine.Dummy)
+
+    jsr ShowComplainRoutine
+}
+
+* = * "Utils ShowComplain"
+ShowComplainRoutine: {
+    lda Dummy
+    sta HandleEnemyFined.MapComplain
+    lda Dummy + 1
+    sta HandleEnemyFined.MapComplain + 1
+    lda #0
+    sta HandleEnemyFined.Offset    
+    jmp HandleEnemyFined  // jsr + rts
+
+  Dummy: .word $beef
+}
+
 * = * "Utils HandleEnemyFined"
 HandleEnemyFined: {
 // Char self mod
@@ -546,6 +570,8 @@ HandleEnemyFined: {
     sta EditMap6 + 1
 
     lda AddOrSub
+    beq MapSelfModAreaRow1
+    cmp #$ff
     beq !Add+
   !Sub:
     sub16byte(Offset, MapComplain)
@@ -615,8 +641,8 @@ HandleEnemyFined: {
     rts
 
   ComplainChars:  .byte $9e, $9f, $a0, $a1, $a2, $a3
-  AddOrSub:       .byte $00   // $00 means add, otherwise sub
-  Offset:         .byte $00   // Offset (to add or sub) from the tree position
+  AddOrSub:       .byte $00   // $ff means add, $01 means sub, otherwise no offset
+  Offset:         .byte $00   // Offset to add or sub from the position
   MapComplain:    .word $4569
 }
 
