@@ -674,7 +674,7 @@ WoodCutterFromRight: {
     sta HandleEnemyFined.MapComplain
     lda TreeStartAddress + 1
     sta HandleEnemyFined.MapComplain + 1
-    lda #$00
+    lda #$ff
     sta HandleEnemyFined.AddOrSub
     lda #$05
     sta HandleEnemyFined.Offset
@@ -894,7 +894,7 @@ WoodCutterFromRight: {
     sta HandleEnemyFinedOut.MapComplain
     lda TreeStartAddress + 1
     sta HandleEnemyFinedOut.MapComplain + 1
-    lda #$00
+    lda #$ff
     sta HandleEnemyFinedOut.AddOrSub
     lda #$05
     sta HandleEnemyFinedOut.Offset
