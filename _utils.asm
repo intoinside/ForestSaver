@@ -546,7 +546,7 @@ ShowComplainRoutine: {
     lda Dummy + 1
     sta HandleEnemyFined.MapComplain + 1
     lda #0
-    sta HandleEnemyFined.Offset    
+    sta HandleEnemyFined.AddOrSub    
     jmp HandleEnemyFined  // jsr + rts
 
   Dummy: .word $beef
@@ -646,9 +646,35 @@ HandleEnemyFined: {
   MapComplain:    .word $4569
 }
 
+.macro HideComplain(address, x, y) {
+    lda #<address
+    sta HideComplainRoutine.Dummy
+    lda #>address
+    sta HideComplainRoutine.Dummy + 1
+
+    c64lib_add16((y * 40) + x, HideComplainRoutine.Dummy)
+
+    jsr HideComplainRoutine
+}
+
+* = * "Utils HideComplainRoutine"
+HideComplainRoutine: {
+    lda Dummy
+    sta HandleEnemyFinedOut.MapComplain
+    lda Dummy + 1
+    sta HandleEnemyFinedOut.MapComplain + 1
+    lda #$00
+    sta HandleEnemyFinedOut.AddOrSub
+    jmp HandleEnemyFinedOut  // jsr + rts
+
+  Dummy: .word $beef
+}
+
 * = * "Utils HandleEnemyFinedOut"
 HandleEnemyFinedOut: {
     lda AddOrSub
+    beq MapSelfModAreaRow1
+    cmp #$ff
     beq !Add+
   !Sub:
     sub16byte(Offset, MapComplain)
@@ -714,8 +740,8 @@ HandleEnemyFinedOut: {
     rts
 
   FixComplainChars: .byte $00
-  AddOrSub:         .byte $00   // $00 means add, otherwise sub
-  Offset:           .byte $00
+  AddOrSub:         .byte $00   // $ff means add, $01 means sub, otherwise no offset
+  Offset:           .byte $00   // Offset to add or sub from the position
   MapComplain:      .word $4569 //, $456a, $456b, $4591, $4592, $4593
 }
 
