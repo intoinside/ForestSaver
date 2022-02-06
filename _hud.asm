@@ -98,18 +98,18 @@ Init: {
 
 * = * "Hud AddScore"
 AddScore: {
-    ldx #$03
+    ldx #$04
     clc
   !:
-    lda CurrentScore, x
-    adc Points, x
+    lda CurrentScore - 1, x
+    adc Points - 1, x
     cmp #10
     bcc SaveDigit
     sbc #10
     sec
 
   SaveDigit:
-    sta CurrentScore, x
+    sta CurrentScore - 1, x
     dex
     bne !-
 
