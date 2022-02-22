@@ -474,9 +474,6 @@ WoodCutterFromLeft: {
     sta ComplaintShown
     sta WoodCutterFined
 
-    lda #HatchetStrokesMax
-    sta HatchetStrokes
-
   Done:
     rts
 

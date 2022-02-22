@@ -524,9 +524,6 @@ WoodCutterFromLeft: {
     sta ComplaintShown
     sta WoodCutterFined
 
-    lda #HatchetStrokesMax
-    sta HatchetStrokes
-
   Done:
     rts
 
@@ -932,9 +929,6 @@ WoodCutterFromRight: {
     sta WalkInCompleted
     sta ComplaintShown
     sta WoodCutterFined
-
-    lda #HatchetStrokesMax
-    sta HatchetStrokes
 
   Done:
     rts
