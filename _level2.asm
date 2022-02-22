@@ -26,7 +26,6 @@
 * = * "Level2 Manager"
 Manager: {
     jsr Init
-    jsr AddColorToMap
 
   JoystickMovement:
     jsr WaitRoutine
@@ -157,7 +156,7 @@ Init: {
     jsr SetLeftWoodCutterTrack
     jsr SetRightWoodCutterTrack
 
-    rts
+    jmp AddColorToMap   // jsr + rts
 }
 
 * = * "Level2 Finalize"
@@ -552,34 +551,23 @@ WoodCutterFromLeft: {
   .label HatchetStrokesMax = 20
   HatchetStrokes: .byte HatchetStrokesMax
 
-  HatchetFrame:
-    .byte $ff
-
-  WoodCutterFrame:
-    .byte $00
-
-  WoodCutterFined:
-    .byte $00
-
-  ComplaintShown:
-    .byte 0
-
-  HatchetShown:
-    .byte 0
-  CutCompleted:
-    .byte 0
-  WalkInCompleted:
-    .byte 0
+  HatchetFrame: .byte $ff
+  WoodCutterFrame: .byte $00
+  WoodCutterFined: .byte $00
+  ComplaintShown: .byte 0
+  HatchetShown: .byte 0
+  CutCompleted: .byte 0
+  WalkInCompleted: .byte 0
 
   CurrentWoodCutter: .byte $00
 
 // Woodcutter dummy data
-  TrackWalkXStart:  .byte $00
-  TrackWalkXEnd:    .byte $00
-  TrackWalkY:       .byte $00
+  TrackWalkXStart: .byte $00
+  TrackWalkXEnd: .byte $00
+  TrackWalkY: .byte $00
 
-  DirectionX:       .byte $00
-  DirectionY:       .byte $00
+  DirectionX: .byte $00
+  DirectionY: .byte $00
 
   TreeStartAddress: .word $beef
 }
@@ -930,27 +918,15 @@ WoodCutterFromRight: {
 
   // Number of strokes to cut tree
   .label HatchetStrokesMax = 20
-  HatchetStrokes:
-    .byte HatchetStrokesMax
+  HatchetStrokes: .byte HatchetStrokesMax
+  HatchetFrame: .byte $ff
+  WoodCutterFrame: .byte $00
+  WoodCutterFined: .byte $00
+  ComplaintShown: .byte 0
 
-  HatchetFrame:
-    .byte $ff
-
-  WoodCutterFrame:
-    .byte $00
-
-  WoodCutterFined:
-    .byte $00
-
-  ComplaintShown:
-    .byte 0
-
-  HatchetShown:
-    .byte 0
-  CutCompleted:
-    .byte 0
-  WalkInCompleted:
-    .byte 0
+  HatchetShown: .byte 0
+  CutCompleted: .byte 0
+  WalkInCompleted: .byte 0
 
   CurrentWoodCutter: .byte $00
 
@@ -1113,7 +1089,7 @@ AddTankTruck: {
   Done:
     rts
 
-  TruckActive:      .byte $00
+  TruckActive: .byte $00
 }
 
 * = * "Level2 HandleTankTruckMove"
@@ -1642,8 +1618,6 @@ TimedRoutine: {
     jmp Exit
 
   DelayTriggered:
-    // inc $4810
-
     lda DelayRequested      // delay reached 0, reset it
     sta DelayCounter
 
@@ -1668,21 +1642,19 @@ TimedRoutine: {
 TimedRoutine10th: {
     lda DelayCounter
     beq DelayTriggered        // when counter is zero stop decrementing
-    dec DelayCounter        // decrement the counter
+    dec DelayCounter          // decrement the counter
 
     jmp Exit
 
   DelayTriggered:
-    // inc $4811
-
-    lda DelayRequested      // delay reached 0, reset it
+    lda DelayRequested        // delay reached 0, reset it
     sta DelayCounter
 
   Exit:
     rts
 
-  DelayCounter: .byte 8                  // Counter storage
-  DelayRequested: .byte 8                  // 8/50 second delay
+  DelayCounter: .byte 8       // Counter storage
+  DelayRequested: .byte 8     // 8/50 second delay
 }
 
 AddColorToMap: {

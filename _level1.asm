@@ -23,7 +23,6 @@
 * = * "Level1 Manager"
 Manager: {
     jsr Init
-    jsr AddColorToMap
 
   JoystickMovement:
     jsr WaitRoutine
@@ -148,7 +147,7 @@ Init: {
     jsr SetLeftWoodCutterTrack
     jsr SetRightWoodCutterTrack
 
-    rts
+    jmp AddColorToMap   // jsr + rts
 }
 
 * = * "Level1 Finalize"
@@ -937,8 +936,7 @@ WoodCutterFromRight: {
 
   // Number of strokes to cut tree
   .label HatchetStrokesMax = 20
-  HatchetStrokes:
-    .byte HatchetStrokesMax
+  HatchetStrokes: .byte HatchetStrokesMax
 
   HatchetFrame: .byte $ff
   WoodCutterFrame: .byte $00
@@ -1083,14 +1081,12 @@ TimedRoutine: {
 
     lda DelayCounter
     beq DelayTriggered        // when counter is zero stop decrementing
-    dec DelayCounter      // decrement the counter
+    dec DelayCounter          // decrement the counter
 
     jmp Exit
 
   DelayTriggered:
-    // inc $4410
-
-    lda DelayRequested      // delay reached 0, reset it
+    lda DelayRequested        // delay reached 0, reset it
     sta DelayCounter
 
   Waiting:
@@ -1098,33 +1094,29 @@ TimedRoutine: {
 
     jmp Exit
 
-  NotWaiting:
-
   Exit:
     rts
 
-  DelayCounter: .byte 50                  // Counter storage
-  DelayRequested: .byte 50                  // 1 second delay
+  DelayCounter: .byte 50      // Counter storage
+  DelayRequested: .byte 50    // 1 second delay
 }
 
 TimedRoutine10th: {
     lda DelayCounter
     beq DelayTriggered        // when counter is zero stop decrementing
-    dec DelayCounter        // decrement the counter
+    dec DelayCounter          // decrement the counter
 
     jmp Exit
 
   DelayTriggered:
-    // inc $4411
-
-    lda DelayRequested      // delay reached 0, reset it
+    lda DelayRequested        // delay reached 0, reset it
     sta DelayCounter
 
   Exit:
     rts
 
-  DelayCounter: .byte 8                  // Counter storage
-  DelayRequested: .byte 8                  // 8/50 second delay
+  DelayCounter: .byte 8       // Counter storage
+  DelayRequested: .byte 8     // 8/50 second delay
 }
 
 AddColorToMap: {

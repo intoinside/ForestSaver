@@ -25,7 +25,6 @@
 * = * "Level3 Manager"
 Manager: {
     jsr Init
-    jsr AddColorToMap
 
   JoystickMovement:
     jsr WaitRoutine
@@ -137,7 +136,7 @@ Init: {
 
     jsr SetLeftWoodCutterTrack
 
-    rts
+    jmp AddColorToMap   // jsr + rts
 }
 
 * = * "Level3 Finalize"
@@ -1543,9 +1542,7 @@ TimedRoutine: {
     jmp Exit
 
   DelayTriggered:
-    // inc $4410
-
-    lda DelayRequested      // delay reached 0, reset it
+    lda DelayRequested        // delay reached 0, reset it
     sta DelayCounter
 
   Waiting:
@@ -1569,21 +1566,19 @@ TimedRoutine: {
 TimedRoutine10th: {
     lda DelayCounter
     beq DelayTriggered        // when counter is zero stop decrementing
-    dec DelayCounter        // decrement the counter
+    dec DelayCounter          // decrement the counter
 
     jmp Exit
 
   DelayTriggered:
-    // inc $4411
-
-    lda DelayRequested      // delay reached 0, reset it
+    lda DelayRequested        // delay reached 0, reset it
     sta DelayCounter
 
   Exit:
     rts
 
-  DelayCounter: .byte 8                  // Counter storage
-  DelayRequested: .byte 8                  // 8/50 second delay
+  DelayCounter: .byte 8       // Counter storage
+  DelayRequested: .byte 8     // 8/50 second delay
 }
 
 * = * "Level3 AddColorToMap"

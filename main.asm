@@ -25,6 +25,9 @@
 .disk [filename="./ForestSaver.d64", name="FORESTSAVER", id="C2022", showInfo]
 {
   [name="----------------", type="rel"],
+  [name="--- RAFFAELE ---", type="rel"],
+  [name="--- INTORCIA ---", type="rel"],
+  [name="----------------", type="rel"],
   [name="FORESTSAVER", type="prg", segments="Code, Charsets, CharsetsColors, MapData, Sprites, Dialogs", modify="BasicUpstart", _start=$0810],
   [name="----------------", type="rel"]
 }
@@ -33,7 +36,7 @@
 
 * = * "Entry"
 Entry: {
-    jsr MainGameSettings
+    MainGameSettings()
     jmp GamePlay
 }
 
@@ -42,8 +45,10 @@ GameEnded:          // $00 - Game in progress
 
 * = * "Main GamePlay"
 GamePlay: {
+// Show intro screen until player start a new game
     jsr Intro.Manager
 
+// Init a new game
     InitNewGame()
 
 // Play on level 1
@@ -67,8 +72,7 @@ GamePlay: {
     sta GameEnded
 }
 
-* = * "Main MainGameSettings"
-MainGameSettings: {
+.macro MainGameSettings() {
 // Switch out Basic so there is available ram on $a000-$bfff
     lda $01
     ora #%00000010
@@ -87,8 +91,6 @@ MainGameSettings: {
     sta c64lib.SPRITE_COL_MODE
 
     jsr Keyboard.Init
-
-    rts
 }
 
 #import "_intro.asm"
@@ -96,4 +98,3 @@ MainGameSettings: {
 #import "_level2.asm"
 #import "_level3.asm"
 #import "_keyboard.asm"
-//#import "_allimport.asm"
