@@ -11,41 +11,41 @@
 #importonce
 
 .macro CallUpdateArsionistFrame(arsionistFrame) {
-  lda #$ff
-  sta Arsionist.UpdateFrame.DirectionX
+    lda #$ff
+    sta Arsionist.UpdateFrame.DirectionX
 
-  lda arsionistFrame
-  sta Arsionist.UpdateFrame.ArsionistFrame
+    lda arsionistFrame
+    sta Arsionist.UpdateFrame.ArsionistFrame
 
-  jsr Arsionist.UpdateFrame
+    jsr Arsionist.UpdateFrame
 
-  lda Arsionist.UpdateFrame.ArsionistFrame
-  sta arsionistFrame
+    lda Arsionist.UpdateFrame.ArsionistFrame
+    sta arsionistFrame
 }
 
 .macro CallUpdateArsionistFrameReverse(arsionistFrame) {
-  lda #1
-  sta Arsionist.UpdateFrame.DirectionX
+    lda #1
+    sta Arsionist.UpdateFrame.DirectionX
 
-  lda arsionistFrame
-  sta Arsionist.UpdateFrame.ArsionistFrame
+    lda arsionistFrame
+    sta Arsionist.UpdateFrame.ArsionistFrame
 
-  jsr Arsionist.UpdateFrame
+    jsr Arsionist.UpdateFrame
 
-  lda Arsionist.UpdateFrame.ArsionistFrame
-  sta arsionistFrame
+    lda Arsionist.UpdateFrame.ArsionistFrame
+    sta arsionistFrame
 }
 
 .macro CallUseTheFlameThrower(flameFrame, frameReference) {
-  lda flameFrame
-  sta Arsionist.UseTheFlame.FlameFrame
-  lda #frameReference
-  sta Arsionist.UseTheFlame.FrameReference
+    lda flameFrame
+    sta Arsionist.UseTheFlame.FlameFrame
+    lda #frameReference
+    sta Arsionist.UseTheFlame.FrameReference
 
-  jsr Arsionist.UseTheFlame
+    jsr Arsionist.UseTheFlame
 
-  lda Arsionist.UseTheFlame.FlameFrame
-  sta flameFrame
+    lda Arsionist.UseTheFlame.FlameFrame
+    sta flameFrame
 }
 
 .filenamespace Arsionist
@@ -84,7 +84,7 @@ UpdateFrame: {
     lsr
     bcc NoMove
 
-    lda #$00
+    lda #0
     sta ArsionistFrame
 
   LoadDirection:

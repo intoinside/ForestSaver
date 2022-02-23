@@ -13,9 +13,9 @@
 .filenamespace InfoScreen
 
 Handler: {
-    CopyScreenRam($4000, MapDummyArea)
+    CopyScreenRam(ScreenMemoryBaseAddress, MapDummyArea)
 
-    ClearScreen($4000)
+    ClearScreen(ScreenMemoryBaseAddress)
 
     lda #RED
     sta c64lib.BORDER_COL

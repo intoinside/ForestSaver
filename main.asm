@@ -40,9 +40,6 @@ Entry: {
     jmp GamePlay
 }
 
-GameEnded:          // $00 - Game in progress
-  .byte $00         // $ff - Played dead, game ended
-
 * = * "Main GamePlay"
 GamePlay: {
 // Show intro screen until player start a new game
@@ -67,11 +64,13 @@ GamePlay: {
     jmp GamePlay
 }
 
+// Initialize vars for new game
 .macro InitNewGame() {
     lda #0
     sta GameEnded
 }
 
+// Initial environment setup
 .macro MainGameSettings() {
 // Switch out Basic so there is available ram on $a000-$bfff
     lda $01
@@ -92,6 +91,9 @@ GamePlay: {
 
     jsr Keyboard.Init
 }
+
+GameEnded:          // $00 - Game in progress
+  .byte $00         // $ff - Player dead, game ended
 
 #import "_intro.asm"
 #import "_level1.asm"

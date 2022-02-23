@@ -50,7 +50,7 @@ UseTheHatchet: {
     lda FrameReference
     sta SpriteFrameReference + 1
 
-    ldx #$00
+    ldx #0
 
     inc HatchetFrame
     lda HatchetFrame
@@ -60,7 +60,7 @@ UseTheHatchet: {
     lsr
     bcc Done
 
-    lda #$00
+    lda #0
     sta HatchetFrame
 
   LoadHatchet1:

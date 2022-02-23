@@ -31,83 +31,83 @@ SID: {
 // Voice 1
 * = * "Sfx Walkstep"
 Walkstep: {
-      lda #%00011001
-      sta SID.VOLUME_FILTER_MODES
-      lda #%00000000        
-      sta SID.VOICE1_FREQ_1
-      lda #%00000010        
-      sta SID.VOICE1_FREQ_2
-      lda #%00000010        
-      sta SID.VOICE1_ATTACK_DECAY
-      lda #%00000010
-      sta SID.VOICE1_SUSTAIN_RELEASE
-      lda #%00000000        
-      sta SID.VOICE1_CTRL
-      lda #%10000001
-      sta SID.VOICE1_CTRL
+    lda #%00011001
+    sta SID.VOLUME_FILTER_MODES
+    lda #%00000000        
+    sta SID.VOICE1_FREQ_1
+    lda #%00000010        
+    sta SID.VOICE1_FREQ_2
+    lda #%00000010        
+    sta SID.VOICE1_ATTACK_DECAY
+    lda #%00000010
+    sta SID.VOICE1_SUSTAIN_RELEASE
+    lda #%00000000        
+    sta SID.VOICE1_CTRL
+    lda #%10000001
+    sta SID.VOICE1_CTRL
 
-      rts
+    rts
 }
 
 // Voice 2
 * = * "Sfx TreeFall"
 TreeFall: {
-      lda #%00011011
-      sta SID.VOLUME_FILTER_MODES
-      lda #%10100000        
-      sta SID.VOICE2_FREQ_1
-      lda #240
-      sta SID.VOICE2_FREQ_2
-      lda #%10011010        
-      sta SID.VOICE2_ATTACK_DECAY
-      lda #%00000111
-      sta SID.VOICE2_SUSTAIN_RELEASE
-      lda #%00000000        
-      sta SID.VOICE2_CTRL
-      lda #%10000001
-      sta SID.VOICE2_CTRL
+    lda #%00011011
+    sta SID.VOLUME_FILTER_MODES
+    lda #%10100000        
+    sta SID.VOICE2_FREQ_1
+    lda #240
+    sta SID.VOICE2_FREQ_2
+    lda #%10011010        
+    sta SID.VOICE2_ATTACK_DECAY
+    lda #%00000111
+    sta SID.VOICE2_SUSTAIN_RELEASE
+    lda #%00000000        
+    sta SID.VOICE2_CTRL
+    lda #%10000001
+    sta SID.VOICE2_CTRL
 
-      rts
+    rts
 }
 
 // Voice 1
 * = * "Sfx HatchetStrike"
 HatchetStrike: {
-      lda #%00011001
-      sta SID.VOLUME_FILTER_MODES
-      lda #%00000000        
-      sta SID.VOICE1_FREQ_1
-      lda #%00001000        
-      sta SID.VOICE1_FREQ_2
-      lda #%00000100        
-      sta SID.VOICE1_ATTACK_DECAY
-      lda #%00000110
-      sta SID.VOICE1_SUSTAIN_RELEASE
-      lda #%00000000        
-      sta SID.VOICE1_CTRL
-      lda #%10000001
-      sta SID.VOICE1_CTRL
+    lda #%00011001
+    sta SID.VOLUME_FILTER_MODES
+    lda #%00000000        
+    sta SID.VOICE1_FREQ_1
+    lda #%00001000        
+    sta SID.VOICE1_FREQ_2
+    lda #%00000100        
+    sta SID.VOICE1_ATTACK_DECAY
+    lda #%00000110
+    sta SID.VOICE1_SUSTAIN_RELEASE
+    lda #%00000000        
+    sta SID.VOICE1_CTRL
+    lda #%10000001
+    sta SID.VOICE1_CTRL
 
-      rts
+    rts
 }
 
 // Voice 1
 * = * "Sfx PointConversion"
 PointConversion: {
-      lda #%00000111
-      sta SID.VOLUME_FILTER_MODES
-      lda #%00000000        
-      sta SID.VOICE1_FREQ_1
-      lda #%00001000      
-      sta SID.VOICE1_FREQ_2
-      lda #%00100100  
-      sta SID.VOICE1_ATTACK_DECAY
-      lda #%00000110
-      sta SID.VOICE1_SUSTAIN_RELEASE
-      lda #%00000000        
-      sta SID.VOICE1_CTRL
-      lda #%00010001
-      sta SID.VOICE1_CTRL
+    lda #%00000111
+    sta SID.VOLUME_FILTER_MODES
+    lda #%00000000        
+    sta SID.VOICE1_FREQ_1
+    lda #%00001000      
+    sta SID.VOICE1_FREQ_2
+    lda #%00100100  
+    sta SID.VOICE1_ATTACK_DECAY
+    lda #%00000110
+    sta SID.VOICE1_SUSTAIN_RELEASE
+    lda #%00000000        
+    sta SID.VOICE1_CTRL
+    lda #%00010001
+    sta SID.VOICE1_CTRL
 
-      rts
+    rts
 }

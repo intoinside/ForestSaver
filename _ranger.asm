@@ -54,7 +54,7 @@ HandleRangerMove: {
     lda FirePressed
     cmp #$ff
     bne !+
-    lda #$00
+    lda #0
     sta IsFining
 
   !:

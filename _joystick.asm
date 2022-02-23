@@ -63,7 +63,7 @@ GetJoystickMove: {
 // $00 otherwise
 GetOnlyFirePress: {
     lda $dc00
-    ldx #$00
+    ldx #0
     lsr
     lsr
     lsr

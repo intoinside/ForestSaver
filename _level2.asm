@@ -1604,8 +1604,8 @@ TimedRoutine: {
     bne Exit
     lda LevelCompleted
     bne Exit
-    AnimateLake(Char1, $61, $65)
-    AnimateLake(Char2, $62, $66)
+    AnimateLake(Char1, Map.LakeChar6_1, Map.LakeChar6_2)
+    AnimateLake(Char2, Map.LakeChar7_1, Map.LakeChar7_2)
     jmp Exit
 
   Delay20:
@@ -1613,8 +1613,8 @@ TimedRoutine: {
     bne Exit
     lda LevelCompleted
     bne Exit
-    AnimateLake(Char3, $61, $65)
-    AnimateLake(Char4, $62, $66)
+    AnimateLake(Char3, Map.LakeChar6_1, Map.LakeChar6_2)
+    AnimateLake(Char4, Map.LakeChar7_1, Map.LakeChar7_2)
     jmp Exit
 
   DelayTriggered:

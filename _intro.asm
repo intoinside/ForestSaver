@@ -34,7 +34,7 @@ Manager: {
     beq KeyPress
 
   ExitIntroScreen:
-    jsr Finalize
+    // jsr Finalize
 
     rts
 }
@@ -68,16 +68,15 @@ Init: {
 
     jsr Instruction
 
-    // jsr Copyright
-    // jsr Copyright2
-
     rts
 }
 
+/*
+// No finalize needed, keeping for future use
 Finalize: {
     rts
 }
-
+*/
 * = * "Intro DrawHiScore"
 DrawHiScore: {
     ldx #$00
@@ -110,43 +109,6 @@ Instruction: {
                     .byte $11, $10, $13, $15, $00, $2c
 }
 
-/*
-* = * "Intro Copyright"
-Copyright: {
-    ldx #CopyrightLabelLen
-  LabelLoop:
-    lda CopyrightLabel, x
-    sta $439e, x
-    dex
-    bne LabelLoop
-
-    rts
-
-// "RAFFAELE.INTORCIA@GMAIL.COM"
-  .label CopyrightLabelLen = $1B
-  CopyrightLabel: .byte $00, $13, $02, $07, $07, $02, $06, $0D, $06, $28
-                  .byte $0a, $0f, $15, $10, $13, $04, $0a, $02, $01
-                  .byte $08, $0e, $02, $0a, $0d, $28, $04, $10, $0e
-}
-
-* = * "Intro Copyright2"
-Copyright2: {
-    ldx #CopyrightLabelLen
-  LabelLoop:
-    lda CopyrightLabel, x
-    sta $43cc, x
-    dex
-    bne LabelLoop
-
-    rts
-
-// "INTOINSIDE (c)"
-  .label CopyrightLabelLen = $0e
-  CopyrightLabel: .byte $00, $0a, $0f, $15, $10, $0a, $0f, $14, $0a, $05
-                  .byte $06, $00, $22, $04, $23
-}
-*/
-
 * = * "Intro TimedRoutine"
 TimedRoutine: {
     lda DelayCounter
@@ -167,21 +129,21 @@ TimedRoutine: {
     jmp DelayTriggered
 
   Delay10:
-    AnimateLake(Char1, $5e, $64)
-    AnimateLake(Char2, $65, $61)
+    AnimateLake(Char1, Map.LakeChar3_1, Map.LakeChar3_2)
+    AnimateLake(Char2, Map.LakeChar6_2, Map.LakeChar6_1)
     jmp Exit
 
   Delay20:
-    AnimateLake(Char3, $61, $65)
-    AnimateLake(Char4, $62, $66)
+    AnimateLake(Char3, Map.LakeChar6_1, Map.LakeChar6_2)
+    AnimateLake(Char4, Map.LakeChar7_1, Map.LakeChar7_2)
     jmp Exit
 
   Delay30:
     jmp Exit
 
   Delay40:
-    AnimateLake(Char5, $62, $66)
-    AnimateLake(Char6, $5e, $64)
+    AnimateLake(Char5, Map.LakeChar7_1, Map.LakeChar7_2)
+    AnimateLake(Char6, Map.LakeChar3_1, Map.LakeChar3_2)
     jmp Exit
 
   DelayTriggered:
@@ -217,3 +179,4 @@ HiScoreLabel: .byte $09, $0a, $27, $14, $04, $10, $13, $06, $34, $00
 #import "_keyboard.asm"
 #import "_infoscreen.asm"
 #import "_hud.asm"
+#import "_map.asm"

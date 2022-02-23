@@ -12,6 +12,7 @@
 
 #importonce
 
+// Add points to current score
 .macro AddPoints(digit4, digit3, digit2, digit1) {
     lda #digit1
     sta Hud.AddScore.Points + 3
@@ -25,6 +26,7 @@
     jsr Hud.AddScore
 }
 
+// Subtracts points to current score
 .macro SubPoints(digit4, digit3, digit2, digit1) {
     lda #digit1
     sta Hud.SubScore.Points + 3
@@ -98,7 +100,7 @@ Init: {
 
 * = * "Hud AddScore"
 AddScore: {
-    ldx #$04
+    ldx #4
     clc
   !:
     lda CurrentScore - 1, x
@@ -114,15 +116,14 @@ AddScore: {
     bne !-
 
   Done:
-    jsr DrawScore
-    rts
+    jmp DrawScore   // jsr + rts
 
   Points: .byte $00, $00, $00, $00
 }
 
 * = * "Hud SubScore"
 SubScore: {
-    ldx #$04
+    ldx #4
     sec
   !:
     lda CurrentScore - 1, x
@@ -138,15 +139,15 @@ SubScore: {
     bne !-
 
   Done:
-    jmp DrawScore
+    jmp DrawScore   // jsr + rts
 
   Points: .byte $00, $00, $00, $00
 }
 
 * = * "Hud ResetScore"
 ResetScore: {
-    ldx #$03
-    lda #$00
+    ldx #3
+    lda #0
   !:
     sta CurrentScore, x
     dex
@@ -158,7 +159,7 @@ ResetScore: {
 * = * "Hud DrawScore"
 DrawScore: {
   // Append current score on score label
-    ldx #$00
+    ldx #0
     clc
   !:
     lda CurrentScore, x
@@ -169,7 +170,7 @@ DrawScore: {
     bne !-
 
   // Draws score label
-    ldx #$00
+    ldx #0
   LoopScore:
     lda ScoreLabel, x
   SelfMod:
@@ -191,8 +192,8 @@ DrawScore: {
 
 * = * "Hud IsScoreBiggerThanZero"
 IsScoreBiggerThanZero: {
-    ldx #$04
-    ldy #$00
+    ldx #4
+    ldy #0
   !:
     lda CurrentScore - 1, x
     bne NonZero
@@ -224,24 +225,24 @@ ReduceDismissalCounter: {
     bne !-
 
   RangerDismissal:
-    lda #$00
+    lda #0
     sta DismissalLabel + $0b
     inc DismissalCompleted
     jmp Done
 
   Reduce:
-    lda #$00
+    lda #0
     sta DismissalLabel, x
 
   Done:
-    jmp DrawDismissal
+    jmp DrawDismissal   // jsr + rts
 
   DismissalCompleted: .byte $00
 }
 
 * = * "Hud ResetDismissalCounter"
 ResetDismissalCounter: {
-    ldx #05
+    ldx #5
     lda #DismissalAliveChar
   !:
     sta DismissalLabel + $0a, x
@@ -253,7 +254,7 @@ ResetDismissalCounter: {
 
 * = * "Hud DrawDismissal"
 DrawDismissal: {
-    ldx #$00
+    ldx #0
   LoopDismissal:
     lda DismissalLabel, x
   SelfMod:
@@ -270,7 +271,7 @@ DrawDismissal: {
 
     rts
 
-    .label DismissalPtr = $beef
+  .label DismissalPtr = $beef
 }
 
 CurrentScore: .byte $00, $00, $00, $00
@@ -280,7 +281,6 @@ ScoreLabel: .byte $14, $04, $10, $13, $06, $34, $00
             .byte ZeroChar, ZeroChar, ZeroChar, ZeroChar
 
 .label ZeroChar = $2a
-
 
 // "DISMISSAL: *****"
 DismissalLabel: .byte $05, $0a, $14, $0e, $0a, $14, $14, $02, $0d, $34, $00

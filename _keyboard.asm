@@ -10,6 +10,7 @@
 
 #importonce
 
+// Set Keyboard.ReturnPressed if return is pressed
 .macro IsReturnPressed() {
     lda #%11111110
     sta Keyboard.DetectKeyPressed.MaskOnPortA
@@ -19,6 +20,7 @@
     sta Keyboard.ReturnPressed
 }
 
+// Set Keyboard.IKeyPressed if I is pressed
 .macro IsIKeyPressed() {
     lda #%11101111
     sta Keyboard.DetectKeyPressed.MaskOnPortA
@@ -28,6 +30,7 @@
     sta Keyboard.IKeyPressed
 }
 
+// Set Keyboard.BackArrowPressed if "BACK ARROW" is pressed
 .macro IsBackArrowPressed() {
     lda #%01111111
     sta Keyboard.DetectKeyPressed.MaskOnPortA
