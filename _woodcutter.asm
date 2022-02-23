@@ -50,37 +50,37 @@
 
 // Update woodcutter frame
 .macro CallUpdateWoodCutterFrame(directionX, directionY, woodCutterFrame) {
-  lda directionX
-  sta WoodCutter.UpdateWoodCutterFrame.DirectionX
-  lda directionY
-  sta WoodCutter.UpdateWoodCutterFrame.DirectionY
+    lda directionX
+    sta WoodCutter.UpdateWoodCutterFrame.DirectionX
+    lda directionY
+    sta WoodCutter.UpdateWoodCutterFrame.DirectionY
 
-  lda woodCutterFrame
-  sta WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+    lda woodCutterFrame
+    sta WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
 
-  jsr WoodCutter.UpdateWoodCutterFrame
+    jsr WoodCutter.UpdateWoodCutterFrame
 
-  lda WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
-  sta woodCutterFrame
+    lda WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+    sta woodCutterFrame
 }
 
 // Update woodcutter frame with reverse hatchet
 .macro CallUpdateWoodCutterFrameReverse(directionX, directionY, woodCutterFrame) {
-  lda directionX
-  sec
-  sbc #2
-  sta WoodCutter.UpdateWoodCutterFrame.DirectionX
-  lda directionY
-  sta WoodCutter.UpdateWoodCutterFrame.DirectionY
+    lda directionX
+    sec
+    sbc #2
+    sta WoodCutter.UpdateWoodCutterFrame.DirectionX
+    lda directionY
+    sta WoodCutter.UpdateWoodCutterFrame.DirectionY
 
-  lda woodCutterFrame
-  sta WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+    lda woodCutterFrame
+    sta WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
 
-  jsr WoodCutter.UpdateWoodCutterFrame
+    jsr WoodCutter.UpdateWoodCutterFrame
 
-  lda WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
-  sta woodCutterFrame
-}
+    lda WoodCutter.UpdateWoodCutterFrame.WoodCutterFrame
+    sta woodCutterFrame
+  }
 
 .filenamespace WoodCutter
 
@@ -204,12 +204,9 @@ UpdateWoodCutterFrame: {
   NoMove:
     rts
 
-  WoodCutterFrame:
-    .byte $00
-  DirectionX:
-    .byte $00
-  DirectionY:
-    .byte $00
+  WoodCutterFrame: .byte $00
+  DirectionX: .byte $00
+  DirectionY: .byte $00
 }
 
 SetPosition: {
@@ -229,14 +226,10 @@ SetPosition: {
   Done:
     rts
 
-  NewX:
-    .byte $00
-  NewY:
-    .byte $00
-  SpriteXLow:
-    .byte $00
-  SpriteYLow:
-    .byte $00
+  NewX: .byte $00
+  NewY: .byte $00
+  SpriteXLow: .byte $00
+  SpriteYLow: .byte $00
 }
 
 ScreenMemoryAddress: .byte $be

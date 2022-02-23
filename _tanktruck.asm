@@ -66,14 +66,10 @@ SetPosition: {
   Done:
     rts
 
-  NewX:
-    .byte $00
-  NewY:
-    .byte $00
-  SpriteXLow:
-    .byte $00
-  SpriteYLow:
-    .byte $00
+  NewX: .byte $00
+  NewY: .byte $00
+  SpriteXLow: .byte $00
+  SpriteYLow: .byte $00
 }
 
 #import "chipset/lib/vic2.asm"
