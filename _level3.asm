@@ -364,7 +364,6 @@ WoodCutterFromLeft: {
 
   StrokeHappened:
     dec HatchetStrokes
-    lda HatchetStrokes
     bne DoneFar
     inc CutCompleted
     jmp HideHatchet
@@ -378,8 +377,6 @@ WoodCutterFromLeft: {
   HideHatchet:
     lda #$00
     sta HatchetShown
-    lda #HatchetStrokesMax
-    sta HatchetStrokes
 
     EnableSprite(1, false)
 
@@ -454,6 +451,7 @@ WoodCutterFromLeft: {
     bne LookForTreeAvailable
     jmp Done
   CheckNextWoodCutter:
+    jsr SaveLeftTreeStrokesCount
     GetRandomUpTo(4)
     tax
     lda TreeAlreadyCut, x
@@ -479,28 +477,15 @@ WoodCutterFromLeft: {
   TreeAlreadyCut: .byte $00, $00, $00
 
   // Number of strokes to cut tree
-  .label HatchetStrokesMax = 20
-  HatchetStrokes: .byte HatchetStrokesMax
+  HatchetStrokes: .byte 0
 
-  HatchetFrame:
-    .byte $ff
-
-  WoodCutterFrame:
-    .byte $00
-
-  WoodCutterFined:
-    .byte $00
-
-  ComplaintShown:
-    .byte 0
-
-  HatchetShown:
-    .byte 0
-  CutCompleted:
-    .byte 0
-  WalkInCompleted:
-    .byte 0
-
+  HatchetFrame: .byte $ff
+  WoodCutterFrame: .byte $00
+  WoodCutterFined: .byte $00
+  ComplaintShown: .byte 0
+  HatchetShown: .byte 0
+  CutCompleted: .byte 0
+  WalkInCompleted: .byte 0
   CurrentWoodCutter: .byte $00
 
 // Woodcutter dummy data
@@ -514,6 +499,32 @@ WoodCutterFromLeft: {
   TreeStartAddress: .word $beef
 }
 
+* = * "Level3 SaveLeftTreeStrokesCount"
+SaveLeftTreeStrokesCount: {
+    lda WoodCutterFromLeft.CurrentWoodCutter
+    cmp #$01
+    beq SaveTree2StrokesCount
+    cmp #$02
+    beq SaveTree3StrokesCount
+
+  SaveTree1StrokesCount:
+    lda WoodCutterFromLeft.HatchetStrokes
+    sta SetLeftWoodCutterTrack.TreeStrokesCount1
+    jmp !+
+
+  SaveTree2StrokesCount:  
+    lda WoodCutterFromLeft.HatchetStrokes
+    sta SetLeftWoodCutterTrack.TreeStrokesCount2
+    jmp !+
+
+  SaveTree3StrokesCount:  
+    lda WoodCutterFromLeft.HatchetStrokes
+    sta SetLeftWoodCutterTrack.TreeStrokesCount3
+
+  !:
+    rts
+}
+
 * = * "Level3 SetLeftWoodCutterTrack"
 SetLeftWoodCutterTrack: {
     lda WoodCutterFromLeft.CurrentWoodCutter
@@ -523,6 +534,9 @@ SetLeftWoodCutterTrack: {
     beq FixForWoodCutter2
 
   FixForWoodCutter1:
+    lda TreeStrokesCount1
+    sta WoodCutterFromLeft.HatchetStrokes
+
     lda #TrackWalk1XStart
     sta WoodCutterFromLeft.TrackWalkXStart
     lda #TrackWalk1XEnd
@@ -544,6 +558,9 @@ SetLeftWoodCutterTrack: {
     jmp Done
 
   FixForWoodCutter2:
+    lda TreeStrokesCount2
+    sta WoodCutterFromLeft.HatchetStrokes
+
     lda #TrackWalk2XStart
     sta WoodCutterFromLeft.TrackWalkXStart
     lda #TrackWalk2XEnd
@@ -565,6 +582,9 @@ SetLeftWoodCutterTrack: {
     jmp Done
 
   FixForWoodCutter3:
+    lda TreeStrokesCount3
+    sta WoodCutterFromLeft.HatchetStrokes
+
     lda #TrackWalk3XStart
     sta WoodCutterFromLeft.TrackWalkXStart
     lda #TrackWalk3XEnd
@@ -599,6 +619,7 @@ SetLeftWoodCutterTrack: {
   .label DirectionY1      = 0
 
   TreeStartAddress1: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(9, 4)
+  TreeStrokesCount1: .byte HatchetStrokesMax
 
 // Second woodcutter track data
   .label TrackWalk2XStart = 0
@@ -608,6 +629,7 @@ SetLeftWoodCutterTrack: {
   .label DirectionY2      = 0
 
   TreeStartAddress2: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(5, 14)
+  TreeStrokesCount2: .byte HatchetStrokesMax
 
 // Third woodcutter track data
   .label TrackWalk3XStart = 0
@@ -617,6 +639,9 @@ SetLeftWoodCutterTrack: {
   .label DirectionY3      = 0
 
   TreeStartAddress3: .word ScreenMemoryBaseAddress + c64lib_getTextOffset(12, 17)
+  TreeStrokesCount3: .byte HatchetStrokesMax
+
+  .label HatchetStrokesMax = 20
 }
 
 * = * "Level3 AddTankTruck"
