@@ -122,7 +122,6 @@ UpdateFrame: {
     // If left frame edit occours, no other frame switch will be performed
   StoreSprite2:
     stx SPRITE_PTR
-    jmp NoMove
 
   NoMove:
     rts
