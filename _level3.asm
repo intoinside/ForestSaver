@@ -309,10 +309,7 @@ WoodCutterFromLeft: {
     bne HatchetStrike
 
     // Walk is done, hatchet must be set
-    lda c64lib.SPRITE_2_X
-    sta c64lib.SPRITE_1_X
-    lda c64lib.SPRITE_2_Y
-    sta c64lib.SPRITE_1_Y
+    SetSpriteToSamePosition(c64lib.SPRITE_2_X, c64lib.SPRITE_1_X)
 
     lda c64lib.SPRITE_MSB_X
     and #%00000100
