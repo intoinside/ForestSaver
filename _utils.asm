@@ -317,6 +317,16 @@ SetSpriteToForeground: {
     rts
 }
 
+.macro SetSpriteToSamePosition(Sprite1X, Sprite2X) {
+    lda Sprite1X
+    sta Sprite2X
+    lda Sprite1X + 1
+    sta Sprite2X + 1
+}
+.assert "SetSpriteToSamePosition($2000, $2100) ", { SetSpriteToSamePosition($2000, $2100) }, {
+  lda $2000; sta $2100; lda $2001; sta $2101
+}
+
 .macro EnableSprite(bSprite, bEnable) {
     ldy #bSprite
     lda SpriteNumberMask, y
