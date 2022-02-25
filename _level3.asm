@@ -310,20 +310,7 @@ WoodCutterFromLeft: {
 
     // Walk is done, hatchet must be set
     SetSpriteToSamePosition(c64lib.SPRITE_2_X, c64lib.SPRITE_1_X)
-
-    lda c64lib.SPRITE_MSB_X
-    and #%00000100
-    beq SetHatchetBitToZero
-    lda c64lib.SPRITE_MSB_X
-    ora #%00000010
-    jmp !+
-
-  SetHatchetBitToZero:
-    lda c64lib.SPRITE_MSB_X
-    and #%11111101
-
-  !:
-    sta c64lib.SPRITE_MSB_X
+    SetXBitToSameValue(2, 1)
 
     lda #SPRITES.HATCHET_REV
     sta SPRITE_1

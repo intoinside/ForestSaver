@@ -317,14 +317,39 @@ SetSpriteToForeground: {
     rts
 }
 
-.macro SetSpriteToSamePosition(Sprite1X, Sprite2X) {
-    lda Sprite1X
-    sta Sprite2X
-    lda Sprite1X + 1
-    sta Sprite2X + 1
+.macro SetSpriteToSamePosition(sprite1X, sprite2X) {
+    lda sprite1X
+    sta sprite2X
+    lda sprite1X + 1
+    sta sprite2X + 1
 }
 .assert "SetSpriteToSamePosition($2000, $2100) ", { SetSpriteToSamePosition($2000, $2100) }, {
   lda $2000; sta $2100; lda $2001; sta $2101
+}
+
+.macro SetXBitToSameValue(bitSource, bitDest) {
+  .const mask = List().add(
+    %00000001,
+    %00000010,
+    %00000100,
+    %00001000,
+    %00010000,
+    %00100000,
+    %01000000,
+    %10000000).lock();
+
+    lda c64lib.SPRITE_MSB_X    // 3by + 4
+    and #~(mask.get(bitDest))  // 2by + 2
+    sta c64lib.SPRITE_MSB_X    // 3by + 4
+    and #mask.get(bitSource)   // 2by + 2
+    lsr                        // 1by + 2
+    ora c64lib.SPRITE_MSB_X    // 3by + 4
+    sta c64lib.SPRITE_MSB_X    // 3by + 4
+                               //17by + 22cy
+}
+.assert "SetXBitToSameValue(2, 3) ", { SetXBitToSameValue(2, 3) }, {
+  lda $d010; and #%11110111; sta $d010;
+  and #%00000100; lsr; ora $d010; sta $d010
 }
 
 .macro EnableSprite(bSprite, bEnable) {
