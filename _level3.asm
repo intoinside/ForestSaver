@@ -86,12 +86,7 @@ Init: {
     sta c64lib.SPRITE_COL_1
 
 // Ranger coordinates
-    lda #$0
-    sta c64lib.SPRITE_MSB_X
-    lda #$50
-    sta c64lib.SPRITE_0_X
-    lda #$40
-    sta c64lib.SPRITE_0_Y
+    jsr Ranger.StartNewLevel
 
 // Optimization may be done
 // Ranger module init

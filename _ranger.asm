@@ -48,6 +48,18 @@ Init: {
     rts
 }
 
+* = * "Ranger StartNewLevel"
+StartNewLevel: {
+    lda #0
+    sta c64lib.SPRITE_MSB_X
+    lda #80
+    sta c64lib.SPRITE_0_X
+    lda #64
+    sta c64lib.SPRITE_0_Y
+
+    rts
+}
+
 * = * "Ranger HandleRangerMove"
 HandleRangerMove: {
     jsr GetOnlyFirePress
