@@ -274,7 +274,26 @@ DrawDismissal: {
   .label DismissalPtr = $beef
 }
 
-CurrentScore: .byte $00, $00, $00, $00
+* = * "Hud ConvertDismissalToPoint"
+ConvertDismissalToPoint: {
+    lda ReduceDismissalCounter.DismissalCompleted
+    bne Done
+
+    ldx #15
+  !:
+    jsr WaitRoutine
+    dex
+    bne !-
+
+    jsr ReduceDismissalCounter
+    jsr Sfx.PointConversion
+    AddPoints(0, 0, 4, 0)
+
+  Done:
+    rts
+}
+
+CurrentScore: .byte 0, 0, 0, 0
 
 // "SCORE: 0000"
 ScoreLabel: .byte $14, $04, $10, $13, $06, $34, $00
@@ -290,3 +309,6 @@ DismissalLabel: .byte $05, $0a, $14, $0e, $0a, $14, $14, $02, $0d, $34, $00
 .label DismissalAliveChar = $a4
 
 ScreenMemoryAddress: .word $be00
+
+#import "_sounds.asm"
+#import "_utils.asm"
